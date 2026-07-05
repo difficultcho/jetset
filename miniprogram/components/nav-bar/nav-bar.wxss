@@ -1,0 +1,44 @@
+.nav {
+  background: #fff;
+  flex-shrink: 0;
+}
+.nav.transparent {
+  background: transparent;
+}
+.nav.bordered {
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.nav-inner {
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+.nav.light .title {
+  color: #fff;
+}
+.back {
+  position: absolute;
+  left: 28rpx;
+  width: 20rpx;
+  height: 20rpx;
+  border-left: 4rpx solid #333;
+  border-bottom: 4rpx solid #333;
+  transform: rotate(45deg);
+  padding: 4rpx;
+}
+.nav.light .back {
+  border-color: #fff;
+}
+.right {
+  position: absolute;
+  right: 28rpx;
+  display: flex;
+  align-items: center;
+}

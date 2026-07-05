@@ -1,0 +1,8 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "prod-img": "/components/prod-img/prod-img",
+    "atc-modal": "/components/atc-modal/atc-modal",
+    "nav-bar": "/components/nav-bar/nav-bar"
+  }
+}

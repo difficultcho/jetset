@@ -1,0 +1,9 @@
+<view class="nav {{light ? 'light' : ''}} {{transparent ? 'transparent' : ''}} {{border && !light ? 'bordered' : ''}}" style="padding-top:{{sbh}}px;">
+  <view class="nav-inner">
+    <view wx:if="{{back}}" class="back" bindtap="onBack" />
+    <text class="title">{{title}}</text>
+    <view class="right">
+      <slot name="right" />
+    </view>
+  </view>
+</view>

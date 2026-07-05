@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "我的订单",
+  "usingComponents": {
+    "prod-img": "/components/prod-img/prod-img"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls /Users/mzhang/Workspaces/golf/backend/ 2>/dev/null | head -20; echo \"---\"; ls /Users/mzhang/Workspaces/golf/backend/scripts 2>/dev/null | head -10)",
+      "Read(//Users/mzhang/Workspaces/golf/backend/**)",
+      "Bash(docker --version)",
+      "Read(//opt/homebrew/**)",
+      "Bash(docker run --rm python:3.12-slim python -c ' *)"
+    ]
+  }
+}

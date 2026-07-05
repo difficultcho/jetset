@@ -1,0 +1,40 @@
+<view class="page">
+  <!-- 搜索 -->
+  <view class="search-wrap">
+    <view class="search-box">
+      <view class="search-icon" />
+      <input class="search-input" value="{{q}}" placeholder="搜索商品" placeholder-class="ph" bindinput="onSearch" />
+      <text class="search-btn">搜索</text>
+    </view>
+  </view>
+
+  <!-- 排序 -->
+  <view class="sort-row">
+    <text class="sort-item {{sortIdx === index ? 'on' : ''}}" wx:for="{{sorts}}" wx:key="*this" data-i="{{index}}" bindtap="pickSort">{{item}}</text>
+  </view>
+
+  <view class="body">
+    <!-- 左侧分类 -->
+    <scroll-view class="side" scroll-y>
+      <view class="side-head">阿尔卑斯系列</view>
+      <view class="side-item {{cat === item ? 'on' : ''}}" wx:for="{{cats}}" wx:key="*this" data-c="{{item}}" bindtap="pickCat">{{item}}</view>
+    </scroll-view>
+
+    <!-- 右侧商品列表 -->
+    <scroll-view class="list" scroll-y>
+      <view wx:if="{{list.length === 0}}" class="empty">该分类暂无商品</view>
+      <view class="row" wx:for="{{list}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
+        <view class="row-img"><prod-img prod="{{item}}" size="{{90}}" /></view>
+        <view class="row-info">
+          <view class="row-name clamp2">{{item.name}}</view>
+          <text wx:if="{{item.badge}}" class="row-badge">{{item.badge}}</text>
+          <view class="row-price">¥{{item.price}}<text class="row-price-dec">.0</text></view>
+        </view>
+        <view class="row-add" data-id="{{item.id}}" catchtap="openQuick" />
+      </view>
+      <view class="list-space" />
+    </scroll-view>
+  </view>
+
+  <atc-modal wx:if="{{quickAdd}}" prod="{{quickAdd}}" mode="cart" bind:close="closeQuick" bind:confirm="confirmQuick" />
+</view>

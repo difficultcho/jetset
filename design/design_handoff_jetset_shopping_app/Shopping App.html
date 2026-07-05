@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>JETSET 购物</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:linear-gradient(135deg,#0f0f14 0%,#1a1a2e 100%);min-height:100vh;display:flex;justify-content:center;align-items:center;font-family:'Noto Sans SC',-apple-system,sans-serif}
+::-webkit-scrollbar{display:none}
+input,button,textarea{font-family:'Noto Sans SC',-apple-system,sans-serif}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef}=React;
+
+/* ─── DATA ─── */
+const PRODS=[
+  {id:1,name:'男款防水冲锋衣',en:'HYDROVA-M 1.0',price:2399,cat:'冲锋衣',
+   colors:['林焰色（橙色）','冰岚色（蓝色）','焦岩色（黑色）'],sw:['#E86A2B','#5B9BD4','#2a2a2a'],
+   sizes:['XS','S','M','L','XL','XXL'],desc:'三层压胶防水工艺，10000mm防水指数，全缝线热压处理，适合各种极限户外环境。',badge:'热销'},
+  {id:2,name:'登山领队背包',en:'LEADA 1.0',price:599,cat:'包类',
+   colors:['黑色'],sw:['#1a1a1a'],sizes:['均码'],desc:'专业登山背包，40L大容量，多功能收纳分区，防水面料。'},
+  {id:3,name:'防水面料户外斜挎包',en:'TRAILVA 1.0',price:280,cat:'包类',
+   colors:['薰衣草紫','黑色'],sw:['#B8A6D4','#2a2a2a'],sizes:['均码'],desc:'随行斜挎包，考杜拉防水面料，可折叠收纳，轻便耐用。'},
+  {id:4,name:'男款无氟防泼水透气短裤',en:'HYDROP-M 1.0',price:799,cat:'短裤',
+   colors:['夜玄色（黑色）','石灰色'],sw:['#2a3a4a','#9a9a9a'],sizes:['XS','S','M','L','XL','XXL'],desc:'无氟防泼水工艺，4向弹力面料，透气舒适，适合户外徒步。'},
+  {id:5,name:'阿尔卑斯双镜片滑雪镜',en:'ALPINA 1.0',price:398,cat:'滑雪',
+   colors:['冰蓝色','焦岩色（黑色）'],sw:['#4A90D9','#2a2a2a'],sizes:['均码'],desc:'瑞士工艺双层防雾镜片，抗UV400，宽视野框架，适合高山滑雪场景。'},
+  {id:6,name:'保暖防风滑雪手套',en:'ZERMATT 1.0',price:328,cat:'滑雪',
+   colors:['雪岩白','焦岩色（黑色）','冰岚色（蓝色）'],sw:['#e8e8e8','#2a2a2a','#5B9BD4'],sizes:['S','M','L'],desc:'源自瑞士雪山工艺，三层防风保暖结构，触屏指尖设计，零下30°仍保持灵活。'},
+  {id:7,name:'美利奴羊毛滑雪头巾',en:'MATTERHORN 1.0',price:199,cat:'滑雪',
+   colors:['薰衣草紫','冰蓝色'],sw:['#B8A6D4','#5B9BD4'],sizes:['均码'],desc:'瑞士美利奴羊毛混纺，透气保暖，多种佩戴方式，滑雪徒步皆宜。'},
+  {id:8,name:'滑雪护具背部护板',en:'GLACIER 1.0',price:458,cat:'滑雪',
+   colors:['冰蓝色','灰色'],sw:['#6B9BD2','#888'],sizes:['均码'],desc:'高密度缓冲背板，符合欧洲雪具安全标准，专为高速滑降场景设计。'},
+];
+const LCATS=['冲锋衣','包类','短裤','开衫','登山鞋','短袖','滑雪'];
+
+/* ─── PRIMITIVES ─── */
+function PImg({prod,w=80,h=80,ci=0,style:st={},onClick}){
+  const c=(prod.sw||['#888'])[Math.min(ci,prod.sw.length-1)];
+  const nw=typeof w==='number'?w:80;
+  return(
+    <div onClick={onClick} style={{width:w,height:h,background:`${c}14`,
+      border:`1px solid ${c}30`,display:'flex',flexDirection:'column',
+      alignItems:'center',justifyContent:'center',overflow:'hidden',flexShrink:0,...st}}>
+      <div style={{display:'flex',alignItems:'center',gap:3,opacity:0.75}}>
+        <img src="assets/jetset-logo.png" style={{height:9,filter:'grayscale(1)'}}/>
+        <span style={{fontSize:7.5,color:c,fontWeight:900,letterSpacing:1}}>JETSET</span>
+      </div>
+      <div style={{width:'55%',height:1,background:c,margin:'4px 0',opacity:0.25}}/>
+      <div style={{width:nw*0.42,height:nw*0.42,borderRadius:'50%',
+        background:`${c}20`,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
+        <div style={{width:nw*0.22,height:nw*0.22,background:c,opacity:0.35,borderRadius:3,transform:'rotate(12deg)'}}/>
+      </div>
+      <div style={{fontSize:6.5,color:'#aaa',marginTop:3,textAlign:'center',padding:'0 6px',lineHeight:1.3}}>{prod.en}</div>
+    </div>
+  );
+}
+
+function Chevron({c='#ccc'}){
+  return<svg width="7"height="11"viewBox="0 0 7 11"fill="none"><path d="M1 1l5 4.5L1 10"stroke={c}strokeWidth="1.6"strokeLinecap="round"/></svg>;
+}
+function BackIcon({light}){
+  return<svg width="10"height="16"viewBox="0 0 10 16"fill="none"><path d="M8 2L2 8L8 14"stroke={light?'#fff':'#333'}strokeWidth="2"strokeLinecap="round"strokeLinejoin="round"/></svg>;
+}
+
+function MIcon({name,size=22,color='#6b6459'}){
+  const s={width:size,height:size,viewBox:'0 0 24 24',fill:'none',stroke:color,strokeWidth:'1.5',strokeLinecap:'round',strokeLinejoin:'round'};
+  const paths={
+    pay:<><rect x="3"y="6"width="18"height="13"rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></>,
+    ship:<><rect x="2"y="7"width="13"height="9"rx="1"/><path d="M15 10h3l3 3v3h-6z"/><circle cx="7"cy="18"r="1.6"/><circle cx="17.5"cy="18"r="1.6"/></>,
+    truck:<><path d="M3 16V6h9v10"/><path d="M12 10h4l4 3v3h-8"/><circle cx="7"cy="18.5"r="1.5"/><circle cx="17"cy="18.5"r="1.5"/></>,
+    star:<path d="M12 3l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.1 6.1-.6z"/>,
+    refund:<><path d="M4 9a8 8 0 1114 5.5"/><path d="M4 4v5h5"/></>,
+    cart:<><path d="M3 4h2.2l2.8 10.5H17l2.5-8H6"/><circle cx="10"cy="20"r="1.4"/><circle cx="16"cy="20"r="1.4"/></>,
+    task:<><rect x="4"y="3"width="16"height="18"rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></>,
+    gift:<><rect x="3"y="8"width="18"height="13"rx="1"/><path d="M3 12h18"/><path d="M12 8v13"/><path d="M12 8c-1.5-4-6-4-6-1.2C6 8.5 8 8 12 8zM12 8c1.5-4 6-4 6-1.2C18 8.5 16 8 12 8z"/></>,
+    chat:<><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></>,
+    shop2:<><path d="M3 9l1-5h16l1 5"/><path d="M3 9a2.5 2.5 0 005 0 2.5 2.5 0 005 0 2.5 2.5 0 005 0 2.5 2.5 0 005 0"/><path d="M5 9v10h14V9"/><path d="M9.5 19v-5h5v5"/></>,
+  };
+  return<svg {...s}>{paths[name]}</svg>;
+}
+
+function SBar({light,abs}){
+  return(
+    <div style={{height:44,flexShrink:0,display:'flex',alignItems:'center',
+      justifyContent:'space-between',padding:'0 20px',zIndex:10,
+      position:abs?'absolute':'relative',top:0,left:0,right:0,
+      background:abs?'transparent':light?'transparent':'#fff',
+      color:light?'#fff':'#1a1a1a'}}>
+      <span style={{fontSize:15,fontWeight:700}}>21:50</span>
+      <div style={{display:'flex',alignItems:'center',gap:5}}>
+        <span style={{fontSize:11,fontWeight:600}}>5G</span>
+        <svg width="18"height="10"viewBox="0 0 18 10"fill={light?'#fff':'#1a1a1a'}>
+          <rect x="0"y="3"width="3"height="7"rx="0.5"/>
+          <rect x="4.5"y="1.5"width="3"height="8.5"rx="0.5"/>
+          <rect x="9"y="0"width="3"height="10"rx="0.5"/>
+          <rect x="13.5"y="0"width="3"height="10"rx="0.5"opacity="0.3"/>
+        </svg>
+        <svg width="24"height="11"viewBox="0 0 24 11"fill="none">
+          <rect x="0.5"y="0.5"width="20"height="10"rx="2.5"stroke={light?'rgba(255,255,255,0.6)':'rgba(0,0,0,0.35)'}/>
+          <rect x="1.5"y="1.5"width="14"height="8"rx="1.5"fill={light?'#fff':'#1a1a1a'}/>
+          <path d="M22 3.5v4a2 2 0 000-4z"fill={light?'rgba(255,255,255,0.4)':'rgba(0,0,0,0.3)'}/>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+function NHdr({title,onBack,light,right,noBorder}){
+  return(
+    <div style={{height:44,flexShrink:0,display:'flex',alignItems:'center',
+      justifyContent:'center',position:'relative',zIndex:5,
+      background:light?'transparent':'#fff',
+      borderBottom:noBorder||light?'none':'1px solid #f0f0f0',
+      color:light?'#fff':'#1a1a1a'}}>
+      {onBack&&<div onClick={onBack} style={{position:'absolute',left:14,cursor:'pointer',padding:'4px 8px 4px 0'}}><BackIcon light={light}/></div>}
+      <span style={{fontSize:16,fontWeight:600}}>{title}</span>
+      {right&&<div style={{position:'absolute',right:14}}>{right}</div>}
+    </div>
+  );
+}
+
+function Scr({children,bg='#f5f5f5',style:st={},...rest}){
+  return<div style={{height:'100%',display:'flex',flexDirection:'column',background:bg,...st}} {...rest}>{children}</div>;
+}
+function Sv({children,style:st={}}){
+  return<div style={{flex:1,overflowY:'auto',...st}}>{children}</div>;
+}
+function Div8(){return<div style={{height:8,background:'#f5f5f5',flexShrink:0}}/>;}
+function SecHdr({label}){
+  return<div style={{padding:'8px 16px',background:'#f0f0f0',fontSize:12,color:'#888',fontWeight:500,flexShrink:0}}>{label}</div>;
+}
+function Row({label,value,onClick,border=true}){
+  return(
+    <div onClick={onClick} style={{display:'flex',alignItems:'center',justifyContent:'space-between',
+      padding:'13px 16px',background:'#fff',borderBottom:border?'1px solid #f5f5f5':'none',cursor:onClick?'pointer':'default'}}>
+      <span style={{fontSize:14,color:'#333'}}>{label}</span>
+      <span style={{fontSize:14,color:'#999',display:'flex',alignItems:'center',gap:6}}>
+        {value}{onClick&&<Chevron/>}
+      </span>
+    </div>
+  );
+}
+function Btn({label,onClick,outline,disabled,style:st={}}){
+  return(
+    <button onClick={onClick} disabled={disabled}
+      style={{padding:'13px',background:disabled?'#e0e0e0':outline?'#fff':'#1a1a1a',
+        color:disabled?'#aaa':outline?'#1a1a1a':'#fff',
+        border:outline?'1px solid #1a1a1a':'none',
+        borderRadius:24,fontSize:15,fontWeight:500,cursor:disabled?'not-allowed':'pointer',
+        fontFamily:'inherit',width:'100%',...st}}>
+      {label}
+    </button>
+  );
+}
+
+/* ─── TAB BAR ─── */
+function TabBar({active,onChange,cnt}){
+  const tabs=[
+    {k:'home',l:'首页',icon:a=>(
+      <svg width="24"height="24"viewBox="0 0 24 24"fill="none">
+        <path d="M3 10.5L12 3l9 7.5V21h-6v-6H9v6H3z"stroke={a?'#000':'#bbb'}strokeWidth="1.6"fill={a?'#000':'none'}/>
+      </svg>)},
+    {k:'shop',l:'商品',icon:a=>(
+      <svg width="24"height="24"viewBox="0 0 24 24"fill="none">
+        <rect x="3"y="7"width="18"height="14"rx="2"stroke={a?'#000':'#bbb'}strokeWidth="1.6"/>
+        <path d="M8 7V5a4 4 0 018 0v2"stroke={a?'#000':'#bbb'}strokeWidth="1.6"strokeLinecap="round"/>
+        <path d="M8 13h8M8 17h5"stroke={a?'#000':'#bbb'}strokeWidth="1.5"strokeLinecap="round"/>
+      </svg>)},
+    {k:'cart',l:'购物车',icon:a=>(
+      <svg width="24"height="24"viewBox="0 0 24 24"fill="none">
+        <path d="M2 3h2.2l2.8 10.5H17l2.5-8H6"stroke={a?'#000':'#bbb'}strokeWidth="1.6"strokeLinecap="round"strokeLinejoin="round"/>
+        <circle cx="10"cy="20"r="1.5"fill={a?'#000':'#bbb'}/>
+        <circle cx="16"cy="20"r="1.5"fill={a?'#000':'#bbb'}/>
+      </svg>)},
+    {k:'wholesale',l:'批发',icon:a=>(
+      <svg width="24"height="24"viewBox="0 0 24 24"fill="none">
+        <rect x="4"y="2"width="16"height="20"rx="2"stroke={a?'#000':'#bbb'}strokeWidth="1.6"/>
+        <path d="M8 8h8M8 12h8M8 16h5"stroke={a?'#000':'#bbb'}strokeWidth="1.5"strokeLinecap="round"/>
+      </svg>)},
+    {k:'mine',l:'我的',icon:a=>(
+      <svg width="24"height="24"viewBox="0 0 24 24"fill="none">
+        <circle cx="12"cy="8"r="4"stroke={a?'#000':'#bbb'}strokeWidth="1.6"/>
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"stroke={a?'#000':'#bbb'}strokeWidth="1.6"strokeLinecap="round"/>
+      </svg>)},
+  ];
+  return(
+    <div style={{height:82,borderTop:'1px solid #e8e8e8',background:'#fff',display:'flex',flexShrink:0}}>
+      {tabs.map(t=>(
+        <div key={t.k} onClick={()=>onChange(t.k)}
+          style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',
+            justifyContent:'center',gap:3,cursor:'pointer',position:'relative',paddingBottom:16}}>
+          {t.icon(active===t.k)}
+          {t.k==='cart'&&cnt>0&&(
+            <div style={{position:'absolute',top:6,left:'50%',marginLeft:3,
+              background:'#ff3b30',color:'#fff',borderRadius:10,fontSize:9,
+              fontWeight:700,minWidth:15,height:15,display:'flex',
+              alignItems:'center',justifyContent:'center',padding:'0 4px'}}>{cnt}</div>
+          )}
+          <span style={{fontSize:10,color:active===t.k?'#000':'#bbb',fontWeight:active===t.k?600:400}}>{t.l}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════
+   HOME TAB
+══════════════════════════════════ */
+function HomeTab({goTab}){
+  const [slide,setSlide]=useState(0);
+  const slides=[
+    {title:'山海无界  陪伴无休',sub:'EXPLORE WITHOUT LIMITS'},
+    {title:'专业户外  品质之选',sub:'PROFESSIONAL OUTDOOR GEAR'},
+    {title:'瑞士阿尔卑斯  滑雪季',sub:'SWISS ALPS SKI SEASON'},
+  ];
+  useEffect(()=>{const t=setInterval(()=>setSlide(s=>(s+1)%3),3500);return()=>clearInterval(t);},[]);
+
+  return(
+    <Scr bg="#f5f5f5" style={{position:'relative'}}>
+      {/* HERO */}
+      <div style={{flexShrink:0,height:290,position:'relative',overflow:'hidden',
+        background:slide===0?'#141410':slide===1?'#101418':'#101014',transition:'background 0.8s'}}>
+        <SBar light abs/>
+        {/* Decorative */}
+        <div style={{position:'absolute',inset:0,overflow:'hidden',pointerEvents:'none'}}>
+          <div style={{position:'absolute',top:-60,right:-60,width:280,height:280,
+            borderRadius:'50%',background:'rgba(255,255,255,0.015)'}}/>
+          <div style={{position:'absolute',bottom:-80,left:-40,width:320,height:320,
+            borderRadius:'50%',background:'rgba(255,255,255,0.015)'}}/>
+          <div style={{position:'absolute',top:60,left:-10,fontSize:90,fontWeight:900,
+            color:'rgba(255,255,255,0.025)',letterSpacing:-2,lineHeight:1}}>JETSET</div>
+          {/* Outdoor silhouette abstraction */}
+          <svg style={{position:'absolute',right:20,bottom:60,opacity:0.06}} width="120"height="80"viewBox="0 0 120 80"fill="white">
+            <path d="M20 80L60 10L100 80z"/>
+            <path d="M0 80L35 30L70 80z"/>
+          </svg>
+        </div>
+        <div style={{position:'absolute',top:8,left:0,right:0,textAlign:'center',zIndex:5,display:'flex',alignItems:'center',justifyContent:'center',gap:7}}>
+          <img src="assets/jetset-logo.png" style={{height:20,filter:'invert(1) brightness(1.6)'}}/>
+          <span style={{fontSize:17,fontWeight:900,color:'#fff',letterSpacing:3}}>JETSET</span>
+        </div>
+        <div style={{position:'absolute',bottom:52,left:0,right:0,textAlign:'center',padding:'0 24px',zIndex:5,transition:'opacity 0.4s'}}>
+          <div style={{fontSize:22,fontWeight:700,color:'#fff',letterSpacing:3,textShadow:'0 2px 12px rgba(0,0,0,0.6)'}}>{slides[slide].title}</div>
+          <div style={{fontSize:9,color:'rgba(255,255,255,0.5)',letterSpacing:4,marginTop:8}}>{slides[slide].sub}</div>
+        </div>
+        {/* Dots */}
+        <div style={{position:'absolute',bottom:24,left:0,right:0,display:'flex',justifyContent:'center',gap:6,zIndex:5}}>
+          {[0,1,2].map(i=>(
+            <div key={i} onClick={()=>setSlide(i)}
+              style={{width:i===slide?22:5,height:3,borderRadius:2,cursor:'pointer',
+                background:i===slide?'#fff':'rgba(255,255,255,0.35)',transition:'all 0.3s'}}/>
+          ))}
+        </div>
+      </div>
+
+      <Sv>
+        {/* Section header */}
+        <div style={{background:'#fff',padding:'18px 0 10px',textAlign:'center',borderBottom:'1px solid #f0f0f0'}}>
+          <div style={{fontSize:19,fontWeight:700,letterSpacing:1}}>热销推荐</div>
+          <div style={{fontSize:9,color:'#bbb',letterSpacing:3,marginTop:3}}>HOT SELLING RECOMMENDATIONS</div>
+        </div>
+        {/* Horizontal scroll */}
+        <div style={{background:'#fff',paddingBottom:14}}>
+          <div style={{display:'flex',overflowX:'auto',padding:'12px 16px 0',gap:10,WebkitOverflowScrolling:'touch'}}>
+            {PRODS.slice(0,5).map(p=>(
+              <div key={p.id} onClick={()=>goTab('shop')} style={{flexShrink:0,width:148,cursor:'pointer',
+                background:'#f8f8f8',borderRadius:10,overflow:'hidden',border:'1px solid #f0f0f0'}}>
+                <PImg prod={p} w={148} h={128} style={{borderRadius:0,width:148,height:128}}/>
+                <div style={{padding:'8px 10px 10px'}}>
+                  <div style={{fontSize:12,color:'#333',lineHeight:1.45,height:35,overflow:'hidden',
+                    display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical'}}>{p.name}</div>
+                  <div style={{fontSize:14,fontWeight:700,color:'#1a1a1a',marginTop:5}}>¥{p.price}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <Div8/>
+        {/* Featured card */}
+        <div style={{background:'#fff',padding:'14px 16px'}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+            <span style={{fontSize:14,fontWeight:600,color:'#1a1a1a'}}>精选好物</span>
+            <span onClick={()=>goTab('shop')} style={{fontSize:12,color:'#999',cursor:'pointer'}}>查看全部 ›</span>
+          </div>
+          <div onClick={()=>goTab('shop')} style={{cursor:'pointer',borderRadius:12,overflow:'hidden',
+            border:`1px solid ${PRODS[2].sw[0]}22`}}>
+            <PImg prod={PRODS[2]} w={'100%'} h={190} style={{width:'100%',height:190,borderRadius:0}}/>
+            <div style={{padding:'12px 14px 14px',background:`${PRODS[2].sw[0]}08`,
+              display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <div>
+                <div style={{fontSize:9,color:'#aaa',letterSpacing:1}}>JETSET – {PRODS[2].en}</div>
+                <div style={{fontSize:15,fontWeight:600,color:'#1a1a1a',marginTop:2}}>{PRODS[2].name}</div>
+              </div>
+              <div style={{background:'#1a1a1a',color:'#fff',borderRadius:20,
+                padding:'8px 14px',fontSize:13,fontWeight:700,whiteSpace:'nowrap'}}>¥{PRODS[2].price}</div>
+            </div>
+          </div>
+        </div>
+        <Div8/>
+        {/* 2-col grid */}
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:1.5,background:'#eee'}}>
+          {PRODS.slice(3).map(p=>(
+            <div key={p.id} onClick={()=>goTab('shop')} style={{background:'#fff',cursor:'pointer',padding:'12px 12px 14px'}}>
+              <PImg prod={p} w={'100%'} h={138} style={{width:'100%',height:138,borderRadius:8}}/>
+              <div style={{fontSize:12,color:'#333',marginTop:8,lineHeight:1.45,height:35,overflow:'hidden',
+                display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical'}}>{p.name}</div>
+              <div style={{fontSize:14,fontWeight:600,color:'#1a1a1a',marginTop:4}}>¥{p.price}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{height:16}}/>
+      </Sv>
+    </Scr>
+  );
+}
+
+/* ══════════════════════════════════
+   SHOP – ADD TO CART MODAL
+══════════════════════════════════ */
+function ATCModal({prod,onClose,onAdd,mode='cart'}){
+  const [ci,setCi]=useState(0);
+  const [si,setSi]=useState(prod.sizes.length===1?0:null);
+  const ok=si!==null;
+
+  return(
+    <div style={{position:'absolute',inset:0,zIndex:100,display:'flex',flexDirection:'column',justifyContent:'flex-end'}}>
+      <div onClick={onClose} style={{flex:1,background:'rgba(0,0,0,0.5)'}}/>
+      <div style={{background:'#fff',borderRadius:'18px 18px 0 0',maxHeight:'78%',overflowY:'auto'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',padding:'20px 16px 0'}}>
+          <div>
+            <div style={{fontSize:26,fontWeight:700}}>¥{prod.price}</div>
+            <div style={{fontSize:12,color:'#aaa',marginTop:4}}>
+              请选择{prod.colors.length>1?' 颜色':''}{prod.sizes.length>1?' 尺码':''}
+            </div>
+          </div>
+          <div onClick={onClose} style={{cursor:'pointer',fontSize:22,color:'#ccc',lineHeight:1,padding:4}}>×</div>
+        </div>
+        {/* Colors */}
+        {prod.colors.length>1&&(
+          <div style={{padding:'16px 16px 0'}}>
+            <div style={{fontSize:14,fontWeight:600,marginBottom:10}}>颜色</div>
+            <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+              {prod.colors.map((c,i)=>(
+                <div key={i} onClick={()=>setCi(i)} style={{cursor:'pointer',textAlign:'center'}}>
+                  <PImg prod={prod} w={88} h={70} ci={i}
+                    style={{borderRadius:6,border:`2px solid ${ci===i?'#1a1a1a':'transparent'}`,transition:'border 0.15s'}}/>
+                  <div style={{fontSize:10,color:ci===i?'#1a1a1a':'#888',marginTop:4,maxWidth:88,lineHeight:1.3}}>{c}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {/* Sizes */}
+        {prod.sizes.length>1&&(
+          <div style={{padding:'16px 16px 0'}}>
+            <div style={{fontSize:14,fontWeight:600,marginBottom:10}}>尺码</div>
+            <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+              {prod.sizes.map((sz,i)=>(
+                <div key={i} onClick={()=>setSi(i)}
+                  style={{border:`1px solid ${si===i?'#1a1a1a':'#e0e0e0'}`,borderRadius:6,
+                    padding:'8px 16px',cursor:'pointer',fontSize:14,transition:'all 0.15s',
+                    background:si===i?'#1a1a1a':'#fff',color:si===i?'#fff':'#333'}}>
+                  {sz}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        <div style={{padding:'20px 16px 28px'}}>
+          <Btn label={mode==='cart'?'加入购物车':'立即购买'} onClick={()=>{if(ok)onAdd({prod,ci,si:si??0,qty:1});}} disabled={!ok}/>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ──── PRODUCT DETAIL ──── */
+function ProdDetail({prod,onBack,onAddToCart,onOrderNow}){
+  const [ci,setCi]=useState(0);
+  const [modal,setModal]=useState(null); // 'cart'|'buy'
+  const touch=useRef({x:0,y:0});
+  const onTS=e=>{touch.current={x:e.touches[0].clientX,y:e.touches[0].clientY};};
+  const onTE=e=>{
+    const dx=e.changedTouches[0].clientX-touch.current.x;
+    const dy=e.changedTouches[0].clientY-touch.current.y;
+    if(dx>80&&Math.abs(dy)<60) onBack();
+  };
+
+  return(
+    <Scr bg="#fff" style={{position:'relative'}} onTouchStart={onTS} onTouchEnd={onTE}>
+      {/* Image hero */}
+      <div style={{flexShrink:0,height:300,position:'relative',overflow:'hidden',background:'#f8f8f8'}}>
+        <div style={{position:'absolute',top:0,left:0,right:0,zIndex:5,
+          background:'linear-gradient(rgba(0,0,0,0.25),transparent)'}}>
+          <SBar light abs/>
+          <NHdr title={prod.en} light noBorder/>
+        </div>
+        <PImg prod={prod} w={'100%'} h={300} ci={ci} style={{width:'100%',height:'100%',borderRadius:0}}/>
+        {/* Color indicator dots */}
+        <div style={{position:'absolute',bottom:12,left:0,right:0,display:'flex',justifyContent:'center',gap:7}}>
+          {prod.colors.map((_,i)=>(
+            <div key={i} onClick={()=>setCi(i)}
+              style={{width:i===ci?22:7,height:7,borderRadius:4,cursor:'pointer',
+                background:prod.sw[i],border:`2px solid ${i===ci?'#fff':'transparent'}`,
+                boxShadow:i===ci?'0 0 0 1px rgba(0,0,0,0.2)':'none',transition:'all 0.2s'}}/>
+          ))}
+        </div>
+      </div>
+
+      {/* Thumbnails */}
+      <div style={{display:'flex',gap:8,padding:'10px 14px',background:'#fff',
+        borderBottom:'1px solid #f0f0f0',flexShrink:0}}>
+        {prod.colors.map((_,i)=>(
+          <PImg key={i} prod={prod} w={54} h={54} ci={i}
+            style={{border:`2px solid ${i===ci?'#1a1a1a':'#e8e8e8'}`,borderRadius:5,cursor:'pointer',transition:'border 0.15s'}}
+            onClick={()=>setCi(i)}/>
+        ))}
+      </div>
+
+      <Sv>
+        <div style={{padding:'16px 16px 12px'}}>
+          <div style={{fontSize:28,fontWeight:700,letterSpacing:-0.5}}>¥{prod.price}</div>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginTop:8}}>
+            <div style={{fontSize:16,fontWeight:600,color:'#1a1a1a',flex:1,lineHeight:1.4,paddingRight:12}}>{prod.name}</div>
+            <div style={{textAlign:'center',cursor:'pointer',flexShrink:0}}>
+              <svg width="18"height="18"viewBox="0 0 18 18"fill="none">
+                <path d="M12 3h3v3M15 3L9 9M7 4H4a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1v-3"stroke="#aaa"strokeWidth="1.5"strokeLinecap="round"/>
+              </svg>
+              <div style={{fontSize:9,color:'#aaa',marginTop:2}}>分享</div>
+            </div>
+          </div>
+          <div style={{fontSize:12,color:'#999',marginTop:8,lineHeight:1.8}}>{prod.desc}</div>
+        </div>
+        <Div8/>
+        <Row label="配送" value="选择地址查看配送时间" onClick={()=>{}}/>
+        <Div8/>
+        <div style={{padding:'12px 16px',background:'#fff'}}>
+          <div style={{fontSize:14,fontWeight:600,marginBottom:10}}>已选颜色</div>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+            {prod.colors.map((c,i)=>(
+              <div key={i} onClick={()=>setCi(i)}
+                style={{border:`1px solid ${ci===i?'#1a1a1a':'#e0e0e0'}`,borderRadius:6,
+                  padding:'6px 14px',cursor:'pointer',fontSize:13,
+                  background:ci===i?'#1a1a1a':'#fff',color:ci===i?'#fff':'#555',transition:'all 0.15s'}}>
+                {c}
+              </div>
+            ))}
+          </div>
+        </div>
+        <Div8/>
+        <div style={{padding:'16px',background:'#fff'}}>
+          <div style={{fontSize:14,fontWeight:600,color:'#333',marginBottom:8}}>商品详情</div>
+          <div style={{fontSize:13,color:'#666',lineHeight:1.9}}>{prod.desc}专为户外爱好者设计，高性能防水面料，轻量化结构，满足登山、徒步、露营等多种场景需求。</div>
+        </div>
+        <div style={{height:90}}/>
+      </Sv>
+
+      {/* Bottom action */}
+      <div style={{borderTop:'1px solid #f0f0f0',padding:'10px 16px',background:'#fff',
+        display:'flex',gap:10,alignItems:'center',flexShrink:0,paddingBottom:18}}>
+        <div style={{textAlign:'center',cursor:'pointer',flexShrink:0,width:46,height:46,
+          display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:1,
+          border:'1px solid #eee',borderRadius:23,background:'#fafafa'}}>
+          <MIcon name="chat" size={18} color="#555"/>
+          <div style={{fontSize:8.5,color:'#777'}}>客服</div>
+        </div>
+        <button onClick={()=>setModal('cart')}
+          style={{flex:0.8,height:46,padding:0,background:'#fff',border:'1px solid #1a1a1a',
+            borderRadius:23,fontSize:13,fontWeight:500,cursor:'pointer',fontFamily:'inherit'}}>
+          加入购物车
+        </button>
+        <button onClick={()=>setModal('buy')}
+          style={{flex:0.8,height:46,padding:0,background:'#1a1a1a',border:'none',
+            borderRadius:23,fontSize:13,fontWeight:500,color:'#fff',cursor:'pointer',fontFamily:'inherit'}}>
+          立即购买
+        </button>
+      </div>
+
+      {modal&&<ATCModal prod={prod} mode={modal} onClose={()=>setModal(null)}
+        onAdd={item=>{if(modal==='cart'){onAddToCart(item);setModal(null);}else{onOrderNow(item);setModal(null);}}}/>}
+    </Scr>
+  );
+}
+
+/* ──── ORDER CONFIRM ──── */
+function OrderConfirm({items,addresses,onBack,onSubmit}){
+  const [note,setNote]=useState('');
+  const [qtys,setQtys]=useState(items.map(()=>1));
+  const total=items.reduce((s,it,i)=>s+it.prod.price*qtys[i],0);
+  const addr=addresses[0];
+  const chQty=(i,d)=>setQtys(q=>q.map((v,j)=>j===i?Math.max(1,v+d):v));
+
+  return(
+    <Scr bg="#f5f5f5">
+      <SBar/>
+      <NHdr title="确认订单" onBack={onBack}/>
+      <Sv>
+        {/* Address */}
+        <div style={{background:'#fff',padding:'14px 16px',marginBottom:8,cursor:'pointer'}}>
+          {addr?(
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <div>
+                <div style={{fontSize:15,fontWeight:600}}>{addr.name}
+                  <span style={{fontSize:13,fontWeight:400,color:'#666',marginLeft:10}}>{addr.phone}</span>
+                </div>
+                <div style={{fontSize:12,color:'#666',marginTop:4}}>{addr.address}</div>
+              </div>
+              <Chevron/>
+            </div>
+          ):(
+            <div>
+              <div style={{fontSize:11,color:'#aaa'}}>暂未获取到收货地址</div>
+              <div style={{fontSize:15,fontWeight:500,color:'#1a1a1a',marginTop:2,display:'flex',alignItems:'center',gap:4}}>
+                请新建收货地址 <Chevron c="#1a1a1a"/>
+              </div>
+            </div>
+          )}
+        </div>
+        {/* Items */}
+        <div style={{background:'#fff',marginBottom:8}}>
+          {items.map((it,i)=>(
+            <div key={i} style={{display:'flex',gap:12,padding:'14px 16px',
+              borderBottom:'1px solid #f5f5f5',alignItems:'flex-start'}}>
+              <PImg prod={it.prod} w={72} h={72} ci={it.ci} style={{borderRadius:6}}/>
+              <div style={{flex:1}}>
+                <div style={{fontSize:14,fontWeight:500,lineHeight:1.4}}>{it.prod.name}</div>
+                <div style={{fontSize:12,color:'#999',marginTop:3}}>
+                  {it.prod.colors[it.ci]}；{it.prod.sizes[it.si]}
+                </div>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:8}}>
+                  <span style={{fontSize:15,fontWeight:600}}>¥{it.prod.price}.00</span>
+                  <div style={{display:'flex',alignItems:'center',gap:10}}>
+                    {[-1,null,1].map((d,j)=>d===null
+                      ?<span key={j} style={{fontSize:14,fontWeight:600,minWidth:18,textAlign:'center'}}>{qtys[i]}</span>
+                      :<div key={j} onClick={()=>chQty(i,d)}
+                        style={{width:24,height:24,border:'1px solid #ddd',borderRadius:4,display:'flex',
+                          alignItems:'center',justifyContent:'center',cursor:'pointer',fontSize:15,color:'#555'}}>
+                        {d<0?'−':'+'}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Price summary */}
+        <div style={{background:'#fff',padding:'14px 16px',marginBottom:8}}>
+          {[
+            {l:`商品总价 共${items.length}件商品`,v:`¥${total}.00`},
+            {l:'优惠券',v:'暂无可用 ›',vc:'#aaa'},
+          ].map((r,i)=>(
+            <div key={i} style={{display:'flex',justifyContent:'space-between',marginBottom:10}}>
+              <span style={{fontSize:13,color:'#666'}}>{r.l}</span>
+              <span style={{fontSize:13,color:r.vc||'#333'}}>{r.v}</span>
+            </div>
+          ))}
+          <div style={{borderTop:'1px solid #f0f0f0',paddingTop:10,display:'flex',justifyContent:'space-between'}}>
+            <span style={{fontSize:13,color:'#666'}}>合计：</span>
+            <span style={{fontSize:15,fontWeight:700}}>¥{total}.00</span>
+          </div>
+        </div>
+        {/* Note */}
+        <div style={{background:'#fff',padding:'14px 16px',marginBottom:8}}>
+          <div style={{fontSize:13,color:'#888',marginBottom:8}}>订单备注</div>
+          <textarea value={note} onChange={e=>setNote(e.target.value)} placeholder="备注建议提前协商（250字以内）"
+            style={{width:'100%',border:'none',outline:'none',resize:'none',fontSize:13,
+              color:'#333',background:'transparent',height:56,fontFamily:'inherit'}}/>
+        </div>
+        <div style={{textAlign:'center',padding:'16px',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
+          <img src="assets/jetset-logo.png" style={{height:16,opacity:0.35}}/>
+          <span style={{color:'#ccc',fontSize:14,fontWeight:700,letterSpacing:2}}>JETSET</span>
+        </div>
+        <div style={{height:80}}/>
+      </Sv>
+      {/* Bottom bar */}
+      <div style={{borderTop:'1px solid #f0f0f0',padding:'10px 16px 18px',background:'#fff',
+        display:'flex',justifyContent:'space-between',alignItems:'center',flexShrink:0}}>
+        <div>
+          <span style={{fontSize:12,color:'#888'}}>应付：</span>
+          <span style={{fontSize:22,fontWeight:700}}>¥{total}.00</span>
+        </div>
+        <button onClick={onSubmit}
+          style={{padding:'12px 28px',background:'#1a1a1a',color:'#fff',border:'none',
+            borderRadius:22,fontSize:15,fontWeight:500,cursor:'pointer',fontFamily:'inherit'}}>
+          提交订单
+        </button>
+      </div>
+    </Scr>
+  );
+}
+
+/* ──── SHOP LIST ──── */
+function ShopList({onProd,setCart}){
+  const [cat,setCat]=useState('冲锋衣');
+  const [q,setQ]=useState('');
+  const [quickAdd,setQuickAdd]=useState(null);
+  const filtered=PRODS.filter(p=>(p.cat===cat)&&(!q||p.name.includes(q)));
+
+  return(
+    <Scr style={{position:'relative'}}>
+      <SBar/>
+      <NHdr title="所有商品"/>
+      {/* Search */}
+      <div style={{padding:'8px 12px',background:'#fff',borderBottom:'1px solid #f0f0f0',flexShrink:0}}>
+        <div style={{display:'flex',gap:8,alignItems:'center',background:'#f5f5f5',borderRadius:20,padding:'7px 14px'}}>
+          <svg width="13"height="13"viewBox="0 0 13 13"fill="none">
+            <circle cx="5.5"cy="5.5"r="4"stroke="#bbb"strokeWidth="1.4"/>
+            <path d="M8.5 8.5l3 3"stroke="#bbb"strokeWidth="1.4"strokeLinecap="round"/>
+          </svg>
+          <input value={q} onChange={e=>setQ(e.target.value)} placeholder="搜索商品"
+            style={{flex:1,border:'none',background:'transparent',outline:'none',fontSize:13,color:'#333'}}/>
+          <span style={{fontSize:13,color:'#333',fontWeight:500,cursor:'pointer'}}>搜索</span>
+        </div>
+      </div>
+      {/* Sort */}
+      <div style={{display:'flex',background:'#fff',borderBottom:'1px solid #f0f0f0',flexShrink:0,paddingLeft:4}}>
+        {['综合','销量','价格','上新'].map(t=>(
+          <div key={t} style={{padding:'9px 14px',fontSize:12,color:'#555',cursor:'pointer'}}>{t}</div>
+        ))}
+      </div>
+      {/* Body */}
+      <div style={{flex:1,display:'flex',overflow:'hidden'}}>
+        {/* Sidebar */}
+        <div style={{width:78,background:'#f9f9f9',overflowY:'auto',flexShrink:0,borderRight:'1px solid #f0f0f0'}}>
+          <div style={{padding:'10px 0 6px',fontSize:11,color:'#888',textAlign:'center',fontWeight:600}}>阿尔卑斯系列</div>
+          {LCATS.map(c=>(
+            <div key={c} onClick={()=>setCat(c)}
+              style={{padding:'11px 0 11px 10px',fontSize:13,cursor:'pointer',
+                color:cat===c?'#1a1a1a':'#777',fontWeight:cat===c?600:400,
+                background:cat===c?'#fff':'transparent',
+                borderLeft:cat===c?'3px solid #1a1a1a':'3px solid transparent'}}>
+              {c}
+            </div>
+          ))}
+        </div>
+        {/* Products */}
+        <div style={{flex:1,overflowY:'auto',background:'#f5f5f5'}}>
+          {filtered.length===0
+            ?<div style={{padding:'40px 20px',textAlign:'center',color:'#bbb',fontSize:14}}>该分类暂无商品</div>
+            :filtered.map(p=>(
+            <div key={p.id} style={{display:'flex',gap:10,padding:'12px 12px',marginBottom:1,
+              background:'#fff',cursor:'pointer',alignItems:'flex-start'}} onClick={()=>onProd(p)}>
+              <PImg prod={p} w={90} h={90} style={{borderRadius:6}}/>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:13,color:'#1a1a1a',lineHeight:1.5,overflow:'hidden',
+                  display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical'}}>{p.name}</div>
+                {p.badge&&<span style={{background:'#ff4444',color:'#fff',fontSize:9,padding:'1px 5px',borderRadius:3,marginTop:3,display:'inline-block'}}>{p.badge}</span>}
+                <div style={{fontSize:16,fontWeight:700,color:'#1a1a1a',marginTop:6}}>
+                  ¥{p.price}<span style={{fontSize:10,fontWeight:400}}>.0</span>
+                </div>
+              </div>
+              <div onClick={e=>{e.stopPropagation();setQuickAdd(p);}}
+                style={{width:32,height:32,border:'1px solid #e0e0e0',borderRadius:16,
+                  display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',flexShrink:0,alignSelf:'flex-end'}}>
+                <svg width="15"height="14"viewBox="0 0 15 14"fill="none">
+                  <path d="M1 1h1.3L4.5 9H10l1.5-5H4"stroke="#888"strokeWidth="1.2"strokeLinecap="round"/>
+                  <circle cx="5.5"cy="12"r="1"fill="#888"/>
+                  <circle cx="9.5"cy="12"r="1"fill="#888"/>
+                </svg>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {quickAdd&&<ATCModal prod={quickAdd} mode="cart" onClose={()=>setQuickAdd(null)}
+        onAdd={item=>{setCart(c=>[...c,item]);setQuickAdd(null);}}/>}
+    </Scr>
+  );
+}
+
+/* ──── SHOP TAB ──── */
+function ShopTab({cart,setCart,addresses,setOrders,goTab}){
+  const [page,setPage]=useState({t:'list'});
+  const addToCart=item=>setCart(c=>[...c,item]);
+  const orderNow=item=>{setPage({t:'order',items:[item]});};
+  const submitOrder=items=>{
+    setOrders(o=>[{id:Date.now(),items,status:'待付款',date:'2026-04-22'},...o]);
+    setPage({t:'list'});goTab('mine');
+  };
+
+  if(page.t==='list') return<ShopList onProd={p=>setPage({t:'detail',prod:p})} setCart={setCart}/>;
+  if(page.t==='detail') return<ProdDetail prod={page.prod}
+    onBack={()=>setPage({t:'list'})}
+    onAddToCart={item=>{addToCart(item);}}
+    onOrderNow={item=>orderNow(item)}/>;
+  if(page.t==='order') return<OrderConfirm items={page.items} addresses={addresses}
+    onBack={()=>setPage({t:'detail',prod:page.items[0].prod})}
+    onSubmit={()=>submitOrder(page.items)}/>;
+  return null;
+}
+
+/* ══════════════════════════════════
+   CART TAB
+══════════════════════════════════ */
+function CartTab({cart,setCart,goTab}){
+  const [sel,setSel]=useState([]);
+  const [editing,setEditing]=useState(false);
+  useEffect(()=>setSel(cart.map(()=>true)),[cart.length]);
+  const total=cart.reduce((s,it,i)=>s+(sel[i]?it.prod.price*it.qty:0),0);
+  const chQty=(i,d)=>setCart(c=>c.map((it,j)=>j===i?{...it,qty:Math.max(1,it.qty+d)}:it));
+  const del=i=>{setCart(c=>c.filter((_,j)=>j!==i));setSel(s=>s.filter((_,j)=>j!==i));};
+  const allSel=sel.length>0&&sel.every(Boolean);
+
+  return(
+    <Scr bg="#f5f5f5">
+      <SBar/>
+      <NHdr title="购物车"
+        right={cart.length>0&&<span onClick={()=>setEditing(e=>!e)} style={{fontSize:14,color:'#333',cursor:'pointer'}}>{editing?'完成':'编辑'}</span>}/>
+      <Sv>
+        {cart.length===0?(
+          <div style={{display:'flex',flexDirection:'column',alignItems:'center',
+            justifyContent:'center',height:280,gap:14}}>
+            <div style={{width:70,height:70,background:'#f0f0f0',borderRadius:35,
+              display:'flex',alignItems:'center',justifyContent:'center'}}><MIcon name="cart"size={30}color="#bbb"/></div>
+            <div style={{fontSize:15,color:'#bbb'}}>购物车空空如也</div>
+            <button onClick={()=>goTab('shop')}
+              style={{background:'#1a1a1a',color:'#fff',border:'none',borderRadius:20,
+                padding:'10px 26px',fontSize:14,cursor:'pointer',fontFamily:'inherit'}}>去购物</button>
+          </div>
+        ):(
+          <>
+            {cart.map((it,i)=>(
+              <div key={i} style={{display:'flex',gap:10,padding:'12px 14px',background:'#fff',
+                marginBottom:1,alignItems:'center'}}>
+                <div onClick={()=>setSel(s=>s.map((v,j)=>j===i?!v:v))}
+                  style={{width:20,height:20,borderRadius:10,flexShrink:0,cursor:'pointer',
+                    border:`2px solid ${sel[i]?'#1a1a1a':'#ddd'}`,
+                    background:sel[i]?'#1a1a1a':'#fff',
+                    display:'flex',alignItems:'center',justifyContent:'center'}}>
+                  {sel[i]&&<svg width="9"height="7"viewBox="0 0 9 7"fill="none"><path d="M1 3.5l2.5 2.5L8 1"stroke="#fff"strokeWidth="1.5"strokeLinecap="round"/></svg>}
+                </div>
+                <PImg prod={it.prod} w={72} h={72} ci={it.ci} style={{borderRadius:6}}/>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:13,lineHeight:1.4,overflow:'hidden',display:'-webkit-box',
+                    WebkitLineClamp:2,WebkitBoxOrient:'vertical',color:'#1a1a1a'}}>{it.prod.name}</div>
+                  <div style={{fontSize:11,color:'#aaa',marginTop:2}}>
+                    {it.prod.colors[it.ci]}，{it.prod.sizes[it.si]} ∨
+                  </div>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:7}}>
+                    <span style={{fontSize:15,fontWeight:600}}>¥{it.prod.price}</span>
+                    {editing?(
+                      <button onClick={()=>del(i)}
+                        style={{border:'1px solid #e0e0e0',borderRadius:12,padding:'4px 12px',
+                          background:'#fff',color:'#666',fontSize:12,cursor:'pointer',fontFamily:'inherit'}}>删除</button>
+                    ):(
+                      <div style={{display:'flex',alignItems:'center',gap:10}}>
+                        {[-1,null,1].map((d,j)=>d===null
+                          ?<span key={j} style={{fontSize:14,fontWeight:600,minWidth:18,textAlign:'center'}}>{it.qty}</span>
+                          :<div key={j} onClick={()=>chQty(i,d)}
+                            style={{width:24,height:24,border:'1px solid #ddd',borderRadius:4,
+                              display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',
+                              fontSize:15,color:'#555'}}>
+                            {d<0?'−':'+'}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {/* Recommended */}
+            <div style={{background:'#fff',padding:'14px 14px',marginTop:8}}>
+              <div style={{fontSize:12,color:'#bbb',textAlign:'center',marginBottom:12}}>— 推荐商品 —</div>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+                {PRODS.filter(p=>!cart.find(it=>it.prod.id===p.id)).slice(0,4).map(p=>(
+                  <div key={p.id} onClick={()=>goTab('shop')} style={{cursor:'pointer'}}>
+                    <PImg prod={p} w={'100%'} h={120} style={{width:'100%',height:120,borderRadius:8}}/>
+                    <div style={{fontSize:12,color:'#333',marginTop:6,lineHeight:1.4,overflow:'hidden',
+                      display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical'}}>{p.name}</div>
+                    <div style={{fontSize:13,fontWeight:600,marginTop:3}}>¥{p.price}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{height:80}}/>
+          </>
+        )}
+      </Sv>
+      {cart.length>0&&(
+        <div style={{borderTop:'1px solid #e8e8e8',padding:'10px 14px 18px',background:'#fff',
+          display:'flex',alignItems:'center',gap:10,flexShrink:0}}>
+          <div onClick={()=>setSel(cart.map(()=>!allSel))}
+            style={{width:20,height:20,borderRadius:10,border:`2px solid ${allSel?'#1a1a1a':'#ddd'}`,
+              background:allSel?'#1a1a1a':'#fff',cursor:'pointer',flexShrink:0,
+              display:'flex',alignItems:'center',justifyContent:'center'}}>
+            {allSel&&<svg width="9"height="7"viewBox="0 0 9 7"fill="none"><path d="M1 3.5l2.5 2.5L8 1"stroke="#fff"strokeWidth="1.5"strokeLinecap="round"/></svg>}
+          </div>
+          <span style={{fontSize:13}}>全选</span>
+          <div style={{flex:1,marginLeft:4}}>
+            <div style={{fontSize:10,color:'#aaa'}}>不含运费 合计：</div>
+            <div style={{fontSize:17,fontWeight:700}}>¥{total}</div>
+          </div>
+          <button onClick={()=>goTab('shop')}
+            style={{background:'#1a1a1a',color:'#fff',border:'none',borderRadius:22,
+              padding:'12px 22px',fontSize:14,fontWeight:500,cursor:'pointer',fontFamily:'inherit'}}>
+            去结算
+          </button>
+        </div>
+      )}
+    </Scr>
+  );
+}
+
+/* ══════════════════════════════════
+   WHOLESALE TAB
+══════════════════════════════════ */
+function WholesaleTab(){
+  const [form,setForm]=useState({type:'',phone:'15501147281',company:'',region:''});
+  const [done,setDone]=useState(false);
+  const set=(k,v)=>setForm(f=>({...f,[k]:v}));
+
+  if(done) return(
+    <Scr bg="#f5f5f5">
+      <SBar/>
+      <NHdr title="申请合作"/>
+      <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',
+        justifyContent:'center',gap:16,padding:32}}>
+        <div style={{width:72,height:72,background:'#e8f5e9',borderRadius:36,
+          display:'flex',alignItems:'center',justifyContent:'center',fontSize:36}}>✅</div>
+        <div style={{fontSize:18,fontWeight:600}}>申请已提交</div>
+        <div style={{fontSize:13,color:'#888',textAlign:'center',lineHeight:1.9}}>
+          我们将在1-3个工作日内与您联系<br/>请保持手机畅通
+        </div>
+        <button onClick={()=>setDone(false)}
+          style={{marginTop:8,background:'#1a1a1a',color:'#fff',border:'none',
+            borderRadius:24,padding:'12px 36px',fontSize:15,cursor:'pointer',fontFamily:'inherit'}}>
+          再次申请
+        </button>
+      </div>
+    </Scr>
+  );
+
+  return(
+    <Scr bg="#fff">
+      <SBar/>
+      <NHdr title="申请合作"/>
+      <Sv>
+        {/* Hero */}
+        <div style={{height:200,background:'linear-gradient(150deg,#111 0%,#1a1a2e 60%,#2a1a1a 100%)',
+          display:'flex',flexDirection:'column',justifyContent:'flex-end',padding:'20px',
+          position:'relative',overflow:'hidden'}}>
+          <div style={{position:'absolute',inset:0,
+            backgroundImage:'repeating-linear-gradient(45deg,transparent,transparent 28px,rgba(255,255,255,0.012) 28px,rgba(255,255,255,0.012) 29px)'}}/>
+          <svg style={{position:'absolute',right:24,top:'50%',transform:'translateY(-50%)',opacity:0.06}}
+            width="130"height="80"viewBox="0 0 130 80"fill="white">
+            <path d="M15 80L65 5L115 80z"/>
+            <path d="M0 80L40 25L80 80z" opacity="0.6"/>
+          </svg>
+          <div style={{display:'flex',alignItems:'center',gap:9}}>
+            <img src="assets/jetset-logo.png" style={{height:26,filter:'invert(1) brightness(1.6)'}}/>
+            <div style={{fontSize:26,fontWeight:900,color:'#fff',letterSpacing:4}}>JETSET</div>
+          </div>
+          <div style={{fontSize:9,color:'rgba(255,255,255,0.45)',letterSpacing:2.5,marginTop:5}}>
+            SWISS ALPINE OUTDOOR & SKI GEAR
+          </div>
+        </div>
+
+        <div style={{background:'#fff9f0',padding:'9px 16px',fontSize:12,color:'#c0703a',borderBottom:'1px solid #f5e8d8'}}>
+          分销申请必须提交营业执照和门店照片
+        </div>
+
+        {/* Form rows */}
+        {[
+          {l:'申请类型',k:'type',ph:'请选择',sel:true},
+          {l:'联系方式',k:'phone',ph:''},
+          {l:'公司名称',k:'company',ph:'请输入'},
+          {l:'所在地区',k:'region',ph:'请选择',sel:true},
+        ].map(f=>(
+          <div key={f.k} style={{display:'flex',alignItems:'center',padding:'14px 16px',borderBottom:'1px solid #f5f5f5',background:'#fff'}}>
+            <span style={{color:'#ff4444',marginRight:4,fontSize:14}}>*</span>
+            <span style={{fontSize:14,color:'#333',minWidth:64}}>{f.l}</span>
+            {f.sel?(
+              <div style={{flex:1,textAlign:'right',fontSize:14,color:'#bbb',cursor:'pointer',display:'flex',justifyContent:'flex-end',alignItems:'center',gap:6}}>
+                {form[f.k]||f.ph}<Chevron/>
+              </div>
+            ):(
+              <input value={form[f.k]} onChange={e=>set(f.k,e.target.value)}
+                style={{flex:1,border:'none',outline:'none',textAlign:'right',
+                  fontSize:14,color:'#333',background:'transparent'}}/>
+            )}
+          </div>
+        ))}
+
+        {/* Upload boxes */}
+        {['营业执照','门店照片'].map(label=>(
+          <div key={label} style={{padding:'14px 16px',borderBottom:'1px solid #f5f5f5',background:'#fff'}}>
+            <div style={{fontSize:14,color:'#333',marginBottom:10}}>
+              <span style={{color:'#ff4444',marginRight:4}}>*</span>{label}
+            </div>
+            <div style={{display:'flex',gap:10}}>
+              <div style={{width:78,height:78,border:'1.5px dashed #ddd',borderRadius:8,
+                display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
+                gap:5,cursor:'pointer',background:'#fafafa'}}>
+                <svg width="22"height="22"viewBox="0 0 22 22"fill="none">
+                  <path d="M11 4v14M4 11h14"stroke="#ccc"strokeWidth="2"strokeLinecap="round"/>
+                </svg>
+                <span style={{fontSize:10,color:'#ccc'}}>上传图片</span>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        <div style={{padding:'20px 16px 36px'}}>
+          <Btn label="申请合作" onClick={()=>setDone(true)}/>
+        </div>
+      </Sv>
+    </Scr>
+  );
+}
+
+/* ══════════════════════════════════
+   MINE – SUB SCREENS
+══════════════════════════════════ */
+function OrdersSc({orders,onBack,goTab}){
+  const [f,setF]=useState('全部');
+  const tabs=['全部','待付款','待发货','待收货','待评价'];
+  const list=orders.filter(o=>f==='全部'||o.status===f);
+
+  return(
+    <Scr bg="#f5f5f5">
+      <SBar/>
+      <NHdr title="我的订单" onBack={onBack}/>
+      <div style={{padding:'8px 12px',background:'#fff',flexShrink:0}}>
+        <div style={{background:'#f5f5f5',borderRadius:18,padding:'7px 13px',display:'flex',gap:7,alignItems:'center'}}>
+          <svg width="13"height="13"viewBox="0 0 13 13"fill="none">
+            <circle cx="5.5"cy="5.5"r="4"stroke="#ccc"strokeWidth="1.4"/>
+            <path d="M8.5 8.5l3 3"stroke="#ccc"strokeWidth="1.4"strokeLinecap="round"/>
+          </svg>
+          <span style={{fontSize:13,color:'#ccc'}}>搜索订单</span>
+        </div>
+      </div>
+      <div style={{display:'flex',background:'#fff',borderBottom:'1px solid #f0f0f0',flexShrink:0}}>
+        {tabs.map(t=>(
+          <div key={t} onClick={()=>setF(t)}
+            style={{flex:1,padding:'10px 0',textAlign:'center',fontSize:11,cursor:'pointer',
+              color:f===t?'#1a1a1a':'#888',fontWeight:f===t?600:400,
+              borderBottom:f===t?'2px solid #1a1a1a':'2px solid transparent'}}>
+            {t}
+          </div>
+        ))}
+      </div>
+      <Sv>
+        {list.length===0?(
+          <div style={{display:'flex',flexDirection:'column',alignItems:'center',padding:'44px 20px',gap:10}}>
+            <div style={{width:56,height:64,background:'#eee',borderRadius:4,
+              display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,
+              position:'relative'}}>
+              <div style={{width:40,height:44,border:'2px solid #ddd',borderRadius:3,
+                display:'flex',alignItems:'flex-end',justifyContent:'center',paddingBottom:6}}>
+                <div style={{width:28,height:2,background:'#ddd',borderRadius:1}}/>
+              </div>
+            </div>
+            <div style={{fontSize:16,fontWeight:500,color:'#333',marginTop:4}}>暂无订单</div>
+            <div style={{fontSize:12,color:'#aaa'}}>近期没有下单记录</div>
+            <div style={{margin:'16px 0 8px',fontSize:12,color:'#bbb'}}>— 推荐商品 —</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,width:'100%'}}>
+              {PRODS.slice(0,4).map(p=>(
+                <div key={p.id} onClick={()=>goTab('shop')} style={{cursor:'pointer',background:'#fff',borderRadius:8,padding:10}}>
+                  <PImg prod={p} w={'100%'} h={108} style={{width:'100%',height:108,borderRadius:6}}/>
+                  <div style={{fontSize:12,color:'#333',marginTop:6,lineHeight:1.4}}>{p.name}</div>
+                  <div style={{fontSize:13,fontWeight:600,marginTop:3}}>¥{p.price}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ):list.map(o=>(
+          <div key={o.id} style={{background:'#fff',margin:'1px 0 0',padding:'14px 16px'}}>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:10,paddingBottom:10,borderBottom:'1px solid #f5f5f5'}}>
+              <span style={{fontSize:12,color:'#aaa'}}>订单号：{o.id}</span>
+              <span style={{fontSize:12,color:'#E86A2B',fontWeight:500}}>{o.status}</span>
+            </div>
+            {o.items.map((it,i)=>(
+              <div key={i} style={{display:'flex',gap:10,marginBottom:8}}>
+                <PImg prod={it.prod} w={60} h={60} ci={it.ci} style={{borderRadius:5}}/>
+                <div>
+                  <div style={{fontSize:13,color:'#333',lineHeight:1.4}}>{it.prod.name}</div>
+                  <div style={{fontSize:11,color:'#aaa',marginTop:3}}>{it.prod.colors[it.ci]}；{it.prod.sizes[it.si]}</div>
+                  <div style={{fontSize:13,fontWeight:600,marginTop:3}}>¥{it.prod.price}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </Sv>
+    </Scr>
+  );
+}
+
+function AddrSc({addresses,setAddresses,onBack}){
+  const [showF,setShowF]=useState(false);
+  const [form,setForm]=useState({name:'',phone:'',address:''});
+  const set=(k,v)=>setForm(f=>({...f,[k]:v}));
+  const save=()=>{
+    if(!form.name||!form.phone||!form.address)return;
+    setAddresses(a=>[{...form,id:Date.now()},...a]);
+    setShowF(false);setForm({name:'',phone:'',address:''});
+  };
+
+  return(
+    <Scr bg="#f5f5f5">
+      <SBar/>
+      <NHdr title="收货地址" onBack={onBack}/>
+      <Sv>
+        {addresses.length===0&&!showF&&(
+          <div style={{height:350,display:'flex',alignItems:'center',justifyContent:'center',
+            flexDirection:'column',gap:10,color:'#ccc'}}>
+            <svg width="48"height="48"viewBox="0 0 48 48"fill="none">
+              <path d="M24 4C16.27 4 10 10.27 10 18c0 10.5 14 26 14 26s14-15.5 14-26c0-7.73-6.27-14-14-14z"stroke="#ddd"strokeWidth="2"/>
+              <circle cx="24"cy="18"r="5"stroke="#ddd"strokeWidth="2"/>
+            </svg>
+            <div style={{fontSize:14}}>暂无收货地址</div>
+          </div>
+        )}
+        {addresses.map(a=>(
+          <div key={a.id} style={{background:'#fff',padding:'14px 16px',marginBottom:1}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <div>
+                <span style={{fontSize:15,fontWeight:600}}>{a.name}</span>
+                <span style={{fontSize:13,color:'#888',marginLeft:10}}>{a.phone}</span>
+                <span style={{fontSize:10,color:'#E86A2B',border:'1px solid #E86A2B',
+                  borderRadius:3,padding:'1px 4px',marginLeft:8}}>默认</span>
+              </div>
+              <span style={{fontSize:13,color:'#aaa',cursor:'pointer'}}>编辑</span>
+            </div>
+            <div style={{fontSize:12,color:'#888',marginTop:5,lineHeight:1.6}}>{a.address}</div>
+          </div>
+        ))}
+        {showF&&(
+          <div style={{background:'#fff',padding:'16px',margin:'8px 0'}}>
+            <div style={{fontSize:15,fontWeight:600,marginBottom:14,color:'#1a1a1a'}}>新增收货地址</div>
+            {[{l:'姓名',k:'name',ph:'请输入姓名'},{l:'手机',k:'phone',ph:'请输入手机号'},{l:'地址',k:'address',ph:'省市区+详细地址'}].map(f=>(
+              <div key={f.k} style={{display:'flex',alignItems:'center',paddingBottom:13,marginBottom:13,borderBottom:'1px solid #f5f5f5'}}>
+                <span style={{fontSize:14,color:'#555',minWidth:44}}>{f.l}</span>
+                <input value={form[f.k]} onChange={e=>set(f.k,e.target.value)} placeholder={f.ph}
+                  style={{flex:1,border:'none',outline:'none',fontSize:14,color:'#333',marginLeft:12}}/>
+              </div>
+            ))}
+            <div style={{display:'flex',gap:10,marginTop:4}}>
+              <Btn label="取消" onClick={()=>setShowF(false)} outline style={{flex:1}}/>
+              <Btn label="保存" onClick={save} style={{flex:1}}/>
+            </div>
+          </div>
+        )}
+        <div style={{height:80}}/>
+      </Sv>
+      {!showF&&(
+        <div style={{padding:'12px 16px 20px',flexShrink:0}}>
+          <Btn label="+ 新增地址" onClick={()=>setShowF(true)}/>
+        </div>
+      )}
+    </Scr>
+  );
+}
+
+function ProfileSc({userInfo,setUserInfo,onBack}){
+  const [info,setInfo]=useState(userInfo);
+  const set=(k,v)=>setInfo(i=>({...i,[k]:v}));
+
+  return(
+    <Scr bg="#f5f5f5">
+      <SBar/>
+      <NHdr title="个人信息" onBack={()=>{setUserInfo(info);onBack();}}/>
+      <Sv>
+        <div style={{height:8}}/>
+        <SecHdr label="基本信息"/>
+        <div style={{background:'#fff'}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',
+            padding:'13px 16px',borderBottom:'1px solid #f5f5f5',cursor:'pointer'}}>
+            <span style={{fontSize:14,color:'#333'}}>头像</span>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <div style={{width:44,height:44,borderRadius:22,
+                background:'linear-gradient(135deg,#667eea,#764ba2)',
+                display:'flex',alignItems:'center',justifyContent:'center',fontSize:22}}>👤</div>
+              <Chevron/>
+            </div>
+          </div>
+          <Row label="姓名" value={info.name||'请填写'} onClick={()=>{}}/>
+          <Row label="手机号" value={info.phone}/>
+          <div style={{padding:'13px 16px',borderBottom:'1px solid #f5f5f5'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <span style={{fontSize:14,color:'#333'}}>性别</span>
+              <div style={{display:'flex',gap:8}}>
+                {['男','女'].map(g=>(
+                  <button key={g} onClick={()=>set('gender',g)}
+                    style={{padding:'6px 20px',border:'1px solid #e0e0e0',borderRadius:4,
+                      background:info.gender===g?'#e8e8e8':'#fff',
+                      color:'#333',fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>
+                    {g}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <Row label="生日" value={info.birthday||'请选择'} onClick={()=>{}}/>
+          <Row label="地区" value={info.region||'请选择'} onClick={()=>{}}/>
+          <Row label="收货地址" value="" onClick={()=>{}} border={false}/>
+        </div>
+        <div style={{height:8}}/>
+        <SecHdr label="通用设置"/>
+        <div style={{background:'#fff'}}>
+          <div style={{padding:'13px 16px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <div>
+              <div style={{fontSize:14,color:'#333'}}>个性化推荐</div>
+              <div style={{fontSize:11,color:'#bbb',marginTop:3}}>开启后可看到你感兴趣的内容，建议开启</div>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:5,fontSize:13,color:'#555',cursor:'pointer'}}>
+              已允许<Chevron/>
+            </div>
+          </div>
+        </div>
+      </Sv>
+    </Scr>
+  );
+}
+
+/* ──── MINE MAIN ──── */
+function MineTab({cart,orders,addresses,setAddresses,userInfo,setUserInfo,goTab}){
+  const [page,setPage]=useState('main');
+  if(page==='orders') return<OrdersSc orders={orders} onBack={()=>setPage('main')} goTab={goTab}/>;
+  if(page==='address') return<AddrSc addresses={addresses} setAddresses={setAddresses} onBack={()=>setPage('main')}/>;
+  if(page==='profile') return<ProfileSc userInfo={userInfo} setUserInfo={setUserInfo} onBack={()=>setPage('main')}/>;
+
+  const oStats=[{l:'待付款',n:'pay'},{l:'待发货',n:'ship'},{l:'待收货',n:'truck'},{l:'待评价',n:'star'},{l:'退款/售后',n:'refund'}];
+  const cartCnt=cart.reduce((s,i)=>s+i.qty,0);
+
+  return(
+    <Scr bg="#f5f5f5">
+      <SBar/>
+      <Sv>
+        {/* Profile header */}
+        <div style={{background:'linear-gradient(140deg,#3a352e 0%,#2b2823 55%,#211e1a 100%)',
+          padding:'14px 16px 28px',position:'relative',overflow:'hidden'}}>
+          <div style={{position:'absolute',inset:0,
+            backgroundImage:'repeating-linear-gradient(135deg,transparent,transparent 22px,rgba(255,255,255,0.04) 22px,rgba(255,255,255,0.04) 23px)'}}/>
+          <div style={{position:'absolute',top:12,right:14,cursor:'pointer',
+            display:'flex',flexDirection:'column',alignItems:'center',gap:2}}>
+            <svg width="22"height="22"viewBox="0 0 22 22"fill="none">
+              {[[0,0],[10,0],[0,11],[10,11]].map(([x,y],i)=>(
+                <rect key={i} x={x+0.5} y={y+0.5} width={i===3?4:8} height={i===3?4:8} rx="1" stroke="rgba(214,190,148,0.6)" strokeWidth="1.2"/>
+              ))}
+              <rect x="16.5"y="13.5"width="3"height="8"rx="0.5"fill="rgba(214,190,148,0.6)"/>
+            </svg>
+            <span style={{fontSize:8,color:'rgba(214,190,148,0.6)'}}>会员码</span>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:14,position:'relative',zIndex:1}}>
+            <div onClick={()=>setPage('profile')}
+              style={{width:64,height:64,borderRadius:32,background:'rgba(236,230,220,0.12)',border:'1px solid rgba(214,190,148,0.3)',
+                display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',fontSize:30}}>
+              👤
+            </div>
+            <div>
+              <div onClick={()=>setPage('profile')}
+                style={{fontSize:16,fontWeight:600,color:'#ece6dc',cursor:'pointer'}}>
+                {userInfo.name||'点击设置昵称'}
+              </div>
+              <div style={{marginTop:7}}>
+                <span style={{background:'rgba(255,255,255,0.1)',border:'1px solid rgba(214,190,148,0.4)',borderRadius:12,
+                  padding:'3px 12px',fontSize:11,color:'#d6be94',cursor:'pointer'}}>
+                  会员中心
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Member card */}
+        <div style={{margin:'0 12px',background:'linear-gradient(135deg,#211e1a 0%,#312c24 100%)',
+          border:'1px solid rgba(214,190,148,0.18)',borderTop:'none',
+          borderRadius:'0 0 12px 12px',padding:'11px 16px 13px',marginBottom:10}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <img src="assets/jetset-logo.png" style={{height:13,filter:'invert(1) brightness(1.5)'}}/>
+              <span style={{fontSize:13,color:'#ece6dc',fontWeight:700,letterSpacing:2}}>JETSET</span>
+            </div>
+            <span style={{fontSize:12,color:'rgba(214,190,148,0.75)',cursor:'pointer'}}>成为会员 ›</span>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div style={{background:'#fff',display:'flex',padding:'16px 0',marginBottom:8}}>
+          {[{l:'余额',v:'0.00'},{l:'积分',v:'0'},{l:'卡',v:'0'},{l:'优惠券/码',v:'0'},{l:'钱包',v:'⊙'}].map((it,i)=>(
+            <div key={i} style={{flex:1,textAlign:'center',cursor:'pointer',
+              borderRight:i<4?'1px solid #f0f0f0':'none'}}>
+              <div style={{fontSize:15,fontWeight:600,color:'#1a1a1a'}}>{it.v}</div>
+              <div style={{fontSize:10,color:'#aaa',marginTop:3}}>{it.l}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Orders */}
+        <div style={{background:'#fff',marginBottom:8}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'13px 16px 8px'}}>
+            <span style={{fontSize:15,fontWeight:600}}>我的订单</span>
+            <span onClick={()=>setPage('orders')} style={{fontSize:12,color:'#aaa',cursor:'pointer'}}>查看全部订单 ›</span>
+          </div>
+          <div style={{display:'flex',padding:'8px 0 14px'}}>
+            {oStats.map(o=>(
+              <div key={o.l} onClick={()=>setPage('orders')}
+                style={{flex:1,textAlign:'center',cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center'}}>
+                <MIcon name={o.n} size={21}/>
+                <div style={{fontSize:10,color:'#777',marginTop:6}}>{o.l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Menu */}
+        <div style={{background:'#fff',marginBottom:8}}>
+          {[
+            {icon:'cart',label:'购物车',badge:cartCnt||null,onClick:()=>goTab('cart')},
+            {icon:'task',label:'任务中心',onClick:()=>{}},
+            {icon:'gift',label:'赠品',onClick:()=>{}},
+          ].map(m=>(
+            <div key={m.label} onClick={m.onClick}
+              style={{display:'flex',alignItems:'center',gap:12,padding:'13px 16px',
+                borderBottom:'1px solid #f5f5f5',cursor:'pointer'}}>
+              <MIcon name={m.icon} size={20}/>
+              <span style={{flex:1,fontSize:14,color:'#333'}}>{m.label}</span>
+              {m.badge&&<span style={{background:'#ff3b30',color:'#fff',borderRadius:10,fontSize:10,
+                padding:'1px 6px',fontWeight:600}}>{m.badge}</span>}
+              <Chevron/>
+            </div>
+          ))}
+        </div>
+
+        <div style={{background:'#fff',marginBottom:16}}>
+          <div onClick={()=>setPage('address')}
+            style={{display:'flex',alignItems:'center',gap:12,padding:'13px 16px',cursor:'pointer'}}>
+            <svg width="20"height="20"viewBox="0 0 20 20"fill="none">
+              <path d="M10 2C7.24 2 5 4.24 5 7c0 3.75 5 10 5 10s5-6.25 5-10c0-2.76-2.24-5-5-5z"stroke="#555"strokeWidth="1.5"/>
+              <circle cx="10"cy="7"r="2"stroke="#555"strokeWidth="1.5"/>
+            </svg>
+            <span style={{flex:1,fontSize:14,color:'#333'}}>收货地址</span>
+            <Chevron/>
+          </div>
+        </div>
+      </Sv>
+    </Scr>
+  );
+}
+
+/* ══════════════════════════════════
+   APP ROOT
+══════════════════════════════════ */
+function App(){
+  const [tab,setTab]=useState('home');
+  const [cart,setCart]=useState([]);
+  const [addresses,setAddresses]=useState([]);
+  const [orders,setOrders]=useState([]);
+  const [userInfo,setUserInfo]=useState({name:'',phone:'155****7281',gender:'',birthday:'',region:''});
+
+  const props={cart,setCart,addresses,setAddresses,orders,setOrders,userInfo,setUserInfo,goTab:setTab};
+  const cnt=cart.reduce((s,i)=>s+i.qty,0);
+
+  return(
+    <div style={{display:'flex',justifyContent:'center',alignItems:'center',
+      minHeight:'100vh',background:'linear-gradient(135deg,#0f0f14 0%,#1a1a2e 100%)'}}>
+      <div style={{width:390,height:844,borderRadius:50,overflow:'hidden',
+        boxShadow:'0 0 0 11px #1c1c1e,0 0 0 12px #2a2a2e,0 50px 120px rgba(0,0,0,0.85)',
+        background:'#f5f5f5',display:'flex',flexDirection:'column',position:'relative'}}>
+
+        <div style={{flex:1,overflow:'hidden',position:'relative'}}>
+          {tab==='home'&&<HomeTab {...props}/>}
+          {tab==='shop'&&<ShopTab {...props}/>}
+          {tab==='cart'&&<CartTab {...props}/>}
+          {tab==='wholesale'&&<WholesaleTab {...props}/>}
+          {tab==='mine'&&<MineTab {...props}/>}
+        </div>
+
+        <TabBar active={tab} onChange={setTab} cnt={cnt}/>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

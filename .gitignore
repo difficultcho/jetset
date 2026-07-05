@@ -1,0 +1,16 @@
+.DS_Store
+node_modules/
+
+# backend
+backend/.venv/
+backend/__pycache__/
+**/__pycache__/
+*.pyc
+backend/.pytest_cache/
+backend/.env
+backend/jetset.db
+backend/uploads/
+
+# miniprogram
+miniprogram/node_modules/
+project.private.config.json

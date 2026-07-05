@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "所有商品",
+  "usingComponents": {
+    "prod-img": "/components/prod-img/prod-img",
+    "atc-modal": "/components/atc-modal/atc-modal"
+  }
+}

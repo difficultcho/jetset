@@ -1,0 +1,70 @@
+<view class="page">
+  <!-- Hero 轮播 -->
+  <view class="hero hero-{{slide}}" style="padding-top:{{sbh}}px;height:{{sbh + 246}}px;">
+    <view class="deco-circle c1" />
+    <view class="deco-circle c2" />
+    <view class="deco-word">JETSET</view>
+    <view class="deco-mountains" />
+    <view class="hero-brand">
+      <image class="hero-logo" src="/assets/jetset-logo.png" mode="heightFix" />
+      <text class="hero-brand-name">JETSET</text>
+    </view>
+    <view class="hero-copy" wx:if="{{slides.length}}">
+      <view class="hero-title">{{slides[slide].title}}</view>
+      <view class="hero-sub">{{slides[slide].sub}}</view>
+    </view>
+    <view class="hero-dots">
+      <view class="dot {{slide === index ? 'on' : ''}}" wx:for="{{slides}}" wx:key="sub" data-i="{{index}}" bindtap="setSlide" />
+    </view>
+  </view>
+
+  <!-- 热销推荐 -->
+  <view class="sec-head">
+    <view class="sec-title">热销推荐</view>
+    <view class="sec-sub">HOT SELLING RECOMMENDATIONS</view>
+  </view>
+  <scroll-view class="hot-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="hot-row">
+      <view class="hot-card" wx:for="{{hot}}" wx:key="id" bindtap="goShop">
+        <view class="hot-img"><prod-img prod="{{item}}" size="{{148}}" /></view>
+        <view class="hot-info">
+          <view class="hot-name clamp2">{{item.name}}</view>
+          <view class="hot-price">¥{{item.price}}</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="gap8" />
+
+  <!-- 精选好物 -->
+  <view class="feat" wx:if="{{featured}}">
+    <view class="feat-head">
+      <text class="feat-label">精选好物</text>
+      <text class="feat-more" bindtap="goShop">查看全部 ›</text>
+    </view>
+    <view class="feat-card" style="border:1rpx solid {{featured.sw[0]}}22;" bindtap="goShop">
+      <view class="feat-img"><prod-img prod="{{featured}}" /></view>
+      <view class="feat-bar" style="background:{{featured.sw[0]}}08;">
+        <view>
+          <view class="feat-en">JETSET – {{featured.en}}</view>
+          <view class="feat-name">{{featured.name}}</view>
+        </view>
+        <view class="feat-price">¥{{featured.price}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="gap8" />
+
+  <!-- 2 列商品网格 -->
+  <view class="grid">
+    <view class="grid-cell" wx:for="{{grid}}" wx:key="id" bindtap="goShop">
+      <view class="grid-img"><prod-img prod="{{item}}" /></view>
+      <view class="grid-name clamp2">{{item.name}}</view>
+      <view class="grid-price">¥{{item.price}}</view>
+    </view>
+  </view>
+
+  <view class="tab-space" />
+</view>

@@ -1,0 +1,54 @@
+# 服务器部署编排：放到服务器 /opt/jetset/docker-compose.yml
+# 镜像由 CI 构建推送，服务器只 pull 不 build。
+#
+# 首次部署：
+#   mkdir -p /opt/jetset && 上传本文件为 docker-compose.yml + 配好 .env
+#   docker login ccr.ccs.tencentyun.com
+#   docker compose up -d
+#   docker compose exec api python -m app.seed
+#
+# 若服务器上没有现成 MySQL，用内置的：docker compose --profile withdb up -d
+# （并把 .env 的 DATABASE_URL 指向 mysql+aiomysql://jetset:密码@mysql:3306/jetset?charset=utf8mb4）
+
+name: jetset
+
+services:
+  api:
+    image: ccr.ccs.tencentyun.com/mz_personal_namespace/jetset-api:latest
+    env_file: .env
+    ports:
+      - "127.0.0.1:8000:8000"   # 仅本机监听，由 nginx 反代并终止 TLS
+    volumes:
+      - upload_data:/code/uploads
+    restart: always
+    depends_on:
+      - redis
+
+  worker:
+    image: ccr.ccs.tencentyun.com/mz_personal_namespace/jetset-api:latest
+    env_file: .env
+    command: arq app.worker.WorkerSettings
+    restart: always
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+
+  mysql:
+    profiles: ["withdb"]
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change_me}
+      MYSQL_DATABASE: jetset
+      MYSQL_USER: jetset
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-change_me}
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+
+volumes:
+  upload_data:
+  mysql_data:

@@ -1,0 +1,21 @@
+# 生产覆盖: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+services:
+  api:
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
+    volumes:
+      - upload_data:/code/uploads
+    restart: always
+    ports: !override
+      - "127.0.0.1:8000:8000"   # 仅本机监听，外层由 nginx/caddy 反代并终止 TLS
+
+  worker:
+    volumes: []
+    restart: always
+
+  mysql:
+    restart: always
+    ports: !override []          # 生产不对外暴露 3306
+
+  redis:
+    restart: always
+    ports: !override []

@@ -1,0 +1,9 @@
+{
+  "desc": "JETSET 购物小程序",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}

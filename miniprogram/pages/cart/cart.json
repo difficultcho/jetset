@@ -1,0 +1,7 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "prod-img": "/components/prod-img/prod-img",
+    "nav-bar": "/components/nav-bar/nav-bar"
+  }
+}
