@@ -33,12 +33,13 @@ services:
       - redis
 
   redis:
-    image: redis:7-alpine
+    # 服务器直连不了 Docker Hub，用 CI 同步到 TCR 的副本
+    image: ccr.ccs.tencentyun.com/mz_personal_namespace/redis:7-alpine
     restart: always
 
   mysql:
     profiles: ["withdb"]
-    image: mysql:8.0
+    image: ccr.ccs.tencentyun.com/mz_personal_namespace/mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change_me}
       MYSQL_DATABASE: jetset
