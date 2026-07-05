@@ -17,7 +17,7 @@ services:
     image: ccr.ccs.tencentyun.com/mz_personal_namespace/jetset-api:latest
     env_file: .env
     ports:
-      - "127.0.0.1:8000:8000"   # 仅本机监听，由 nginx 反代并终止 TLS
+      - "127.0.0.1:8010:8000"   # 8000/8001 已被 golf 占用；nginx /jetset/ 前缀反代到 8010
     volumes:
       - upload_data:/code/uploads
     restart: always

@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     app_env: str = "dev"  # dev | test | prod
+    # 反代路径前缀（如 nginx 挂在 /jetset/ 下则设为 /jetset），影响 /docs 等自引用 URL
+    root_path: str = ""
 
     database_url: str = "sqlite+aiosqlite:///./jetset.db"
     redis_url: str = "redis://127.0.0.1:6379/0"

@@ -35,7 +35,8 @@ async def lifespan(app: FastAPI):
         await app.state.arq.aclose()
 
 
-app = FastAPI(title="JETSET Shop API", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="JETSET Shop API", version="0.1.0", lifespan=lifespan,
+              root_path=settings.root_path)
 
 app.add_middleware(
     CORSMiddleware,
