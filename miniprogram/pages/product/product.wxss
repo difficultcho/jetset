@@ -206,6 +206,14 @@
   border-radius: 46rpx;
   background: #fafafa;
   box-sizing: border-box;
+  /* button 默认样式重置 */
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  font-size: inherit;
+}
+.cs-btn::after {
+  border: none;
 }
 .cs-icon {
   width: 36rpx;

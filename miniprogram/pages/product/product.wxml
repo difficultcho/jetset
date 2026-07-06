@@ -68,10 +68,12 @@
 
   <!-- 底部操作栏 -->
   <view class="action-bar">
-    <view class="cs-btn">
+    <button class="cs-btn" open-type="contact" show-message-card="{{true}}"
+      send-message-title="{{prod.name}}" send-message-img="{{prod.img || ''}}"
+      send-message-path="/pages/product/product?id={{prod.id}}">
       <view class="cs-icon" />
       <view class="cs-label">客服</view>
-    </view>
+    </button>
     <view class="act-btn outline" data-mode="cart" bindtap="openModal">加入购物车</view>
     <view class="act-btn solid" data-mode="buy" bindtap="openModal">立即购买</view>
   </view>
