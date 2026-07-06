@@ -4,8 +4,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, JSONResponse
 
 from app.api import api_router
 from app.api.admin import admin_router
@@ -48,7 +47,18 @@ app.add_middleware(
 
 app.include_router(api_router, prefix="/api/v1")
 app.include_router(admin_router, prefix="/api/admin")
-app.mount("/uploads", StaticFiles(directory=settings.upload_dir, check_dir=False), name="uploads")
+
+
+# 显式路由伺服上传文件（不用 StaticFiles：其对 root_path 的处理与普通路由不一致，
+# 在 nginx 剥前缀 + ROOT_PATH 组合下会 404）
+@app.get("/uploads/{name}", include_in_schema=False)
+async def serve_upload(name: str):
+    if "/" in name or "\\" in name or name.startswith("."):
+        raise HTTPException(status_code=404, detail="Not Found")
+    path = Path(settings.upload_dir) / name
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="Not Found")
+    return FileResponse(path)
 
 
 @app.exception_handler(BizError)
