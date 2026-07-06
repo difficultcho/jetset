@@ -1,4 +1,5 @@
-<view class="pimg" style="background:{{c}}14;border-color:{{c}}30;">
+<image wx:if="{{src}}" class="real-img" src="{{src}}" mode="aspectFill" />
+<view wx:else class="pimg" style="background:{{c}}14;border-color:{{c}}30;">
   <view class="brand">
     <image class="logo" src="/assets/jetset-logo.png" mode="heightFix" />
     <text class="brand-name" style="color:{{c}};">JETSET</text>

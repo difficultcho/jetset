@@ -1,11 +1,18 @@
 // 后端数据 → 页面视图模型。金额统一：后端返回「分」，展示用「元」。
+const { API_BASE } = require('./config.js');
 
 function fen2yuan(cents) {
   const y = (cents || 0) / 100;
   return Number.isInteger(y) ? y : y.toFixed(2);
 }
 
-// 商品列表项（首页/商城/推荐位共用），兼容 prod-img 需要的 {sw, en} 形状
+// 相对路径图片（/uploads/x.jpg）补全为完整 URL；空值返回 ''（组件回退占位图案）
+function fullImg(path) {
+  if (!path) return '';
+  return path.indexOf('http') === 0 ? path : API_BASE + path;
+}
+
+// 商品列表项（首页/商城/推荐位共用），兼容 prod-img 需要的 {sw, en, img} 形状
 function toProd(p) {
   return {
     id: p.id,
@@ -14,11 +21,13 @@ function toProd(p) {
     price: fen2yuan(p.price),
     badge: p.badge || '',
     sw: p.color_hexes && p.color_hexes.length ? p.color_hexes : ['#888888'],
+    img: fullImg(p.image),
   };
 }
 
 // 商品详情
 function toDetail(d) {
+  const imgs = d.colors.map((c) => fullImg(c.image));
   return {
     id: d.id,
     name: d.name,
@@ -29,6 +38,8 @@ function toDetail(d) {
     detailText: d.detail,
     colors: d.colors.map((c) => c.name),
     sw: d.colors.map((c) => c.hex),
+    imgs, // 每个颜色一张图，切色联动
+    img: imgs.find((u) => u) || '',
     sizes: d.sizes,
     skus: d.skus, // [{id, color_index, size, price, stock}]
   };
@@ -44,7 +55,7 @@ function toCartItem(it) {
     spec: it.color_name + '，' + it.size,
     price: fen2yuan(it.price),
     stock: it.stock,
-    prod: { en: it.en_model, sw: [it.color_hex || '#888888'] },
+    prod: { en: it.en_model, sw: [it.color_hex || '#888888'], img: fullImg(it.image) },
   };
 }
 
@@ -56,7 +67,7 @@ function toOrderLine(it) {
     name: it.name,
     spec: it.color_name + '；' + it.size,
     price: fen2yuan(it.price),
-    prod: { en: it.en_model, sw: [it.color_hex || '#888888'] },
+    prod: { en: it.en_model, sw: [it.color_hex || '#888888'], img: fullImg(it.image) },
   };
 }
 
@@ -68,6 +79,7 @@ function toOrder(o) {
     statusLabel: o.status_label,
     payAmount: fen2yuan(o.pay_amount),
     itemAmount: fen2yuan(o.item_amount),
+    shipment: o.shipment || null, // {company, tracking_no}
     items: o.items.map(toOrderLine),
   };
 }

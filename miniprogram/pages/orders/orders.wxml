@@ -44,6 +44,10 @@
           <view class="oi-price">¥{{it.price}}</view>
         </view>
       </view>
+      <view wx:if="{{item.shipment}}" class="ship-row" data-no="{{item.shipment.tracking_no}}" bindtap="copyTracking">
+        <text class="ship-text">物流：{{item.shipment.company}} {{item.shipment.tracking_no}}</text>
+        <text class="ship-copy">复制</text>
+      </view>
       <view class="order-foot">
         <text class="order-total">合计 ¥{{item.payAmount}}</text>
         <view class="order-actions">

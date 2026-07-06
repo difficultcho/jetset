@@ -178,6 +178,24 @@
   font-weight: 600;
   margin-top: 6rpx;
 }
+.ship-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f8f8;
+  border-radius: 8rpx;
+  padding: 14rpx 20rpx;
+  margin-bottom: 16rpx;
+}
+.ship-text {
+  font-size: 24rpx;
+  color: #555;
+}
+.ship-copy {
+  font-size: 22rpx;
+  color: #1a1a1a;
+  font-weight: 500;
+}
 .order-foot {
   display: flex;
   justify-content: space-between;

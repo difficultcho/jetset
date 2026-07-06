@@ -76,6 +76,10 @@ Page({
     }
   },
 
+  copyTracking(e) {
+    wx.setClipboardData({ data: e.currentTarget.dataset.no });
+  },
+
   goShop() {
     wx.switchTab({ url: '/pages/shop/shop' });
   }
