@@ -12,6 +12,7 @@ from app.models.order import Order, OrderItem, OrderStatus, Payment
 from app.models.user import User
 from app.schemas.order import OrderLineReq
 from app.services import coupons as coupon_svc
+from app.services import points as points_svc
 from app.utils import gen_order_no, utcnow
 
 
@@ -59,19 +60,19 @@ def _build_line(sku: Sku, qty: int) -> dict:
     }
 
 
-def _amounts(lines: list[dict], discount: int = 0) -> dict:
+def _amounts(lines: list[dict], discount: int = 0, points_deduct: int = 0) -> dict:
     item_amount = sum(line["price"] * line["qty"] for line in lines)
     freight = settings.freight_cents
     return {
         "item_amount": item_amount,
         "freight": freight,
         "discount_amount": discount,
-        "pay_amount": item_amount + freight - discount,
+        "pay_amount": item_amount + freight - discount - points_deduct,
     }
 
 
 async def preview(session: AsyncSession, user: User, items: list[OrderLineReq],
-                  user_coupon_id: int | None = None) -> dict:
+                  user_coupon_id: int | None = None, use_points: bool = False) -> dict:
     merged = _merge_lines(items)
     sku_map = await _load_skus(session, list(merged))
     lines = [_build_line(sku_map[sid], qty) for sid, qty in merged.items()]
@@ -85,17 +86,26 @@ async def preview(session: AsyncSession, user: User, items: list[OrderLineReq],
         uc = await coupon_svc.get_valid_for_order(session, user.id, user_coupon_id, item_amount)
         discount = min(uc.amount, item_amount)  # 减免不超过商品总额
         applied_id = uc.id
+
+    # 积分抵扣：顺序为 商品总额 → 优惠券 → 积分，抵扣不超过剩余应付（不含运费）
+    points_used = 0
+    if use_points:
+        points_used = points_svc.max_points_for(item_amount - discount, user.points)
     return {
         "items": lines,
         "coupons": [coupon_svc.uc_to_dict(uc, item_amount) for uc in ucs],
         "applied_coupon_id": applied_id,
-        **_amounts(lines, discount),
+        "points_available": user.points,
+        "points_used": points_used,
+        "points_deduct": points_svc.deduct_cents(points_used),
+        **_amounts(lines, discount, points_svc.deduct_cents(points_used)),
     }
 
 
 async def create_order(session: AsyncSession, user: User, items: list[OrderLineReq],
                        address_id: int, note: str,
-                       user_coupon_id: int | None = None) -> Order:
+                       user_coupon_id: int | None = None,
+                       use_points: bool = False) -> Order:
     address = await session.get(Address, address_id)
     if address is None or address.user_id != user.id:
         raise BizError("请选择有效的收货地址")
@@ -123,12 +133,18 @@ async def create_order(session: AsyncSession, user: User, items: list[OrderLineR
         uc = await coupon_svc.get_valid_for_order(session, user.id, user_coupon_id, item_amount)
         discount = min(uc.amount, item_amount)
 
-    am = _amounts(lines, discount)
+    # 积分抵扣（顺序：商品总额 → 优惠券 → 积分）
+    points_used = 0
+    if use_points:
+        points_used = points_svc.max_points_for(item_amount - discount, user.points)
+
+    am = _amounts(lines, discount, points_svc.deduct_cents(points_used))
     order = Order(
         order_no=gen_order_no(),
         user_id=user.id,
         status=OrderStatus.PENDING_PAYMENT,
         note=note,
+        points_used=points_used,
         address_snapshot={
             "name": address.name,
             "phone": address.phone,
@@ -142,6 +158,9 @@ async def create_order(session: AsyncSession, user: User, items: list[OrderLineR
     await session.flush()
     if uc is not None:
         await coupon_svc.lock_for_order(session, uc, order.id)
+    if points_used > 0:
+        await points_svc.deduct(session, user.id, points_used, "order_deduct",
+                                ref_id=order.id, remark=order.order_no)
     for line in lines:
         session.add(OrderItem(order_id=order.id, **line))
     return order
@@ -157,6 +176,9 @@ async def cancel_order(session: AsyncSession, order: Order) -> None:
             update(Sku).where(Sku.id == item.sku_id).values(stock=Sku.stock + item.qty)
         )
     await coupon_svc.release_for_order(session, order.id)  # 退券
+    if order.points_used > 0:  # 退积分
+        await points_svc.grant(session, order.user_id, order.points_used, "order_refund",
+                               ref_id=order.id, remark=order.order_no)
 
 
 async def mark_order_paid(session: AsyncSession, order: Order,
@@ -174,6 +196,11 @@ async def mark_order_paid(session: AsyncSession, order: Order,
         await session.execute(
             update(Spu).where(Spu.id == item.spu_id).values(sales=Spu.sales + item.qty)
         )
+    # 购物返积分：实付每元返 points_per_yuan 分（本函数有状态幂等保护，不会重复发）
+    reward = order.pay_amount // 100 * settings.points_per_yuan
+    if reward > 0:
+        await points_svc.grant(session, order.user_id, reward, "order_reward",
+                               ref_id=order.id, remark=order.order_no)
     return True
 
 
@@ -206,6 +233,8 @@ def order_to_dict(order: Order) -> dict:
         "status_label": OrderStatus.LABELS.get(order.status, order.status),
         "item_amount": order.item_amount,
         "discount_amount": order.discount_amount,
+        "points_used": order.points_used,
+        "points_deduct": points_svc.deduct_cents(order.points_used),
         "freight": order.freight,
         "pay_amount": order.pay_amount,
         "note": order.note,

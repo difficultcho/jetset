@@ -15,6 +15,10 @@ Page({
     usableCount: 0,
     appliedId: null,
     couponSheet: false,
+    usePoints: false,
+    pointsAvailable: 0,
+    pointsUsed: 0,
+    pointsDeduct: 0,
     submitting: false
   },
 
@@ -40,7 +44,7 @@ Page({
 
   async loadPreview() {
     try {
-      const d = await api.orderPreview(this.po.items, this.data.appliedId);
+      const d = await api.orderPreview(this.po.items, this.data.appliedId, this.data.usePoints);
       // 首次进入自动应用减免最大的可用券（后端已按减免额降序）
       if (!this.autoPicked) {
         this.autoPicked = true;
@@ -56,7 +60,10 @@ Page({
         payAmount: fen2yuan(d.pay_amount),
         discount: fen2yuan(d.discount_amount),
         coupons: d.coupons.map(toCoupon),
-        usableCount: d.coupons.filter((c) => c.usable).length
+        usableCount: d.coupons.filter((c) => c.usable).length,
+        pointsAvailable: d.points_available,
+        pointsUsed: d.points_used,
+        pointsDeduct: fen2yuan(d.points_deduct)
       });
     } catch (e) {
       // 改数量后可能不再满足已选券门槛：清掉券重试一次
@@ -98,6 +105,11 @@ Page({
     this.loadPreview();
   },
 
+  togglePoints(e) {
+    this.setData({ usePoints: e.detail.value });
+    this.loadPreview();
+  },
+
   noop() {},
 
   goAddress() {
@@ -112,7 +124,8 @@ Page({
     }
     this.setData({ submitting: true });
     try {
-      await api.orderCreate(this.po.items, this.data.addr.id, this.data.note, this.data.appliedId);
+      await api.orderCreate(this.po.items, this.data.addr.id, this.data.note,
+        this.data.appliedId, this.data.usePoints);
       if (this.po.from === 'cart' && this.po.cartItemIds) {
         for (const id of this.po.cartItemIds) {
           try { await api.cartDelete(id); } catch (e) { /* 单条失败忽略 */ }

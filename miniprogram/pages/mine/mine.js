@@ -51,9 +51,9 @@ Page({
   },
 
   onStat(e) {
-    if (e.currentTarget.dataset.i === 3) {
-      wx.navigateTo({ url: '/pages/coupons/coupons' });
-    }
+    const i = e.currentTarget.dataset.i;
+    if (i === 1) wx.navigateTo({ url: '/pages/points/points' });
+    if (i === 3) wx.navigateTo({ url: '/pages/coupons/coupons' });
   },
 
   goProfile() {

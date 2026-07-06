@@ -20,11 +20,14 @@ const api = {
   cartDelete: (itemId) => request('DELETE', '/api/v1/cart/items/' + itemId),
 
   // 订单
-  orderPreview: (items, userCouponId) =>
-    request('POST', '/api/v1/orders/preview', { items, user_coupon_id: userCouponId || null }),
-  orderCreate: (items, addressId, note, userCouponId) =>
+  orderPreview: (items, userCouponId, usePoints) =>
+    request('POST', '/api/v1/orders/preview', {
+      items, user_coupon_id: userCouponId || null, use_points: !!usePoints
+    }),
+  orderCreate: (items, addressId, note, userCouponId, usePoints) =>
     request('POST', '/api/v1/orders', {
-      items, address_id: addressId, note: note || '', user_coupon_id: userCouponId || null
+      items, address_id: addressId, note: note || '',
+      user_coupon_id: userCouponId || null, use_points: !!usePoints
     }),
   orders: (status, page) =>
     request('GET', '/api/v1/orders?page_size=50' + (status ? '&status=' + status : '') + (page ? '&page=' + page : '')),
@@ -46,6 +49,9 @@ const api = {
   couponsCenter: () => request('GET', '/api/v1/coupons/center'),
   couponClaim: (id) => request('POST', '/api/v1/coupons/' + id + '/claim'),
   myCoupons: (status) => request('GET', '/api/v1/me/coupons' + (status ? '?status=' + status : '')),
+
+  // 积分
+  pointsLogs: () => request('GET', '/api/v1/me/points/logs'),
 
   // 批发合作
   wholesaleApply: (data) => request('POST', '/api/v1/wholesale/applications', data),

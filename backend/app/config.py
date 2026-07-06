@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     order_timeout_minutes: int = 30
     freight_cents: int = 0
 
+    # 积分规则：实付每元返 points_per_yuan 分；points_deduct_rate 积分抵 1 元
+    points_per_yuan: int = 1
+    points_deduct_rate: int = 100
+
     upload_dir: str = "./uploads"
 
     # 管理后台初始账号（seed 时创建；生产务必改密码）

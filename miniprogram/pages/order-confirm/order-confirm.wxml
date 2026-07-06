@@ -48,6 +48,14 @@
         <text wx:elif="{{usableCount > 0}}" class="sum-value discount">{{usableCount}} 张可用 ›</text>
         <text wx:else class="sum-value muted">暂无可用 ›</text>
       </view>
+      <view class="sum-row">
+        <text class="sum-label">积分抵扣<text wx:if="{{pointsAvailable > 0}}" class="points-hint">（可用 {{pointsAvailable}} 分）</text></text>
+        <view class="points-right">
+          <text wx:if="{{usePoints && pointsUsed > 0}}" class="sum-value discount">-¥{{pointsDeduct}}</text>
+          <text wx:if="{{pointsAvailable === 0}}" class="sum-value muted">无可用</text>
+          <switch wx:else class="points-switch" checked="{{usePoints}}" color="#1a1a1a" bindchange="togglePoints" />
+        </view>
+      </view>
       <view class="sum-total">
         <text class="sum-label">合计：</text>
         <text class="total-value">¥{{payAmount}}.00</text>

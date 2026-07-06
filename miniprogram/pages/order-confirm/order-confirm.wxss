@@ -138,6 +138,19 @@
   color: #E86A2B;
   font-weight: 500;
 }
+.points-hint {
+  font-size: 22rpx;
+  color: #aaa;
+}
+.points-right {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+.points-switch {
+  transform: scale(0.7);
+  transform-origin: right center;
+}
 
 /* 优惠券选择弹窗 */
 .cp-mask {

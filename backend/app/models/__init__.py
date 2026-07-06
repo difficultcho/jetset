@@ -5,6 +5,7 @@ from app.models.catalog import Category, Sku, Spu, SpuImage
 from app.models.cms import Banner
 from app.models.coupon import Coupon, UserCoupon
 from app.models.order import Order, OrderItem, OrderStatus, Payment, Shipment
+from app.models.points import PointsLog
 from app.models.user import User
 from app.models.wholesale import WholesaleApplication
 
@@ -19,6 +20,7 @@ __all__ = [
     "OrderItem",
     "OrderStatus",
     "Payment",
+    "PointsLog",
     "Shipment",
     "Sku",
     "Spu",

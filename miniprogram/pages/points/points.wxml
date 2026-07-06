@@ -1,0 +1,21 @@
+<view class="page">
+  <view class="balance-card">
+    <view class="balance-num">{{balance}}</view>
+    <view class="balance-label">当前积分 · 下单可抵现（100 积分 = ¥1）</view>
+  </view>
+
+  <view wx:if="{{loaded && logs.length === 0}}" class="empty">暂无积分记录</view>
+
+  <view class="log-card" wx:for="{{logs}}" wx:key="id">
+    <view class="log-main">
+      <view class="log-reason">{{item.reason}}</view>
+      <view class="log-time">{{item.time}}<text wx:if="{{item.remark}}"> · {{item.remark}}</text></view>
+    </view>
+    <view class="log-right">
+      <view class="log-change {{item.plus ? 'plus' : ''}}">{{item.plus ? '+' : ''}}{{item.change}}</view>
+      <view class="log-balance">余 {{item.balance}}</view>
+    </view>
+  </view>
+
+  <view class="bottom-space" />
+</view>

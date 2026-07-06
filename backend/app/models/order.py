@@ -33,7 +33,8 @@ class Order(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), index=True)
     status: Mapped[str] = mapped_column(String(32), default=OrderStatus.PENDING_PAYMENT, index=True)
     item_amount: Mapped[int] = mapped_column(Integer, default=0)  # 分
-    discount_amount: Mapped[int] = mapped_column(Integer, default=0)
+    discount_amount: Mapped[int] = mapped_column(Integer, default=0)  # 优惠券折扣
+    points_used: Mapped[int] = mapped_column(Integer, default=0, server_default="0")  # 抵扣消耗的积分数
     freight: Mapped[int] = mapped_column(Integer, default=0)
     pay_amount: Mapped[int] = mapped_column(Integer, default=0)
     note: Mapped[str] = mapped_column(Text, default="")
