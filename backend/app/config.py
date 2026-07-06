@@ -44,3 +44,17 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
+
+# 生产环境防线：关键配置缺失必须在启动时报错，而不是静默用默认值拖到运行期
+if settings.app_env == "prod":
+    import sys
+
+    if settings.database_url.startswith("sqlite"):
+        raise RuntimeError(
+            "APP_ENV=prod 但 DATABASE_URL 未配置（当前为 sqlite 默认值）。"
+            "sqlite 数据存在容器内、重建即丢失，生产必须配置 MySQL。"
+        )
+    if settings.wechat_mock:
+        print("[config] 警告：生产环境 WECHAT_MOCK=true，任何人可伪造登录", file=sys.stderr)
+    if settings.jwt_secret.startswith("dev-secret") or settings.admin_password == "jetset-admin":
+        print("[config] 警告：JWT_SECRET/ADMIN_PASSWORD 仍为默认值，生产必须更换", file=sys.stderr)
