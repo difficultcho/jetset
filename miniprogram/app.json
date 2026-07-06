@@ -8,6 +8,7 @@
     "pages/product/product",
     "pages/order-confirm/order-confirm",
     "pages/orders/orders",
+    "pages/coupons/coupons",
     "pages/address/address",
     "pages/profile/profile"
   ],

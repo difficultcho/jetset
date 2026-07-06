@@ -11,6 +11,7 @@ from app.models.catalog import Sku, Spu
 from app.models.order import Order, OrderItem, OrderStatus, Payment
 from app.models.user import User
 from app.schemas.order import OrderLineReq
+from app.services import coupons as coupon_svc
 from app.utils import gen_order_no, utcnow
 
 
@@ -58,10 +59,9 @@ def _build_line(sku: Sku, qty: int) -> dict:
     }
 
 
-def _amounts(lines: list[dict]) -> dict:
+def _amounts(lines: list[dict], discount: int = 0) -> dict:
     item_amount = sum(line["price"] * line["qty"] for line in lines)
     freight = settings.freight_cents
-    discount = 0  # 二期：优惠券/促销在此收口
     return {
         "item_amount": item_amount,
         "freight": freight,
@@ -70,15 +70,32 @@ def _amounts(lines: list[dict]) -> dict:
     }
 
 
-async def preview(session: AsyncSession, items: list[OrderLineReq]) -> dict:
+async def preview(session: AsyncSession, user: User, items: list[OrderLineReq],
+                  user_coupon_id: int | None = None) -> dict:
     merged = _merge_lines(items)
     sku_map = await _load_skus(session, list(merged))
     lines = [_build_line(sku_map[sid], qty) for sid, qty in merged.items()]
-    return {"items": lines, "coupons": [], **_amounts(lines)}
+    item_amount = sum(line["price"] * line["qty"] for line in lines)
+
+    # 可用券列表（含门槛是否满足），指定券则计算折扣
+    ucs = await coupon_svc.usable_coupons(session, user.id)
+    discount = 0
+    applied_id = None
+    if user_coupon_id:
+        uc = await coupon_svc.get_valid_for_order(session, user.id, user_coupon_id, item_amount)
+        discount = min(uc.amount, item_amount)  # 减免不超过商品总额
+        applied_id = uc.id
+    return {
+        "items": lines,
+        "coupons": [coupon_svc.uc_to_dict(uc, item_amount) for uc in ucs],
+        "applied_coupon_id": applied_id,
+        **_amounts(lines, discount),
+    }
 
 
 async def create_order(session: AsyncSession, user: User, items: list[OrderLineReq],
-                       address_id: int, note: str) -> Order:
+                       address_id: int, note: str,
+                       user_coupon_id: int | None = None) -> Order:
     address = await session.get(Address, address_id)
     if address is None or address.user_id != user.id:
         raise BizError("请选择有效的收货地址")
@@ -97,7 +114,16 @@ async def create_order(session: AsyncSession, user: User, items: list[OrderLineR
             raise BizError(f"「{sku_map[sid].spu.name}」库存不足")
 
     lines = [_build_line(sku_map[sid], qty) for sid, qty in merged.items()]
-    am = _amounts(lines)
+    item_amount = sum(line["price"] * line["qty"] for line in lines)
+
+    # 优惠券：先校验算折扣，订单落库后再锁定（同一事务，失败整体回滚）
+    uc = None
+    discount = 0
+    if user_coupon_id:
+        uc = await coupon_svc.get_valid_for_order(session, user.id, user_coupon_id, item_amount)
+        discount = min(uc.amount, item_amount)
+
+    am = _amounts(lines, discount)
     order = Order(
         order_no=gen_order_no(),
         user_id=user.id,
@@ -114,6 +140,8 @@ async def create_order(session: AsyncSession, user: User, items: list[OrderLineR
     )
     session.add(order)
     await session.flush()
+    if uc is not None:
+        await coupon_svc.lock_for_order(session, uc, order.id)
     for line in lines:
         session.add(OrderItem(order_id=order.id, **line))
     return order
@@ -128,6 +156,7 @@ async def cancel_order(session: AsyncSession, order: Order) -> None:
         await session.execute(
             update(Sku).where(Sku.id == item.sku_id).values(stock=Sku.stock + item.qty)
         )
+    await coupon_svc.release_for_order(session, order.id)  # 退券
 
 
 async def mark_order_paid(session: AsyncSession, order: Order,

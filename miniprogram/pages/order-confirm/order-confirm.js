@@ -1,6 +1,6 @@
 const app = getApp();
 const api = require('../../utils/api.js');
-const { toOrderLine, toAddress, fen2yuan } = require('../../utils/mapper.js');
+const { toOrderLine, toAddress, toCoupon, fen2yuan } = require('../../utils/mapper.js');
 const { toastError } = require('../../utils/request.js');
 
 Page({
@@ -10,6 +10,11 @@ Page({
     note: '',
     itemAmount: 0,
     payAmount: 0,
+    discount: 0,
+    coupons: [],
+    usableCount: 0,
+    appliedId: null,
+    couponSheet: false,
     submitting: false
   },
 
@@ -20,6 +25,7 @@ Page({
       return;
     }
     this.po = po;
+    this.autoPicked = false;
     this.loadPreview();
   },
 
@@ -34,13 +40,30 @@ Page({
 
   async loadPreview() {
     try {
-      const d = await api.orderPreview(this.po.items);
+      const d = await api.orderPreview(this.po.items, this.data.appliedId);
+      // 首次进入自动应用减免最大的可用券（后端已按减免额降序）
+      if (!this.autoPicked) {
+        this.autoPicked = true;
+        const best = d.coupons.find((c) => c.usable);
+        if (best) {
+          this.setData({ appliedId: best.id });
+          return this.loadPreview();
+        }
+      }
       this.setData({
         lines: d.items.map(toOrderLine),
         itemAmount: fen2yuan(d.item_amount),
-        payAmount: fen2yuan(d.pay_amount)
+        payAmount: fen2yuan(d.pay_amount),
+        discount: fen2yuan(d.discount_amount),
+        coupons: d.coupons.map(toCoupon),
+        usableCount: d.coupons.filter((c) => c.usable).length
       });
     } catch (e) {
+      // 改数量后可能不再满足已选券门槛：清掉券重试一次
+      if (this.data.appliedId) {
+        this.setData({ appliedId: null });
+        return this.loadPreview();
+      }
       toastError(e);
     }
   },
@@ -57,6 +80,26 @@ Page({
     this.setData({ note: e.detail.value });
   },
 
+  openCoupons() {
+    if (!this.data.coupons.length) {
+      wx.showToast({ title: '暂无优惠券', icon: 'none' });
+      return;
+    }
+    this.setData({ couponSheet: true });
+  },
+
+  closeCoupons() {
+    this.setData({ couponSheet: false });
+  },
+
+  pickCoupon(e) {
+    const id = e.currentTarget.dataset.id || null; // 0/undefined = 不使用
+    this.setData({ appliedId: id, couponSheet: false });
+    this.loadPreview();
+  },
+
+  noop() {},
+
   goAddress() {
     wx.navigateTo({ url: '/pages/address/address' });
   },
@@ -69,8 +112,7 @@ Page({
     }
     this.setData({ submitting: true });
     try {
-      await api.orderCreate(this.po.items, this.data.addr.id, this.data.note);
-      // 购物车结算的商品下单后移出购物车
+      await api.orderCreate(this.po.items, this.data.addr.id, this.data.note, this.data.appliedId);
       if (this.po.from === 'cart' && this.po.cartItemIds) {
         for (const id of this.po.cartItemIds) {
           try { await api.cartDelete(id); } catch (e) { /* 单条失败忽略 */ }

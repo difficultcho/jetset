@@ -12,6 +12,7 @@ const routes = [
       { path: 'orders', component: () => import('./views/Orders.vue'), meta: { title: '订单管理' } },
       { path: 'wholesale', component: () => import('./views/Wholesale.vue'), meta: { title: '批发审核' } },
       { path: 'banners', component: () => import('./views/Banners.vue'), meta: { title: '首页轮播' } },
+      { path: 'coupons', component: () => import('./views/Coupons.vue'), meta: { title: '优惠券' } },
       { path: 'users', component: () => import('./views/Users.vue'), meta: { title: '用户' } }
     ]
   }

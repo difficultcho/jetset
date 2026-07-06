@@ -37,14 +37,22 @@ Page({
       const u = await api.me();
       app.globalData.userInfo = u;
       const cnt = await app.refreshCartCount();
+      const coupons = await api.myCoupons('unused');
       this.setData({
         user: u,
         cartCnt: cnt,
-        'stats[1].v': String(u.points || 0)
+        'stats[1].v': String(u.points || 0),
+        'stats[3].v': String(coupons.length)
       });
       if (typeof this.getTabBar === 'function') this.getTabBar().refresh(4);
     } catch (e) {
       toastError(e);
+    }
+  },
+
+  onStat(e) {
+    if (e.currentTarget.dataset.i === 3) {
+      wx.navigateTo({ url: '/pages/coupons/coupons' });
     }
   },
 

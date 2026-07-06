@@ -8,6 +8,7 @@
         <el-menu-item index="/orders">订单管理</el-menu-item>
         <el-menu-item index="/wholesale">批发审核</el-menu-item>
         <el-menu-item index="/banners">首页轮播</el-menu-item>
+        <el-menu-item index="/coupons">优惠券</el-menu-item>
         <el-menu-item index="/users">用户</el-menu-item>
       </el-menu>
     </el-aside>

@@ -10,12 +10,14 @@ class OrderLineReq(BaseModel):
 
 class PreviewReq(BaseModel):
     items: list[OrderLineReq] = Field(min_length=1)
+    user_coupon_id: int | None = None
 
 
 class OrderCreateReq(BaseModel):
     items: list[OrderLineReq] = Field(min_length=1)
     address_id: int
     note: str = Field(default="", max_length=250)
+    user_coupon_id: int | None = None
 
 
 class OrderItemOut(BaseModel):
@@ -37,7 +39,8 @@ class PreviewOut(BaseModel):
     discount_amount: int
     freight: int
     pay_amount: int
-    coupons: list = []  # 二期接优惠券
+    coupons: list[dict] = []       # 用户可用券（含 usable 门槛标记）
+    applied_coupon_id: int | None = None
 
 
 class OrderOut(BaseModel):

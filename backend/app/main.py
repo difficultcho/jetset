@@ -79,9 +79,14 @@ async def http_error_handler(request: Request, exc: HTTPException):
 
 @app.exception_handler(RequestValidationError)
 async def validation_error_handler(request: Request, exc: RequestValidationError):
+    # 只保留可 JSON 序列化的字段（ctx 里可能带异常对象）
+    errors = [
+        {"loc": list(e.get("loc", [])), "msg": e.get("msg"), "type": e.get("type")}
+        for e in exc.errors()
+    ]
     return JSONResponse(
         status_code=422,
-        content={"code": 422, "message": "参数错误", "data": exc.errors()},
+        content={"code": 422, "message": "参数错误", "data": errors},
     )
 
 

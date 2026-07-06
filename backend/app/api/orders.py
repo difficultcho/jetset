@@ -30,12 +30,13 @@ async def _get_owned(session, user_id: int, order_id: int) -> Order:
 
 @router.post("/orders/preview", response_model=Resp[PreviewOut])
 async def preview(req: PreviewReq, user: CurrentUser, session: DB):
-    return Resp(data=await svc.preview(session, req.items))
+    return Resp(data=await svc.preview(session, user, req.items, req.user_coupon_id))
 
 
 @router.post("/orders", response_model=Resp[OrderOut])
 async def create_order(req: OrderCreateReq, user: CurrentUser, session: DB, request: Request):
-    order = await svc.create_order(session, user, req.items, req.address_id, req.note)
+    order = await svc.create_order(session, user, req.items, req.address_id, req.note,
+                                   req.user_coupon_id)
     await session.commit()
 
     # 精确超时取消（best-effort；redis 不可用时由 worker 定时扫描兜底）

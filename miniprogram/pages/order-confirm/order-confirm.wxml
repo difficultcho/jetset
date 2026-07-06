@@ -42,9 +42,11 @@
         <text class="sum-label">商品总价 共{{lines.length}}件商品</text>
         <text class="sum-value">¥{{itemAmount}}.00</text>
       </view>
-      <view class="sum-row">
+      <view class="sum-row" bindtap="openCoupons">
         <text class="sum-label">优惠券</text>
-        <text class="sum-value muted">暂无可用 ›</text>
+        <text wx:if="{{discount > 0}}" class="sum-value discount">-¥{{discount}}.00 ›</text>
+        <text wx:elif="{{usableCount > 0}}" class="sum-value discount">{{usableCount}} 张可用 ›</text>
+        <text wx:else class="sum-value muted">暂无可用 ›</text>
       </view>
       <view class="sum-total">
         <text class="sum-label">合计：</text>
@@ -64,6 +66,33 @@
     </view>
     <view class="bottom-space" />
   </scroll-view>
+
+  <!-- 优惠券选择弹窗 -->
+  <block wx:if="{{couponSheet}}">
+    <view class="cp-mask" bindtap="closeCoupons" />
+    <view class="cp-sheet" catchtap="noop">
+      <view class="cp-head">
+        <text class="cp-title">选择优惠券</text>
+        <view class="cp-close" bindtap="closeCoupons">×</view>
+      </view>
+      <scroll-view class="cp-list" scroll-y>
+        <view class="cp-item {{!item.usable ? 'off' : ''}}" wx:for="{{coupons}}" wx:key="id"
+          data-id="{{item.usable ? item.id : ''}}" bindtap="{{item.usable ? 'pickCoupon' : 'noop'}}">
+          <view class="cp-info">
+            <view class="cp-name">{{item.name}}</view>
+            <view class="cp-sub">{{item.thresholdText}} · {{item.expiresText}}</view>
+          </view>
+          <view class="cp-amount">-¥{{item.amount}}</view>
+          <view class="cp-radio {{appliedId === item.id ? 'on' : ''}}" />
+        </view>
+        <view class="cp-item" data-id="" bindtap="pickCoupon">
+          <view class="cp-info"><view class="cp-name">不使用优惠券</view></view>
+          <view class="cp-radio {{!appliedId ? 'on' : ''}}" />
+        </view>
+        <view style="height: 40rpx" />
+      </scroll-view>
+    </view>
+  </block>
 
   <!-- 底部结算栏 -->
   <view class="submit-bar">

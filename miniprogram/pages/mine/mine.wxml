@@ -29,7 +29,7 @@
 
   <!-- 资产统计 -->
   <view class="stats">
-    <view class="stat {{index < 4 ? 'divided' : ''}}" wx:for="{{stats}}" wx:key="l">
+    <view class="stat {{index < 4 ? 'divided' : ''}}" wx:for="{{stats}}" wx:key="l" data-i="{{index}}" bindtap="onStat">
       <view class="stat-v">{{item.v}}</view>
       <view class="stat-l">{{item.l}}</view>
     </view>

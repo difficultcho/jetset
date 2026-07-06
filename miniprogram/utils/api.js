@@ -20,9 +20,12 @@ const api = {
   cartDelete: (itemId) => request('DELETE', '/api/v1/cart/items/' + itemId),
 
   // 订单
-  orderPreview: (items) => request('POST', '/api/v1/orders/preview', { items }),
-  orderCreate: (items, addressId, note) =>
-    request('POST', '/api/v1/orders', { items, address_id: addressId, note: note || '' }),
+  orderPreview: (items, userCouponId) =>
+    request('POST', '/api/v1/orders/preview', { items, user_coupon_id: userCouponId || null }),
+  orderCreate: (items, addressId, note, userCouponId) =>
+    request('POST', '/api/v1/orders', {
+      items, address_id: addressId, note: note || '', user_coupon_id: userCouponId || null
+    }),
   orders: (status, page) =>
     request('GET', '/api/v1/orders?page_size=50' + (status ? '&status=' + status : '') + (page ? '&page=' + page : '')),
   orderCancel: (id) => request('POST', '/api/v1/orders/' + id + '/cancel'),
@@ -38,6 +41,11 @@ const api = {
   // 个人信息
   me: () => request('GET', '/api/v1/me'),
   updateMe: (data) => request('PUT', '/api/v1/me', data),
+
+  // 优惠券
+  couponsCenter: () => request('GET', '/api/v1/coupons/center'),
+  couponClaim: (id) => request('POST', '/api/v1/coupons/' + id + '/claim'),
+  myCoupons: (status) => request('GET', '/api/v1/me/coupons' + (status ? '?status=' + status : '')),
 
   // 批发合作
   wholesaleApply: (data) => request('POST', '/api/v1/wholesale/applications', data),

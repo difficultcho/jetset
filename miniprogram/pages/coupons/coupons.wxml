@@ -1,0 +1,45 @@
+<view class="page">
+  <!-- 领券中心 -->
+  <view wx:if="{{center.length}}" class="center-sec">
+    <view class="sec-title">领券中心</view>
+    <view class="coupon-card" wx:for="{{center}}" wx:key="id">
+      <view class="cp-left">
+        <view class="cp-amount">¥<text class="cp-num">{{item.amount}}</text></view>
+        <view class="cp-threshold">{{item.thresholdText}}</view>
+      </view>
+      <view class="cp-mid">
+        <view class="cp-name">{{item.name}}</view>
+        <view class="cp-expire">{{item.expiresText}}</view>
+      </view>
+      <view class="cp-right">
+        <view wx:if="{{item.claimable}}" class="claim-btn" data-id="{{item.id}}" bindtap="claim">领取</view>
+        <view wx:elif="{{item.soldOut}}" class="claim-btn disabled">已领完</view>
+        <view wx:else class="claim-btn disabled">已领取</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 我的券 -->
+  <view class="tabs">
+    <view class="tab {{ti === index ? 'on' : ''}}" wx:for="{{tabs}}" wx:key="*this" data-i="{{index}}" bindtap="pickTab">{{item}}</view>
+  </view>
+
+  <view wx:if="{{loaded && mine.length === 0}}" class="empty">暂无优惠券</view>
+
+  <view class="coupon-card {{item.status !== 'unused' ? 'muted' : ''}}" wx:for="{{mine}}" wx:key="id">
+    <view class="cp-left">
+      <view class="cp-amount">¥<text class="cp-num">{{item.amount}}</text></view>
+      <view class="cp-threshold">{{item.thresholdText}}</view>
+    </view>
+    <view class="cp-mid">
+      <view class="cp-name">{{item.name}}</view>
+      <view class="cp-expire">{{item.expiresText}}</view>
+    </view>
+    <view class="cp-right">
+      <text wx:if="{{item.status === 'used'}}" class="cp-state">已使用</text>
+      <text wx:elif="{{item.status === 'expired'}}" class="cp-state">已过期</text>
+    </view>
+  </view>
+
+  <view class="bottom-space" />
+</view>

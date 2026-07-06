@@ -84,6 +84,24 @@ function toOrder(o) {
   };
 }
 
+// 优惠券（领券中心与我的券通用）
+function toCoupon(c) {
+  return {
+    id: c.id,
+    name: c.name,
+    amount: fen2yuan(c.amount),
+    thresholdText: c.threshold > 0 ? '满' + fen2yuan(c.threshold) + '可用' : '无门槛',
+    status: c.status || '',
+    usable: c.usable !== false,
+    expiresText: c.expires_at ? String(c.expires_at).slice(0, 10) + ' 前有效'
+      : c.valid_days ? '领取后 ' + c.valid_days + ' 天内有效'
+      : c.valid_until ? String(c.valid_until).slice(0, 10) + ' 前有效' : '',
+    claimable: c.claimable,
+    soldOut: c.sold_out,
+    claimed: c.claimed || 0,
+  };
+}
+
 function toAddress(a) {
   return {
     id: a.id,
@@ -94,4 +112,4 @@ function toAddress(a) {
   };
 }
 
-module.exports = { fen2yuan, toProd, toDetail, toCartItem, toOrderLine, toOrder, toAddress };
+module.exports = { fen2yuan, toProd, toDetail, toCartItem, toOrderLine, toOrder, toAddress, toCoupon };
