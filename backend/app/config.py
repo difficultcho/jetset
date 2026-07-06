@@ -33,6 +33,10 @@ class Settings(BaseSettings):
 
     upload_dir: str = "./uploads"
 
+    # 管理后台初始账号（seed 时创建；生产务必改密码）
+    admin_username: str = "admin"
+    admin_password: str = "jetset-admin"
+
 
 @lru_cache
 def get_settings() -> Settings:

@@ -17,7 +17,7 @@ from httpx import ASGITransport, AsyncClient
 
 from app.db import SessionFactory, create_all
 from app.main import app
-from app.seed import seed_all
+from app.seed import ensure_admin, seed_all
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -26,6 +26,7 @@ def _init_db():
         await create_all()
         async with SessionFactory() as session:
             await seed_all(session)
+            await ensure_admin(session)
             await session.commit()
 
     asyncio.run(_setup())

@@ -52,6 +52,7 @@ class OrderOut(BaseModel):
     note: str
     address: dict
     items: list[OrderItemOut]
+    shipment: dict | None = None  # {company, tracking_no, shipped_at}
     expire_at: datetime | None
     paid_at: datetime | None
     created_at: datetime

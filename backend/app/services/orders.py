@@ -190,6 +190,11 @@ def order_to_dict(order: Order) -> dict:
             }
             for i in order.items
         ],
+        "shipment": (
+            {"company": order.shipment.company, "tracking_no": order.shipment.tracking_no,
+             "shipped_at": order.shipped_at}
+            if order.shipment else None
+        ),
         "expire_at": order.expire_at,
         "paid_at": order.paid_at,
         "created_at": order.created_at,

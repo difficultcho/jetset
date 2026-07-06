@@ -1,0 +1,34 @@
+# 管理后台流水线：构建 Vue SPA → scp 静态文件到服务器 /var/www/jetset-admin
+# 复用 backend.yml 的 SSH_* secrets；服务器需预先 mkdir 并授权（见 backend/deploy/README.md）
+
+name: admin
+
+on:
+  push:
+    branches: [main]
+    paths: ['admin/**', '.github/workflows/admin.yml']
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+      - run: npm ci
+        working-directory: admin
+      - run: npm run build
+        working-directory: admin
+      - name: Deploy dist to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "admin/dist/*"
+          target: /var/www/jetset-admin
+          strip_components: 2
+          rm: true

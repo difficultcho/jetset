@@ -1,10 +1,10 @@
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, UploadFile
+from fastapi import APIRouter, Depends, UploadFile
 
 from app.config import settings
-from app.deps import CurrentUser
+from app.deps import require_any_identity
 from app.errors import BizError
 from app.schemas.common import Resp
 
@@ -14,8 +14,8 @@ MAX_SIZE = 5 * 1024 * 1024
 ALLOWED = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp"}
 
 
-@router.post("/uploads", response_model=Resp[dict])
-async def upload(file: UploadFile, user: CurrentUser):
+@router.post("/uploads", response_model=Resp[dict], dependencies=[Depends(require_any_identity)])
+async def upload(file: UploadFile):
     """图片上传。MVP 存本地磁盘由应用直接伺服；接 COS 后改为直传签名。"""
     ext = ALLOWED.get(file.content_type or "")
     if ext is None:

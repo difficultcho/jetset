@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.api import api_router
+from app.api.admin import admin_router
 from app.config import settings
 from app.db import create_all
 from app.errors import BizError
@@ -46,6 +47,7 @@ app.add_middleware(
 )
 
 app.include_router(api_router, prefix="/api/v1")
+app.include_router(admin_router, prefix="/api/admin")
 app.mount("/uploads", StaticFiles(directory=settings.upload_dir, check_dir=False), name="uploads")
 
 

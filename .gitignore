@@ -14,3 +14,5 @@ backend/uploads/
 # miniprogram
 miniprogram/node_modules/
 project.private.config.json
+admin/node_modules/
+admin/dist/

@@ -8,9 +8,12 @@ import asyncio
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.db import SessionFactory, create_all, engine
+from app.models.admin import AdminUser
 from app.models.catalog import Category, Sku, Spu
 from app.models.cms import Banner
+from app.security import hash_password
 
 CATEGORIES = ["冲锋衣", "包类", "短裤", "开衫", "登山鞋", "短袖", "滑雪"]
 
@@ -90,14 +93,29 @@ async def seed_all(session: AsyncSession) -> bool:
     return True
 
 
+async def ensure_admin(session: AsyncSession) -> bool:
+    """确保管理员账号存在（账号密码来自 ADMIN_USERNAME/ADMIN_PASSWORD 配置）。"""
+    count = (await session.execute(select(func.count()).select_from(AdminUser))).scalar_one()
+    if count > 0:
+        return False
+    session.add(AdminUser(
+        username=settings.admin_username,
+        password_hash=hash_password(settings.admin_password),
+    ))
+    return True
+
+
 async def main() -> None:
     await create_all()
     async with SessionFactory() as session:
         written = await seed_all(session)
+        admin_created = await ensure_admin(session)
         await session.commit()
     # 退出前释放连接池，避免解释器关闭阶段报 "Event loop is closed"
     await engine.dispose()
     print("seeded" if written else "already seeded, skipped")
+    if admin_created:
+        print(f"admin created: {settings.admin_username}（密码来自 ADMIN_PASSWORD，生产务必修改）")
 
 
 if __name__ == "__main__":

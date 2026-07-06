@@ -46,6 +46,7 @@ class Order(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
 
     items: Mapped[list["OrderItem"]] = relationship(back_populates="order", lazy="selectin")
+    shipment: Mapped["Shipment | None"] = relationship(lazy="selectin")
 
 
 class OrderItem(Base):
@@ -66,6 +67,16 @@ class OrderItem(Base):
     qty: Mapped[int] = mapped_column(Integer)
 
     order: Mapped[Order] = relationship(back_populates="items")
+
+
+class Shipment(Base):
+    __tablename__ = "shipment"
+
+    id: Mapped[int] = mapped_column(BigIntPK, primary_key=True, autoincrement=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), unique=True, index=True)
+    company: Mapped[str] = mapped_column(String(32))
+    tracking_no: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
 
 class Payment(Base):
