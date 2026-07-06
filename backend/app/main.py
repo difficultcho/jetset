@@ -58,7 +58,8 @@ async def serve_upload(name: str):
     path = Path(settings.upload_dir) / name
     if not path.is_file():
         raise HTTPException(status_code=404, detail="Not Found")
-    return FileResponse(path)
+    # 文件名为 UUID、内容不可变，可放心长缓存（客户端/微信缓存后不再回源）
+    return FileResponse(path, headers={"Cache-Control": "public, max-age=31536000, immutable"})
 
 
 @app.exception_handler(BizError)

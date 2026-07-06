@@ -11,6 +11,7 @@ from app.models.order import Order, OrderStatus
 from app.schemas.common import Page, Resp
 from app.schemas.order import OrderCreateReq, OrderOut, PreviewOut, PreviewReq
 from app.services import orders as svc
+from app.services import wechat
 from app.services.payment import get_provider
 from app.utils import utcnow
 
@@ -35,6 +36,9 @@ async def preview(req: PreviewReq, user: CurrentUser, session: DB):
 
 @router.post("/orders", response_model=Resp[OrderOut])
 async def create_order(req: OrderCreateReq, user: CurrentUser, session: DB, request: Request):
+    # 订单备注属 UGC，过内容安全检测
+    if req.note and await wechat.msg_sec_check(user.openid, req.note) == "risky":
+        raise BizError("备注包含违规内容，请修改")
     order = await svc.create_order(session, user, req.items, req.address_id, req.note,
                                    req.user_coupon_id)
     await session.commit()
