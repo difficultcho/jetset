@@ -22,6 +22,16 @@ jobs:
         working-directory: admin
       - run: npm run build
         working-directory: admin
+      # 只清空内容不删目录：删除+重建目录需要 /var/www 父目录写权限（root），
+      # 清空内容只需要拥有目录内文件即可
+      - name: Clean target dir
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: find /var/www/jetset-admin -mindepth 1 -delete
+
       - name: Deploy dist to server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -31,4 +41,3 @@ jobs:
           source: "admin/dist/*"
           target: /var/www/jetset-admin
           strip_components: 2
-          rm: true

@@ -34,9 +34,10 @@ docker compose exec api python -m app.seed
 #    （见 nginx.conf.example 方案 A），reload 后验证：
 #    curl https://bce.kkmsee.com/jetset/healthz
 
-# 7. 管理后台静态目录（CI 通过 scp 发布到这里）
-mkdir -p /var/www/jetset-admin
-chown -R <SSH_USER>: /var/www/jetset-admin
+# 7. 管理后台静态目录（CI 通过 scp 发布到这里；必须由部署用户拥有，
+#    CI 每次发布会清空其内容后重新上传）
+sudo mkdir -p /var/www/jetset-admin
+sudo chown -R <SSH_USER对应的用户>: /var/www/jetset-admin
 #    nginx 加 /jetset-admin/ 静态块（见 nginx.conf.example）
 #    访问 https://bce.kkmsee.com/jetset-admin/
 #    初始账号 = .env 的 ADMIN_USERNAME/ADMIN_PASSWORD（seed 创建），登录后右上角改密码
