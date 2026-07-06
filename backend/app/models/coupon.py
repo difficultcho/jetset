@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, DateTime, ForeignKey, Integer, SmallInteger, String
+from sqlalchemy import BigInteger, Boolean, DateTime, ForeignKey, Integer, SmallInteger, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base, BigIntPK
@@ -21,6 +21,8 @@ class Coupon(Base):
     per_user_limit: Mapped[int] = mapped_column(Integer, default=1)
     valid_days: Mapped[int | None] = mapped_column(Integer, default=None)      # 领取后 N 天有效
     valid_until: Mapped[datetime | None] = mapped_column(DateTime, default=None)  # 固定截止
+    # 新客券：注册时自动发放，不出现在领券中心、不可手动领取
+    is_newcomer: Mapped[bool] = mapped_column(Boolean, default=False, server_default="0")
     status: Mapped[int] = mapped_column(SmallInteger, default=1)  # 1 可领取 0 下架
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 

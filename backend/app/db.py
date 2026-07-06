@@ -30,9 +30,33 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
+def _add_missing_columns(conn) -> None:
+    """轻量列迁移：模型新增的列自动 ALTER 补齐（幂等，只加列、不改不删）。
+
+    注意：新增 NOT NULL 列必须带 server_default，否则旧表 ALTER 会失败。
+    """
+    import logging
+
+    from sqlalchemy import inspect, text
+    from sqlalchemy.schema import CreateColumn
+
+    insp = inspect(conn)
+    for table in Base.metadata.tables.values():
+        if not insp.has_table(table.name):
+            continue
+        existing = {c["name"] for c in insp.get_columns(table.name)}
+        for col in table.columns:
+            if col.name in existing:
+                continue
+            ddl = CreateColumn(col).compile(dialect=conn.dialect)
+            conn.execute(text(f"ALTER TABLE {table.name} ADD COLUMN {ddl}"))
+            logging.getLogger(__name__).warning("列迁移：%s 表新增列 %s", table.name, col.name)
+
+
 async def create_all() -> None:
-    # MVP 阶段启动建表；schema 稳定后改为 alembic 迁移
+    # MVP 阶段启动建表 + 轻量列迁移；schema 复杂化后改为 alembic
     from app import models  # noqa: F401  确保模型已注册
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(_add_missing_columns)

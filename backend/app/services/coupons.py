@@ -39,28 +39,22 @@ def _expires_at(coupon: Coupon):
     return min(cands) if cands else utcnow() + timedelta(days=365)
 
 
-async def claim(session: AsyncSession, user: User, coupon_id: int) -> UserCoupon:
-    coupon = await session.get(Coupon, coupon_id)
-    if coupon is None or coupon.status != 1:
-        raise BizError("优惠券不存在或已下架")
-    if coupon.valid_until and coupon.valid_until < utcnow():
-        raise BizError("该券活动已结束")
-
+async def _issue(session: AsyncSession, user: User, coupon: Coupon) -> UserCoupon:
+    """发放一张券给用户（限领校验 + 条件更新占名额防超发）。"""
     claimed = (
         await session.execute(
             select(func.count()).select_from(UserCoupon).where(
-                UserCoupon.user_id == user.id, UserCoupon.coupon_id == coupon_id
+                UserCoupon.user_id == user.id, UserCoupon.coupon_id == coupon.id
             )
         )
     ).scalar_one()
     if claimed >= coupon.per_user_limit:
         raise BizError("已达每人限领数量")
 
-    # 条件更新占名额，防超发
     res = await session.execute(
         update(Coupon)
         .where(
-            Coupon.id == coupon_id,
+            Coupon.id == coupon.id,
             Coupon.status == 1,
             or_(Coupon.total == 0, Coupon.taken < Coupon.total),
         )
@@ -77,6 +71,38 @@ async def claim(session: AsyncSession, user: User, coupon_id: int) -> UserCoupon
     session.add(uc)
     await session.flush()
     return uc
+
+
+async def claim(session: AsyncSession, user: User, coupon_id: int) -> UserCoupon:
+    """领券中心手动领取。"""
+    coupon = await session.get(Coupon, coupon_id)
+    if coupon is None or coupon.status != 1:
+        raise BizError("优惠券不存在或已下架")
+    if coupon.is_newcomer:
+        raise BizError("新人专享券，注册时自动发放")
+    if coupon.valid_until and coupon.valid_until < utcnow():
+        raise BizError("该券活动已结束")
+    return await _issue(session, user, coupon)
+
+
+async def grant_newcomer_coupons(session: AsyncSession, user: User) -> list[UserCoupon]:
+    """注册时自动发放全部在架新客券；单张失败（领完等）静默跳过，不阻塞注册。"""
+    rows = (
+        await session.execute(
+            select(Coupon).where(
+                Coupon.is_newcomer.is_(True),
+                Coupon.status == 1,
+                or_(Coupon.valid_until.is_(None), Coupon.valid_until >= utcnow()),
+            )
+        )
+    ).scalars().all()
+    granted = []
+    for coupon in rows:
+        try:
+            granted.append(await _issue(session, user, coupon))
+        except BizError:
+            continue
+    return granted
 
 
 async def list_my_coupons(session: AsyncSession, user_id: int) -> list[UserCoupon]:

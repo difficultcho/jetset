@@ -22,6 +22,12 @@
         </template>
       </el-table-column>
       <el-table-column prop="per_user_limit" label="限领" width="70" />
+      <el-table-column label="类型" width="90">
+        <template #default="{ row }">
+          <el-tag v-if="row.is_newcomer" type="warning" size="small">新客券</el-tag>
+          <el-tag v-else type="info" size="small">领券中心</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="可领取" width="80">
         <template #default="{ row }">
           <el-switch :model-value="row.status === 1" @change="(v) => toggle(row, v)" />
@@ -66,6 +72,10 @@
       <el-form-item v-else label="截止日期">
         <el-date-picker v-model="form.valid_until" type="date" style="width: 180px" />
       </el-form-item>
+      <el-form-item label="新客自动发放">
+        <el-switch v-model="form.is_newcomer" />
+        <span class="hint">开启后不进领券中心，新用户注册时自动到账</span>
+      </el-form-item>
     </el-form>
     <template #footer>
       <el-button @click="dialog = false">取消</el-button>
@@ -89,7 +99,8 @@ const yuan = (cents) => '¥' + (cents / 100).toFixed(2).replace(/\.00$/, '')
 
 function emptyForm() {
   return { id: null, name: '', thresholdYuan: 0, amountYuan: 0, total: 0,
-           per_user_limit: 1, validType: 'days', valid_days: 30, valid_until: null, status: 1 }
+           per_user_limit: 1, validType: 'days', valid_days: 30, valid_until: null,
+           is_newcomer: false, status: 1 }
 }
 
 async function fetch() {
@@ -111,7 +122,8 @@ function openEdit(row) {
     id: row.id, name: row.name, thresholdYuan: row.threshold / 100, amountYuan: row.amount / 100,
     total: row.total, per_user_limit: row.per_user_limit,
     validType: row.valid_days ? 'days' : 'until',
-    valid_days: row.valid_days || 30, valid_until: row.valid_until, status: row.status
+    valid_days: row.valid_days || 30, valid_until: row.valid_until,
+    is_newcomer: row.is_newcomer, status: row.status
   }
   dialog.value = true
 }
@@ -128,6 +140,7 @@ async function save() {
     total: f.total, per_user_limit: f.per_user_limit,
     valid_days: f.validType === 'days' ? f.valid_days : null,
     valid_until: f.validType === 'until' ? f.valid_until : null,
+    is_newcomer: f.is_newcomer,
     status: f.status
   }
   saving.value = true

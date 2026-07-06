@@ -20,6 +20,7 @@ class CouponIn(BaseModel):
     per_user_limit: int = Field(default=1, ge=1)
     valid_days: int | None = Field(default=None, ge=1)
     valid_until: datetime | None = None
+    is_newcomer: bool = False  # 新客券：注册自动发放，不进领券中心
     status: int = Field(default=1, ge=0, le=1)
 
     @model_validator(mode="after")
@@ -36,7 +37,8 @@ def _row(c: Coupon, used: int = 0) -> dict:
         "id": c.id, "name": c.name, "threshold": c.threshold, "amount": c.amount,
         "total": c.total, "taken": c.taken, "used": used,
         "per_user_limit": c.per_user_limit, "valid_days": c.valid_days,
-        "valid_until": c.valid_until, "status": c.status, "created_at": c.created_at,
+        "valid_until": c.valid_until, "is_newcomer": c.is_newcomer,
+        "status": c.status, "created_at": c.created_at,
     }
 
 

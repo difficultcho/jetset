@@ -18,6 +18,7 @@ async def center(user: CurrentUser, session: DB):
             select(Coupon)
             .where(
                 Coupon.status == 1,
+                Coupon.is_newcomer.is_(False),  # 新客券不进领券中心
                 or_(Coupon.valid_until.is_(None), Coupon.valid_until >= utcnow()),
             )
             .order_by(Coupon.id.desc())

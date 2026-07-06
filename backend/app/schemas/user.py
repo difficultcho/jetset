@@ -31,3 +31,4 @@ class LoginReq(BaseModel):
 class LoginData(BaseModel):
     token: str
     user: UserOut
+    new_coupons: int = 0  # 注册时发放的新客券数量（老用户恒为 0）

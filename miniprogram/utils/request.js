@@ -28,8 +28,12 @@ function login() {
         rawRequest('POST', '/api/v1/auth/login', { code: r.code })
           .then((res) => {
             if (res.statusCode === 200 && res.data && res.data.code === 0) {
-              wx.setStorageSync('token', res.data.data.token);
-              resolve(res.data.data);
+              const data = res.data.data;
+              wx.setStorageSync('token', data.token);
+              if (data.new_coupons > 0) {
+                wx.showToast({ title: '新人优惠券已到账', icon: 'none', duration: 2500 });
+              }
+              resolve(data);
             } else {
               reject(new Error((res.data && res.data.message) || '登录失败'));
             }
