@@ -1,0 +1,6 @@
+.page { min-height: 100vh; background: #fff; }
+.tabs { display: flex; border-bottom: 1rpx solid #eee; }
+.tab { flex: 1; text-align: center; padding: 28rpx 0; font-size: 28rpx; color: #9a9a9a; position: relative; }
+.tab.on { color: #111; }
+.tab.on::after { content: ''; position: absolute; bottom: 0; left: 40%; right: 40%; height: 3rpx; background: #111; }
+.empty { text-align: center; color: #b0b0b0; font-size: 26rpx; padding: 160rpx 0; }

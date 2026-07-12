@@ -1,65 +1,33 @@
-<block wx:if="{{user}}">
-<view class="gap" />
-<view class="sec-hdr">基本信息</view>
-<view class="card">
-  <view class="row" bindtap="pickAvatar">
-    <text class="row-label">头像</text>
-    <view class="row-value">
+<view class="page" wx:if="{{user}}">
+  <nav-bar title="个人信息" />
+  <scroll-view class="body" scroll-y>
+    <view class="avatar-wrap" bindtap="pickAvatar">
       <view class="avatar">
         <image wx:if="{{user.avatar}}" class="avatar-img" src="{{user.avatar}}" mode="aspectFill" />
-        <text wx:else class="avatar-emoji">👤</text>
+        <text wx:else class="avatar-letter">A</text>
       </view>
-      <view class="chev" />
+      <view class="cam" />
     </view>
-  </view>
 
-  <view class="row" bindtap="editName">
-    <text class="row-label">姓名</text>
-    <view class="row-value"><text>{{user.name || '请填写'}}</text><view class="chev" /></view>
-  </view>
-
-  <view class="row">
-    <text class="row-label">手机号</text>
-    <view class="row-value"><text>{{user.phone}}</text></view>
-  </view>
-
-  <view class="row">
-    <text class="row-label">性别</text>
-    <view class="gender-btns">
-      <view class="gender-btn {{user.gender === '男' ? 'on' : ''}}" data-g="男" bindtap="pickGender">男</view>
-      <view class="gender-btn {{user.gender === '女' ? 'on' : ''}}" data-g="女" bindtap="pickGender">女</view>
-    </view>
-  </view>
-
-  <picker mode="date" start="1940-01-01" value="{{user.birthday}}" bindchange="pickBirthday">
+    <view class="row"><text class="rl"><text class="star">*</text>昵称</text><input class="ri" value="{{user.nick}}" placeholder="请输入昵称" placeholder-class="ph" bindinput="onNick" /></view>
+    <view class="row"><text class="rl"><text class="star">*</text>手机号</text><text class="rv">{{user.phone}}</text></view>
     <view class="row">
-      <text class="row-label">生日</text>
-      <view class="row-value"><text>{{user.birthday || '请选择'}}</text><view class="chev" /></view>
+      <text class="rl"><text class="star">*</text>称谓</text>
+      <view class="gender">
+        <view class="g {{user.gender === '男士' ? 'on' : ''}}" data-g="男士" bindtap="pickGender">男士</view>
+        <view class="g {{user.gender === '女士' ? 'on' : ''}}" data-g="女士" bindtap="pickGender">女士</view>
+      </view>
     </view>
-  </picker>
+    <picker mode="date" value="{{user.birthday}}" bindchange="pickBirthday">
+      <view class="row"><text class="rl"><text class="star">*</text>生日</text><text class="rv">{{user.birthday || '请选择'}}</text></view>
+    </picker>
+    <view class="hint">生日每人仅可修改一次，请谨慎选择</view>
+    <picker mode="region" bindchange="pickRegion">
+      <view class="row"><text class="rl">地区</text><text class="rv">{{user.region || '请选择'}}</text></view>
+    </picker>
+    <view class="row"><text class="rl">邮箱</text><input class="ri" value="{{user.email}}" placeholder="选填" placeholder-class="ph" bindinput="onEmail" /></view>
 
-  <picker mode="region" bindchange="pickRegion">
-    <view class="row">
-      <text class="row-label">地区</text>
-      <view class="row-value"><text>{{user.region || '请选择'}}</text><view class="chev" /></view>
-    </view>
-  </picker>
-
-  <view class="row last" bindtap="goAddress">
-    <text class="row-label">收货地址</text>
-    <view class="row-value"><view class="chev" /></view>
-  </view>
+    <view class="body-space" />
+  </scroll-view>
+  <view class="foot"><view class="save-btn" bindtap="save">保存</view></view>
 </view>
-
-<view class="gap" />
-<view class="sec-hdr">通用设置</view>
-<view class="card">
-  <view class="row last" bindtap="toggleReco">
-    <view>
-      <view class="row-label">个性化推荐</view>
-      <view class="row-hint">开启后可看到你感兴趣的内容，建议开启</view>
-    </view>
-    <view class="row-value"><text>{{user.reco ? '已允许' : '已关闭'}}</text><view class="chev" /></view>
-  </view>
-</view>
-</block>

@@ -1,12 +1,11 @@
-// 自定义导航栏：用于 navigationStyle: custom 的页面（状态栏留白 + 44px 标题栏）
+// AURELLE 子页导航栏：状态栏留白 + 返回箭头 + 居中标题 + 右侧 slot
 Component({
   options: { multipleSlots: true },
   properties: {
     title: String,
-    light: Boolean,       // 浅色文字（深色/图片背景上使用）
-    transparent: Boolean, // 透明背景
+    brand: Boolean,   // true 时标题渲染为品牌字标 AURELLE
     border: { type: Boolean, value: true },
-    back: Boolean
+    back: { type: Boolean, value: true }
   },
   data: { sbh: 20 },
   attached() {
@@ -14,7 +13,9 @@ Component({
   },
   methods: {
     onBack() {
-      wx.navigateBack();
+      const pages = getCurrentPages();
+      if (pages.length > 1) wx.navigateBack();
+      else wx.switchTab({ url: '/pages/home/home' });
     }
   }
 });

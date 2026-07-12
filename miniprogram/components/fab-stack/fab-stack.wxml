@@ -1,0 +1,13 @@
+<view class="fab-stack {{aboveTab ? 'above-tab' : ''}}" style="{{aboveTab ? '' : 'bottom:' + bottom + 'rpx'}}">
+  <view wx:if="{{showService}}" class="fab fab-46">
+    <view class="ic-service" />
+    <button class="contact-hit" open-type="contact" show-message-card="{{true}}" />
+  </view>
+  <view wx:if="{{showBag}}" class="fab fab-bag" style="width:{{bagSize}}rpx;height:{{bagSize}}rpx;" bindtap="goBag">
+    <view class="ic-bag-black" />
+    <view wx:if="{{cnt > 0}}" class="badge">{{cnt}}</view>
+  </view>
+  <view wx:if="{{showTop}}" class="fab fab-46" bindtap="toTop">
+    <view class="ic-top" />
+  </view>
+</view>

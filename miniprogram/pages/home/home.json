@@ -1,6 +1,6 @@
 {
-  "navigationStyle": "custom",
   "usingComponents": {
-    "prod-img": "/components/prod-img/prod-img"
+    "prod-img": "/components/prod-img/prod-img",
+    "fab-stack": "/components/fab-stack/fab-stack"
   }
 }

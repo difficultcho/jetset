@@ -1,0 +1,47 @@
+<view class="page" wx:if="{{order}}">
+  <nav-bar title="订单详情" />
+  <scroll-view class="body" scroll-y>
+    <view class="status-head">
+      <text wx:if="{{pending}}" class="status-title">待支付　{{countdown}}</text>
+      <text wx:else class="status-title">{{order.statusLabel}}</text>
+    </view>
+
+    <view class="card addr-card">
+      <view class="ic-pin" />
+      <view class="addr-body">
+        <view class="addr-full">{{order.address.region}} {{order.address.detail}}</view>
+        <view class="addr-line">{{order.address.name}}　{{order.address.phone}}</view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="no-row"><text class="no-label">订单号</text><view class="no-right"><text class="no-val">{{order.orderNo}}</text><view class="ic-copy" bindtap="copyNo" /></view></view>
+      <view class="oline" wx:for="{{order.items}}" wx:for-item="it" wx:key="skuId">
+        <view class="oline-img"><prod-img prod="{{it.prod}}" /></view>
+        <view class="oline-info">
+          <view class="oline-name clamp2">{{it.name}}</view>
+          <view class="oline-spec">{{it.spec}}</view>
+          <view class="oline-qty">×{{it.qty}}</view>
+        </view>
+        <text class="oline-price">¥ {{it.priceText}}</text>
+      </view>
+      <view class="way-row"><text>配送方式</text><text class="way-val">顺丰包邮</text></view>
+      <view class="invoice">如需开发票请联系在线客服</view>
+    </view>
+
+    <view class="card">
+      <view class="amt"><text>下单时间</text><text>{{order.createdAt}}</text></view>
+      <view class="amt"><text>商品金额</text><text>¥ {{order.itemText}}</text></view>
+      <view class="amt"><text>会员奢享</text><text>¥ 0</text></view>
+      <view class="amt"><text>活动优惠</text><text>¥ 0</text></view>
+      <view class="amt"><text>运费</text><text>¥ 0</text></view>
+      <view class="amt total"><text>实付</text><text class="total-num">¥ {{order.payText}}</text></view>
+    </view>
+    <view class="body-space" />
+  </scroll-view>
+
+  <view wx:if="{{pending}}" class="bar">
+    <view class="bar-btn ghost" bindtap="goCancel">取消订单</view>
+    <view class="bar-btn solid" bindtap="goPay">立即支付</view>
+  </view>
+</view>

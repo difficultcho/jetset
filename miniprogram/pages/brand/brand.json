@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "fab-stack": "/components/fab-stack/fab-stack"
+  }
+}

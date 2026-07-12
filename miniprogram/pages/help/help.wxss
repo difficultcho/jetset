@@ -1,0 +1,8 @@
+.page { min-height: 100vh; background: #fff; }
+.title { font-size: 32rpx; font-weight: 600; padding: 32rpx 32rpx 20rpx; }
+.hero { margin: 0 32rpx; aspect-ratio: 16 / 10.5; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 24rpx; }
+.ph-label { font-family: monospace; font-size: 20rpx; letter-spacing: 0.2em; color: rgba(80,65,50,0.6); }
+.topic { display: flex; align-items: center; justify-content: space-between; padding: 34rpx 32rpx; border-bottom: 1rpx solid #f2f2f2; }
+.topic-cn { font-size: 31rpx; color: #222; }
+.topic-en { font-size: 23rpx; color: #999; letter-spacing: 0.12em; margin-top: 8rpx; }
+.arrow { width: 18rpx; height: 18rpx; border-right: 2rpx solid #bbb; border-top: 2rpx solid #bbb; transform: rotate(45deg); }

@@ -1,0 +1,86 @@
+<view class="page" wx:if="{{prod}}" bindtouchstart="onTS" bindtouchend="onTE">
+  <!-- 返回 -->
+  <view class="back-hit" style="top:{{sbh}}px;" catchtap="goBack"><view class="arrow" /></view>
+
+  <scroll-view class="body" scroll-y>
+    <!-- 主图 -->
+    <view class="hero">
+      <prod-img prod="{{prod}}" ci="{{ci}}" />
+    </view>
+
+    <view class="info">
+      <view wx:if="{{prod.series}}" class="p-series">{{prod.series.en}}</view>
+      <view class="name-row">
+        <text class="p-name">{{prod.name}}</text>
+        <view class="ic-share" />
+      </view>
+      <view class="p-price">
+        <text wx:if="{{prod.sale}}" class="p-orig">¥ {{prod.origText}}</text>
+        <text class="{{prod.sale ? 'p-sale' : ''}}">¥ {{prod.priceText}}</text>
+      </view>
+
+      <!-- 尺码 -->
+      <view class="sec-head">
+        <text class="sec-t">尺码</text>
+        <text class="sec-link" bindtap="goSizeGuide">尺码指南</text>
+      </view>
+      <view class="size-row">
+        <view class="size-blk {{size === s ? 'on' : ''}}" wx:for="{{prod.sizes}}" wx:for-item="s" wx:key="*this" data-s="{{s}}" bindtap="pickSize">{{s}}</view>
+      </view>
+
+      <!-- 颜色 -->
+      <view class="sec-head"><text class="sec-t">颜色</text></view>
+      <view class="color-row">
+        <view class="color-item" wx:for="{{prod.colors}}" wx:key="*this" wx:for-index="i" data-i="{{i}}" bindtap="pickColor">
+          <view class="color-dot {{ci === i ? 'on' : ''}}" style="background:{{prod.sw[i]}};" />
+          <text class="color-name {{ci === i ? 'on' : ''}}">{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 手风琴 -->
+    <view class="acc">
+      <view class="acc-item">
+        <view class="acc-head" data-k="d" bindtap="toggleAcc"><text>产品细节 DETAILS</text><view class="acc-arrow {{acc.d ? 'up' : ''}}" /></view>
+        <view wx:if="{{acc.d}}" class="acc-body">
+          <view class="acc-desc">{{prod.desc}}</view>
+          <view class="acc-bullet" wx:for="{{prod.bullets}}" wx:key="*this">· {{item}}</view>
+          <view class="acc-code">款号：{{prod.code}}</view>
+        </view>
+      </view>
+      <view class="acc-item">
+        <view class="acc-head" data-k="s" bindtap="toggleAcc"><text>尺码和版型 SIZE & FIT</text><view class="acc-arrow {{acc.s ? 'up' : ''}}" /></view>
+        <view wx:if="{{acc.s}}" class="acc-body"><view class="acc-desc">{{prod.detailText}}</view></view>
+      </view>
+      <view class="acc-item">
+        <view class="acc-head" data-k="c" bindtap="toggleAcc"><text>洗护说明 CARE</text><view class="acc-arrow {{acc.c ? 'up' : ''}}" /></view>
+        <view wx:if="{{acc.c}}" class="acc-body"><view class="acc-desc">请参照商品内侧洗护标签，建议专业洗涤或轻柔手洗。</view></view>
+      </view>
+    </view>
+
+    <!-- 尊享服务 -->
+    <view class="services">
+      <view class="svc"><view class="svc-ic ic-vip" /><text class="svc-t">专属客服</text></view>
+      <view class="svc"><view class="svc-ic ic-return" /><text class="svc-t">退换货服务</text></view>
+      <view class="svc"><view class="svc-ic ic-ship" /><text class="svc-t">顺丰速达</text></view>
+      <view class="svc"><view class="svc-ic ic-gift" /><text class="svc-t">礼品包装</text></view>
+    </view>
+
+    <!-- 热门推荐 -->
+    <view class="recs-title">热门推荐</view>
+    <view class="recs">
+      <product-card wx:for="{{recs}}" wx:key="id" prod="{{item}}" bind:tap="goPdp" bind:star="toggleWish" bind:bag="goPdp" />
+    </view>
+
+    <view class="body-space" />
+  </scroll-view>
+
+  <!-- 底部操作栏 -->
+  <view class="action-bar">
+    <view class="act-add" bindtap="addBag">加入购物袋</view>
+    <view class="act-buy" bindtap="buyNow">即刻选购</view>
+    <view class="act-star {{wished ? 'on' : ''}}" bindtap="toggleWish" />
+  </view>
+
+  <fab-stack id="fab" show-bag show-service bag-size="{{44}}" bottom="{{200}}" />
+</view>

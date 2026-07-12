@@ -1,0 +1,13 @@
+.page { height: 100vh; display: flex; flex-direction: column; background: #fff; }
+.body { flex: 1; height: 0; }
+.tbl-wrap { padding: 32rpx 32rpx 0; }
+.tbl-title { font-size: 28rpx; font-weight: 600; margin-bottom: 20rpx; }
+.tbl-scroll { width: 100%; }
+.tbl { display: inline-block; min-width: 100%; border: 1rpx solid #eee; }
+.tr { display: flex; }
+.tr.head { background: #f6f6f6; }
+.td { min-width: 110rpx; flex: 1; padding: 18rpx 12rpx; font-size: 22rpx; color: #555; text-align: center; border-right: 1rpx solid #f0f0f0; border-bottom: 1rpx solid #f0f0f0; box-sizing: border-box; }
+.tr.head .td { font-size: 24rpx; font-weight: 600; color: #111; }
+.td.first { color: #111; font-weight: 500; background: #fafafa; }
+.note { font-size: 23rpx; color: #999; padding: 30rpx 32rpx 0; line-height: 1.7; }
+.body-space { height: 40rpx; }

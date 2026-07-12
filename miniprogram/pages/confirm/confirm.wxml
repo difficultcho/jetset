@@ -1,0 +1,73 @@
+<view class="page">
+  <nav-bar title="订单确认" />
+  <view class="notice">下单即可享受包邮服务</view>
+  <view class="steps">
+    <view class="step on">01 配送</view>
+    <view class="step">02 付款</view>
+    <view class="step">03 确认</view>
+  </view>
+
+  <scroll-view class="body" scroll-y>
+    <!-- 商品 -->
+    <view class="card">
+      <view class="card-t">订单详情</view>
+      <view class="line" wx:for="{{lines}}" wx:key="skuId">
+        <view class="line-img"><prod-img prod="{{item.prod}}" /></view>
+        <view class="line-info">
+          <view class="line-name clamp2">{{item.name}}</view>
+          <view class="line-spec">{{item.spec}}</view>
+          <view class="line-foot"><text class="line-price">¥ {{item.priceText}}</text><text class="line-qty">×{{item.qty}}</text></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 金额 -->
+    <view class="card">
+      <view class="amt"><text>商品金额</text><text>¥ {{itemText}}</text></view>
+      <view class="amt"><text>会员奢享</text><text>¥ 0</text></view>
+      <view class="amt"><text>活动优惠</text><text>¥ 0</text></view>
+      <view class="amt"><text>运费</text><text>¥ 0</text></view>
+    </view>
+
+    <!-- 配送信息 -->
+    <view class="card">
+      <view class="card-t">配送信息</view>
+      <view class="addr" bindtap="goAddress">
+        <block wx:if="{{addr}}">
+          <view class="addr-line"><text class="addr-name">{{addr.name}}</text><text class="addr-phone">{{addr.phone}}</text></view>
+          <view class="addr-full">{{addr.full}}</view>
+        </block>
+        <view wx:else class="addr-empty">选择收货地址 ›</view>
+      </view>
+      <view class="ship-way"><text>配送方式</text><text class="ship-val">顺丰包邮</text></view>
+    </view>
+
+    <!-- 包装 -->
+    <view class="card">
+      <view class="card-t">包装选择</view>
+      <view class="pkgs">
+        <view class="pkg {{packaging === 'classic' ? 'on' : ''}}" data-p="classic" bindtap="pickPackaging">
+          <view class="pkg-img" style="background:repeating-linear-gradient(135deg,#e7ded0 0 12rpx,#ded3c0 12rpx 24rpx);" />
+          <view class="pkg-t">经典包装</view>
+          <view class="pkg-d">品牌礼盒 + 丝带</view>
+        </view>
+        <view class="pkg {{packaging === 'eco' ? 'on' : ''}}" data-p="eco" bindtap="pickPackaging">
+          <view class="pkg-img" style="background:repeating-linear-gradient(135deg,#dfe3da 0 12rpx,#d4dacd 12rpx 24rpx);" />
+          <view class="pkg-t">环保包装</view>
+          <view class="pkg-d">可回收材质</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="agree" bindtap="toggleAgree">
+      <view class="checkbox {{agree ? 'on' : ''}}" />
+      <text class="agree-t">提交订单即表明您接受我们的销售条款</text>
+    </view>
+    <view class="body-space" />
+  </scroll-view>
+
+  <view class="bar">
+    <view class="bar-info"><text class="bar-cnt">共{{lines.length}}件商品</text><text class="bar-label">总计：</text><text class="bar-num">¥ {{payText}}</text></view>
+    <view class="bar-btn" bindtap="submit">{{submitting ? '提交中…' : '提交订单'}}</view>
+  </view>
+</view>

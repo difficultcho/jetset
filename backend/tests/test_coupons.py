@@ -21,11 +21,11 @@ async def _create_coupon(client, admin_h, **kw):
 
 
 async def _prepare_user(client, code):
-    """登录 + 建地址 + 找一个高价 SKU（滑雪镜 ¥398）。"""
+    """登录 + 建地址 + 找一个高价 SKU（连衣裙）。"""
     h = await login(client, code)
     addr = await client.post("/api/v1/addresses", headers=h, json={
         "name": "券测试", "phone": "13700000000", "region": "", "detail": "路 9 号"})
-    listing = await client.get("/api/v1/products", params={"q": "滑雪镜"})
+    listing = await client.get("/api/v1/products", params={"q": "连衣裙"})
     spu_id = listing.json()["data"]["items"][0]["id"]
     sku = (await client.get(f"/api/v1/products/{spu_id}")).json()["data"]["skus"][0]
     return h, sku, addr.json()["data"]["id"]

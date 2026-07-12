@@ -1,0 +1,26 @@
+<view class="page">
+  <nav-bar title="收银台" />
+  <view class="body">
+    <view class="amount"><text class="cur">¥</text><text class="num">{{payText}}</text></view>
+    <view class="cd-row">
+      <text class="cd-label">剩余支付时间</text>
+      <text class="cd">{{countdown}}</text>
+    </view>
+
+    <view class="methods">
+      <view class="method" data-m="wechat" bindtap="pickMethod">
+        <view class="m-left"><view class="m-ic ic-wechat" /><text class="m-name">微信支付</text></view>
+        <view class="radio {{method === 'wechat' ? 'on' : ''}}" />
+      </view>
+      <view class="method" data-m="alipay" bindtap="pickMethod">
+        <view class="m-left"><view class="m-ic ic-alipay" /><text class="m-name">支付宝</text></view>
+        <view class="radio {{method === 'alipay' ? 'on' : ''}}" />
+      </view>
+    </view>
+  </view>
+
+  <view class="bar">
+    <view class="bar-pay"><text class="bar-label">待支付</text><text class="bar-num">¥ {{payText}}.00</text></view>
+    <view class="bar-btn" bindtap="pay">{{paying ? '支付中…' : '去支付'}}</view>
+  </view>
+</view>

@@ -1,0 +1,9 @@
+<view class="page">
+  <nav-bar title="帮助中心" />
+  <view class="title">常见问题</view>
+  <view class="hero" style="background:repeating-linear-gradient(135deg,#e8e0d3 0 16rpx,#e0d6c4 16rpx 32rpx);"><text class="ph-label">editorial · 客户服务</text></view>
+  <view class="topic" wx:for="{{topics}}" wx:key="key" data-k="{{item.key}}" bindtap="go">
+    <view><view class="topic-cn">{{item.cn}}</view><view class="topic-en">{{item.en}}</view></view>
+    <view class="arrow" />
+  </view>
+</view>

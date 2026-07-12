@@ -1,56 +1,25 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 .real-img {
   width: 100%;
   height: 100%;
   display: block;
 }
-.pimg {
+.ph-solid {
   width: 100%;
   height: 100%;
-  border: 1rpx solid transparent;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 6rpx;
-  opacity: 0.75;
-}
-.logo {
-  height: 18rpx;
-  filter: grayscale(1);
-}
-.brand-name {
-  font-size: 15rpx;
-  font-weight: 900;
-  letter-spacing: 2rpx;
-}
-.divider {
-  width: 55%;
-  height: 1px;
-  margin: 8rpx 0;
-  opacity: 0.25;
-}
-.ring {
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.chip {
-  opacity: 0.35;
-  border-radius: 6rpx;
-  transform: rotate(12deg);
-}
-.en {
-  font-size: 13rpx;
-  color: #aaa;
-  margin-top: 6rpx;
+.ph-label {
+  font-family: monospace;
+  font-size: 18rpx;
+  letter-spacing: 0.14em;
+  color: rgba(90, 70, 55, 0.5);
+  padding: 0 20rpx;
   text-align: center;
-  padding: 0 12rpx;
-  line-height: 1.3;
 }

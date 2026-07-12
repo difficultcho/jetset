@@ -83,7 +83,7 @@ async def test_ship_flow(client):
     # 用户下单并支付
     addr = await client.post("/api/v1/addresses", headers=user_h, json={
         "name": "发货测试", "phone": "13900000000", "region": "", "detail": "路 1 号"})
-    listing = await client.get("/api/v1/products", params={"q": "手套"})
+    listing = await client.get("/api/v1/products", params={"q": "穆勒鞋"})
     spu_id = listing.json()["data"]["items"][0]["id"]
     sku = (await client.get(f"/api/v1/products/{spu_id}")).json()["data"]["skus"][0]
     order = (await client.post("/api/v1/orders", headers=user_h, json={

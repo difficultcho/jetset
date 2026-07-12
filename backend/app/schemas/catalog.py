@@ -11,9 +11,14 @@ class CategoryOut(BaseModel):
 class ProductListItem(BaseModel):
     id: int
     name: str
+    sub: str
     en_model: str
+    code: str
+    series_en: str = ""
     price: int  # 分
+    original_price: int | None = None
     badge: str | None
+    has_video: bool = False
     image: str | None
     color_hexes: list[str]
 
@@ -38,11 +43,17 @@ class SkuOut(BaseModel):
 class ProductDetail(BaseModel):
     id: int
     name: str
+    sub: str
     en_model: str
+    code: str
     brief: str
     detail: str
+    bullets: list[str] = []
     badge: str | None
+    has_video: bool = False
     price: int
+    original_price: int | None = None
+    series: dict | None = None
     colors: list[ColorOut]
     sizes: list[str]
     skus: list[SkuOut]

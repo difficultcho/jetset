@@ -1,0 +1,33 @@
+<view class="page">
+  <nav-bar title="加入我们" />
+  <scroll-view class="body" scroll-y>
+    <view class="member-card">
+      <view class="mc-brand brand-mark">AURELLE</view>
+      <view class="mc-sub">MEMBERSHIP CARD</view>
+    </view>
+
+    <view class="form-card">
+      <view class="form-t">激活立享会员特权</view>
+      <view class="row"><text class="rl"><text class="star">*</text>姓名</text><input class="ri" value="{{form.name}}" data-k="name" bindinput="onInput" placeholder="请输入" placeholder-class="ph" /></view>
+      <view class="row"><text class="rl"><text class="star">*</text>手机</text><input class="ri" value="{{form.phone}}" type="number" data-k="phone" bindinput="onInput" placeholder="请输入" placeholder-class="ph" /></view>
+      <view class="row">
+        <text class="rl"><text class="star">*</text>性别</text>
+        <view class="gender">
+          <view class="g {{form.gender === '男士' ? 'on' : ''}}" data-g="男士" bindtap="pickGender">男士</view>
+          <view class="g {{form.gender === '女士' ? 'on' : ''}}" data-g="女士" bindtap="pickGender">女士</view>
+        </view>
+      </view>
+      <picker mode="date" value="{{form.birthday}}" bindchange="pickBirthday">
+        <view class="row"><text class="rl"><text class="star">*</text>生日</text><text class="rv">{{form.birthday || '请选择'}}</text></view>
+      </picker>
+    </view>
+
+    <view class="agree" bindtap="toggleAgree">
+      <view class="green-dot {{agree ? 'on' : ''}}" />
+      <text class="agree-t">我已阅读并同意《会员服务声明》及《隐私政策》</text>
+    </view>
+
+    <view class="submit-wrap"><view class="submit-btn" bindtap="submit">{{submitting ? '提交中…' : '提交'}}</view></view>
+    <view class="body-space" />
+  </scroll-view>
+</view>

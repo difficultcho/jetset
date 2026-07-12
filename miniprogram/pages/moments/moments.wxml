@@ -1,0 +1,18 @@
+<view class="page">
+  <nav-bar title="A.MOMENTS" />
+  <scroll-view class="body" scroll-y wx:if="{{post}}">
+    <view class="head">
+      <view class="brand-mark bm">AURELLE</view>
+      <view class="eyebrow ax">{{post.title}}</view>
+      <view class="intro">{{post.subtitle}}</view>
+    </view>
+    <block wx:for="{{post.body}}" wx:key="ph">
+      <view wx:if="{{item.kind === 'image'}}" class="img" style="aspect-ratio:{{item.ratio}};">
+        <image wx:if="{{item.img}}" class="real" src="{{item.img}}" mode="aspectFill" />
+        <view wx:else class="ph" style="background:{{item.tint}};"><text class="ph-label">{{item.ph}}</text></view>
+      </view>
+      <view wx:elif="{{item.kind === 'text'}}" class="para">{{item.text}}</view>
+    </block>
+    <view class="body-space" />
+  </scroll-view>
+</view>

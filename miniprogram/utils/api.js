@@ -12,6 +12,18 @@ const api = {
     return request('GET', '/api/v1/products' + (q ? '?' + q : ''));
   },
   productDetail: (id) => request('GET', '/api/v1/products/' + id),
+  series: () => request('GET', '/api/v1/series'),
+
+  // 门店
+  stores: (province, city) => request('GET', '/api/v1/stores' +
+    (province || city ? '?' + [province && 'province=' + encodeURIComponent(province), city && 'city=' + encodeURIComponent(city)].filter(Boolean).join('&') : '')),
+  storeRegions: () => request('GET', '/api/v1/stores/regions'),
+  storeDetail: (id) => request('GET', '/api/v1/stores/' + id),
+
+  // 品牌内容
+  brandPosts: (type) => request('GET', '/api/v1/brand/posts?type=' + type),
+  brandPost: (id) => request('GET', '/api/v1/brand/posts/' + id),
+  brandFirst: (type) => request('GET', '/api/v1/brand/first?type=' + type),
 
   // 购物车
   cartList: () => request('GET', '/api/v1/cart'),
@@ -31,6 +43,7 @@ const api = {
     }),
   orders: (status, page) =>
     request('GET', '/api/v1/orders?page_size=50' + (status ? '&status=' + status : '') + (page ? '&page=' + page : '')),
+  orderDetail: (id) => request('GET', '/api/v1/orders/' + id),
   orderCancel: (id) => request('POST', '/api/v1/orders/' + id + '/cancel'),
   orderConfirm: (id) => request('POST', '/api/v1/orders/' + id + '/confirm'),
   orderPay: (id) => request('POST', '/api/v1/orders/' + id + '/pay'),
@@ -40,6 +53,8 @@ const api = {
   addresses: () => request('GET', '/api/v1/addresses'),
   addressCreate: (data) => request('POST', '/api/v1/addresses', data),
   addressUpdate: (id, data) => request('PUT', '/api/v1/addresses/' + id, data),
+  addressDelete: (id) => request('DELETE', '/api/v1/addresses/' + id),
+  addressSetDefault: (id) => request('PUT', '/api/v1/addresses/' + id + '/default'),
 
   // 个人信息
   me: () => request('GET', '/api/v1/me'),

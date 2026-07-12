@@ -1,13 +1,109 @@
+/* ===== AURELLE 全局设计令牌 ===== */
 page {
-  background: #f5f5f5;
-  color: #1a1a1a;
-  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  background: #fff;
+  color: #111;
+  font-family: 'Jost', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   font-size: 28rpx;
   -webkit-tap-highlight-color: transparent;
 }
 
-.ph {
-  color: #bbb;
+/* 品牌字标 */
+.brand-mark {
+  font-weight: 300;
+  letter-spacing: 0.32em;
+  padding-left: 0.32em;
+}
+
+/* 通用文字层级 */
+.t-primary { color: #111; }
+.t-body { color: #333; }
+.t-sub { color: #555; }
+.t-muted { color: #9a9a9a; }
+.t-faint { color: #b0b0b0; }
+
+/* 英文小标签（超宽字距） */
+.eyebrow {
+  font-size: 24rpx;
+  letter-spacing: 0.3em;
+  padding-left: 0.3em;
+}
+
+/* 分割线 0.5px */
+.hairline { border-bottom: 1rpx solid #eee; }
+
+/* 按钮 */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  letter-spacing: 0.1em;
+}
+.btn-primary { background: #6d6d67; color: #fff; }
+.btn-dark { background: #565656; color: #fff; }
+.btn-black { background: #111; color: #fff; }
+.btn-grey { background: #f4f4f4; color: #111; }
+.btn-green { background: #07c160; color: #fff; }
+.btn-disabled { background: #e0e0e0 !important; color: #aaa !important; }
+
+/* 价格 */
+.price { color: #111; }
+.price-old { color: #b0b0b0; text-decoration: line-through; }
+.price-sale { color: #d0342c; }
+
+/* 通用整页滚动容器（子页：状态栏 + 导航栏之下） */
+.page-scroll {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 商品占位斜纹（无真实图时） */
+.placeholder-stripe {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 24rpx;
+}
+.placeholder-label {
+  font-family: monospace;
+  font-size: 20rpx;
+  letter-spacing: 0.2em;
+  color: rgba(90, 70, 55, 0.55);
+}
+
+/* Toast（组件复用） */
+.toast {
+  position: fixed;
+  bottom: 300rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(17, 17, 17, 0.88);
+  color: #fff;
+  font-size: 26rpx;
+  padding: 18rpx 30rpx;
+  border-radius: 12rpx;
+  z-index: 3000;
+  max-width: 70%;
+  text-align: center;
+}
+
+/* 复选框 / 单选 */
+.checkbox {
+  width: 40rpx;
+  height: 40rpx;
+  border: 1rpx solid #ccc;
+  border-radius: 6rpx;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.checkbox.on {
+  background: #111 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='9' viewBox='0 0 12 9' fill='none'%3E%3Cpath d='M1 4.5L4.5 8L11 1' stroke='white' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center;
+  border-color: #111;
 }
 
 .clamp2 {
@@ -15,41 +111,4 @@ page {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-}
-
-.chev {
-  width: 14rpx;
-  height: 14rpx;
-  border-top: 3rpx solid #ccc;
-  border-right: 3rpx solid #ccc;
-  transform: rotate(45deg);
-  flex-shrink: 0;
-}
-.chev.dark {
-  border-color: #1a1a1a;
-}
-
-.btn-primary {
-  background: #1a1a1a;
-  color: #fff;
-  border-radius: 48rpx;
-  font-size: 30rpx;
-  font-weight: 500;
-  text-align: center;
-  padding: 26rpx 0;
-}
-.btn-outline {
-  background: #fff;
-  color: #1a1a1a;
-  border: 1rpx solid #1a1a1a;
-  border-radius: 48rpx;
-  font-size: 30rpx;
-  font-weight: 500;
-  text-align: center;
-  padding: 26rpx 0;
-  box-sizing: border-box;
-}
-.btn-disabled {
-  background: #e0e0e0 !important;
-  color: #aaa !important;
 }

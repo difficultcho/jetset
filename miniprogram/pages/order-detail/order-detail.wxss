@@ -1,0 +1,36 @@
+.page { height: 100vh; display: flex; flex-direction: column; background: #f7f7f7; }
+.body { flex: 1; height: 0; }
+.status-head { background: #fff; padding: 40rpx 32rpx; }
+.status-title { font-size: 34rpx; font-weight: 600; }
+
+.card { background: #fff; margin-top: 16rpx; padding: 28rpx 32rpx; }
+.addr-card { display: flex; gap: 20rpx; align-items: flex-start; }
+.ic-pin { width: 40rpx; height: 40rpx; flex-shrink: 0; margin-top: 4rpx; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='20' height='20' fill='none' stroke='%23111' stroke-width='1.4'%3E%3Cpath d='M12 21 C7.5 16 5.5 13 5.5 9.9 A6.5 6.5 0 0 1 18.5 9.9 C18.5 13 16.5 16 12 21 Z'/%3E%3Ccircle cx='12' cy='10' r='2.4'/%3E%3C/svg%3E") no-repeat center / contain; }
+.addr-full { font-size: 27rpx; color: #111; line-height: 1.5; }
+.addr-line { font-size: 25rpx; color: #666; margin-top: 8rpx; }
+
+.no-row { display: flex; justify-content: space-between; align-items: center; padding-bottom: 22rpx; border-bottom: 1rpx solid #f2f2f2; }
+.no-label { font-size: 26rpx; color: #333; }
+.no-right { display: flex; align-items: center; gap: 12rpx; }
+.no-val { font-size: 25rpx; color: #666; }
+.ic-copy { width: 32rpx; height: 32rpx; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='16' height='16' fill='none' stroke='%23999' stroke-width='1.4'%3E%3Crect x='8' y='8' width='11' height='12' rx='1'/%3E%3Cpath d='M5 15 V5 a1 1 0 0 1 1-1 h9'/%3E%3C/svg%3E") no-repeat center / contain; }
+.oline { display: flex; gap: 20rpx; padding: 22rpx 0; border-bottom: 1rpx solid #f2f2f2; }
+.oline-img { width: 150rpx; height: 188rpx; flex-shrink: 0; overflow: hidden; background: #f6f6f6; }
+.oline-info { flex: 1; min-width: 0; }
+.oline-name { font-size: 26rpx; line-height: 1.45; }
+.oline-spec { font-size: 23rpx; color: #999; margin-top: 8rpx; }
+.oline-qty { font-size: 23rpx; color: #999; margin-top: 8rpx; }
+.oline-price { font-size: 26rpx; }
+.way-row { display: flex; justify-content: space-between; font-size: 26rpx; color: #333; padding-top: 22rpx; }
+.way-val { color: #666; }
+.invoice { font-size: 23rpx; color: #999; margin-top: 16rpx; }
+
+.amt { display: flex; justify-content: space-between; font-size: 26rpx; color: #333; padding: 10rpx 0; }
+.amt.total { border-top: 1rpx solid #f2f2f2; padding-top: 20rpx; margin-top: 10rpx; }
+.total-num { font-size: 30rpx; color: #d0342c; }
+.body-space { height: 40rpx; }
+
+.bar { flex-shrink: 0; display: flex; gap: 20rpx; justify-content: flex-end; padding: 18rpx 32rpx calc(18rpx + env(safe-area-inset-bottom)); background: #fff; border-top: 1rpx solid #eee; }
+.bar-btn { font-size: 26rpx; padding: 22rpx 44rpx; }
+.bar-btn.ghost { background: #f2f2f2; color: #333; }
+.bar-btn.solid { background: #565656; color: #fff; }

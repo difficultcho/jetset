@@ -1,17 +1,16 @@
 const app = getApp();
 const api = require('../../utils/api.js');
-const { toProd } = require('../../utils/mapper.js');
-const { toastError } = require('../../utils/request.js');
+const { toCard } = require('../../utils/mapper.js');
+
+// 与设计稿一致的 Hero 三帧
+const HERO = [
+  { c1: '#ecd9cb', c2: '#e5cebc', label: 'campaign · 崖畔印花套装' },
+  { c1: '#e9dfce', c2: '#e2d5bf', label: 'campaign · 金纱帘光影' },
+  { c1: '#dfe5e9', c2: '#d5dde3', label: 'campaign · 泳池假日' }
+];
 
 Page({
-  data: {
-    sbh: 20,
-    slide: 0,
-    slides: [],
-    hot: [],
-    featured: null,
-    grid: []
-  },
+  data: { sbh: 20, hero: HERO, heroIdx: 0, prods: [], prodIdx: 0, scrollTop: 0 },
 
   onLoad() {
     this.setData({ sbh: app.globalData.statusBarHeight });
@@ -20,42 +19,37 @@ Page({
 
   async fetch() {
     try {
-      const d = await api.home();
-      this.setData({
-        slides: d.banners.map((b) => ({ title: b.title, sub: b.sub_title })),
-        hot: d.hot.map(toProd),
-        featured: d.featured ? toProd(d.featured) : null,
-        grid: d.grid.map(toProd)
-      });
+      const page = await api.products({ page_size: 6 });
+      this.setData({ prods: page.items.slice(0, 3).map(toCard) });
+      // HIGH SUMMER 系列 id（供"探索HIGH SUMMER系列"跳转）
+      const series = await api.series();
+      const hs = series.find((s) => s.en === 'HIGH SUMMER') || series[0];
+      if (hs) this.setData({ hsId: hs.id, hsEn: hs.en });
     } catch (e) {
-      toastError(e);
+      console.error('[home] 取商品失败：', e && e.message);
+      wx.showToast({ title: '商品加载失败：' + ((e && e.message) || '网络错误'), icon: 'none', duration: 3000 });
     }
   },
 
   onShow() {
     if (typeof this.getTabBar === 'function') this.getTabBar().refresh(0);
-    app.refreshCartCount().then(() => {
-      if (typeof this.getTabBar === 'function') this.getTabBar().refresh(0);
-    });
-    this.timer = setInterval(() => {
-      const n = this.data.slides.length;
-      if (n) this.setData({ slide: (this.data.slide + 1) % n });
-    }, 3500);
+    app.refreshCartCount();
+    // 首次因登录时序失败时，回到首页补取一次
+    if (!this.data.prods.length) this.fetch();
   },
 
-  onHide() {
-    clearInterval(this.timer);
-  },
+  // swiper 切换（含手势/自动播放）时同步自定义圆点
+  heroChange(e) { this.setData({ heroIdx: e.detail.current }); },
+  prodChange(e) { this.setData({ prodIdx: e.detail.current }); },
+  setHero(e) { this.setData({ heroIdx: e.currentTarget.dataset.i }); },
+  scrollToTop() { this.setData({ scrollTop: this.data.scrollTop === 0 ? 1 : 0 }); },
 
-  onUnload() {
-    clearInterval(this.timer);
+  goCampaign() { wx.navigateTo({ url: '/pages/campaign/campaign' }); },
+  goSeries() {
+    const id = this.data.hsId || 1;
+    wx.navigateTo({ url: '/pages/list/list?series=' + id + '&title=' + encodeURIComponent(this.data.hsEn) });
   },
-
-  setSlide(e) {
-    this.setData({ slide: e.currentTarget.dataset.i });
-  },
-
-  goShop() {
-    wx.switchTab({ url: '/pages/shop/shop' });
-  }
+  goList() { wx.navigateTo({ url: '/pages/list/list' }); },
+  goPdp(e) { wx.navigateTo({ url: '/pages/pdp/pdp?id=' + e.currentTarget.dataset.id }); },
+  goSearch() { wx.navigateTo({ url: '/pages/list/list' }); }
 });

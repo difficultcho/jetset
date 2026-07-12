@@ -1,0 +1,10 @@
+.page { height: 100vh; display: flex; flex-direction: column; background: #fff; }
+.body { flex: 1; height: 0; }
+.store { padding: 32rpx 32rpx 40rpx; }
+.store-img { width: 100%; aspect-ratio: 16 / 11; overflow: hidden; }
+.store-real { width: 100%; height: 100%; }
+.store-ph { width: 100%; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 24rpx; box-sizing: border-box; }
+.ph-label { font-family: monospace; font-size: 20rpx; letter-spacing: 0.2em; color: rgba(70,60,50,0.6); }
+.store-name { font-size: 31rpx; font-weight: 600; margin-top: 22rpx; }
+.store-link { font-size: 25rpx; color: #111; border-bottom: 1rpx solid #111; width: fit-content; margin-top: 14rpx; padding-bottom: 3rpx; }
+.body-space { height: 40rpx; }

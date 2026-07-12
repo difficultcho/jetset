@@ -2,7 +2,7 @@ from tests.conftest import login
 from tests.test_admin import admin_login
 
 
-async def _prepare(client, code, q="滑雪镜"):
+async def _prepare(client, code, q="连衣裙"):
     h = await login(client, code)
     addr = await client.post("/api/v1/addresses", headers=h, json={
         "name": "积分测试", "phone": "13300000000", "region": "", "detail": "路 5 号"})
@@ -74,7 +74,7 @@ async def test_points_deduct_and_refund(client):
 
 async def test_points_capped_by_order_amount(client):
     admin_h = await admin_login(client)
-    h, sku, addr_id = await _prepare(client, "pt-cap", q="头巾")
+    h, sku, addr_id = await _prepare(client, "pt-cap", q="项链")
     await _adjust(client, admin_h, await _uid(client, h), 999999)
 
     pv = (await client.post("/api/v1/orders/preview", headers=h, json={

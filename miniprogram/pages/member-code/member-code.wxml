@@ -1,0 +1,20 @@
+<view class="page">
+  <nav-bar title="会员码" />
+  <view class="hero">
+    <view class="hero-bg" style="background:repeating-linear-gradient(135deg,#d8cfc0 0 18rpx,#cfc4b2 18rpx 36rpx);"><text class="ph-label">interior · 门店内景</text></view>
+    <view class="card">
+      <view class="avatar">A</view>
+      <view class="name brand-mark">{{name}}</view>
+      <view class="barcode">
+        <view class="bar" wx:for="{{bars}}" wx:key="index" style="width:{{item}}rpx;" />
+      </view>
+      <view class="qr">
+        <view class="qr-row" wx:for="{{qr}}" wx:for-item="row" wx:key="index">
+          <view class="qr-cell {{cell ? 'on' : ''}}" wx:for="{{row}}" wx:for-item="cell" wx:key="index" />
+        </view>
+      </view>
+      <view class="code">{{code}}</view>
+      <view class="tip">使用时，出示此码</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,14 @@
+.page { height: 100vh; display: flex; flex-direction: column; background: #fff; }
+.hdr { background: #fff; flex-shrink: 0; border-bottom: 1rpx solid #eee; }
+.hdr-bar { height: 88rpx; display: flex; align-items: center; justify-content: center; }
+.hdr-brand { font-size: 40rpx; }
+.body { flex: 1; height: 0; }
+.pad { padding: 90rpx 80rpx 40rpx; }
+.entry { margin-bottom: 88rpx; }
+.entry-img {
+  width: 100%; aspect-ratio: 16 / 10.5;
+  display: flex; align-items: flex-end; justify-content: center; padding-bottom: 28rpx;
+}
+.entry-en { margin-top: 28rpx; font-size: 30rpx; letter-spacing: 0.22em; }
+.entry-cn { margin-top: 10rpx; font-size: 26rpx; color: #555; letter-spacing: 0.08em; }
+.tab-space { height: calc(180rpx + env(safe-area-inset-bottom)); }

@@ -1,8 +1,6 @@
 <view class="tab-bar">
-  <view class="tab-item" wx:for="{{list}}" wx:key="key" data-path="{{item.pagePath}}" bindtap="switchTab">
-    <view class="tab-icon icon-{{item.key}} {{selected === index ? 'active' : ''}}">
-      <view wx:if="{{item.key === 'cart' && cnt > 0}}" class="badge">{{cnt}}</view>
-    </view>
-    <text class="tab-label {{selected === index ? 'active' : ''}}">{{item.text}}</text>
+  <view class="tab-item" wx:for="{{list}}" wx:key="key" data-index="{{index}}" data-path="{{item.pagePath}}" bindtap="switchTab">
+    <view class="tab-icon icon-{{item.key}} {{selected === index ? 'active' : ''}}" />
+    <text class="tab-label brand-mark-{{item.key}} {{selected === index ? 'active' : ''}}">{{item.text}}</text>
   </view>
 </view>

@@ -1,0 +1,8 @@
+<view class="page">
+  <nav-bar title="我的预约" />
+  <view class="tabs">
+    <view class="tab {{tab === 0 ? 'on' : ''}}" data-i="0" bindtap="pick">未开始</view>
+    <view class="tab {{tab === 1 ? 'on' : ''}}" data-i="1" bindtap="pick">历史记录</view>
+  </view>
+  <view class="empty">暂无预约</view>
+</view>

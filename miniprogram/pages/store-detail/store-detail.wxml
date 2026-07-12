@@ -1,0 +1,23 @@
+<view class="page" wx:if="{{store}}">
+  <nav-bar title="{{store.short}}" />
+  <scroll-view class="body" scroll-y>
+    <view class="big">
+      <image wx:if="{{store.images[0]}}" class="big-real" src="{{store.images[0]}}" mode="aspectFill" />
+      <view wx:else class="big-ph" style="background:repeating-linear-gradient(135deg,#ddd6ca 0 16rpx,#d3cbba 16rpx 32rpx);"><text class="ph-label">storefront · {{store.short}}</text></view>
+    </view>
+    <view class="info">
+      <view class="info-t">店铺信息</view>
+      <view class="line">地址：{{store.addr}}</view>
+      <view class="line">电话：<text class="tel" bindtap="call">{{store.tel}}</text></view>
+      <view class="line">营业时间：{{store.hours}}</view>
+    </view>
+    <block wx:for="{{store.images}}" wx:key="*this" wx:for-index="i">
+      <image wx:if="{{i > 0}}" class="sub-real" src="{{item}}" mode="aspectFill" />
+    </block>
+    <view wx:if="{{store.images.length <= 1}}">
+      <view class="sub-ph" style="background:repeating-linear-gradient(135deg,#ddd6ca 0 16rpx,#d3cbba 16rpx 32rpx);"><text class="ph-label">storefront · 门头</text></view>
+      <view class="sub-ph" style="background:repeating-linear-gradient(135deg,#dfe0dc 0 16rpx,#d5d6d0 16rpx 32rpx);"><text class="ph-label">interior · 店内陈列</text></view>
+    </view>
+    <view class="body-space" />
+  </scroll-view>
+</view>

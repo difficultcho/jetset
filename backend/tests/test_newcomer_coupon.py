@@ -71,7 +71,7 @@ async def test_newcomer_coupon_usable_in_order(client):
 
     addr = await client.post("/api/v1/addresses", headers=h, json={
         "name": "新客", "phone": "13400000000", "region": "", "detail": "路 6 号"})
-    listing = await client.get("/api/v1/products", params={"q": "护板"})
+    listing = await client.get("/api/v1/products", params={"q": "单肩包"})
     spu_id = listing.json()["data"]["items"][0]["id"]
     sku = (await client.get(f"/api/v1/products/{spu_id}")).json()["data"]["skus"][0]
 

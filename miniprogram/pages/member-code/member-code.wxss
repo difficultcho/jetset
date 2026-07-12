@@ -1,0 +1,21 @@
+.page { height: 100vh; background: #f2f2f2; }
+.hero { position: relative; }
+.hero-bg { width: 100%; height: 520rpx; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 30rpx; }
+.card {
+  position: relative; margin: -220rpx 60rpx 0;
+  background: #fff; border-radius: 16rpx;
+  padding: 40rpx 32rpx 44rpx;
+  display: flex; flex-direction: column; align-items: center;
+  box-shadow: 0 6rpx 30rpx rgba(0,0,0,0.08);
+}
+.avatar { width: 132rpx; height: 132rpx; border-radius: 50%; background: #efe9e1; border: 4rpx solid #fff; box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font-size: 52rpx; font-weight: 300; color: #7a7266; margin-top: -100rpx; }
+.name { font-size: 34rpx; margin-top: 20rpx; letter-spacing: 0.35em; padding-left: 0.35em; }
+.barcode { display: flex; align-items: flex-end; gap: 4rpx; height: 130rpx; margin-top: 40rpx; }
+.bar { background: #111; height: 100%; }
+.qr { margin-top: 36rpx; }
+.qr-row { display: flex; }
+.qr-cell { width: 13rpx; height: 13rpx; }
+.qr-cell.on { background: #111; }
+.code { font-size: 30rpx; letter-spacing: 0.12em; margin-top: 28rpx; }
+.tip { font-size: 24rpx; color: #999; margin-top: 12rpx; }
+.ph-label { font-family: monospace; font-size: 20rpx; letter-spacing: 0.2em; color: rgba(80,65,50,0.6); }

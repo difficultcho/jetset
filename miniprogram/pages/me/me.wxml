@@ -1,0 +1,49 @@
+<view class="page">
+  <scroll-view class="body" scroll-y>
+    <!-- 未注册态 -->
+    <block wx:if="{{!registered}}">
+      <view class="welcome" style="padding-top:{{sbh + 90}}px;">
+        <view class="welcome-txt">加入 AURELLE，
+探索新品、享受独家优惠和个性化体验！</view>
+        <view class="perks">
+          <view class="perk"><view class="perk-ic ic-news" /><text class="perk-t">新品资讯</text></view>
+          <view class="perk"><view class="perk-ic ic-cs" /><text class="perk-t">专属客服</text></view>
+          <view class="perk"><view class="perk-ic ic-early" /><text class="perk-t">优先预购</text></view>
+          <view class="perk"><view class="perk-ic ic-event" /><text class="perk-t">品牌活动</text></view>
+        </view>
+        <view class="join-btn btn btn-primary" bindtap="openJoin">注册 \ 登录</view>
+      </view>
+    </block>
+
+    <!-- 已注册态 -->
+    <block wx:else>
+      <view class="profile-top" style="padding-top:{{sbh + 30}}px;">
+        <view class="code-ic" bindtap="goCode" />
+        <view class="avatar" bindtap="goProfile">
+          <image wx:if="{{user.avatar}}" class="avatar-img" src="{{user.avatar}}" mode="aspectFill" />
+          <text wx:else class="avatar-letter">A</text>
+          <view class="avatar-edit" />
+        </view>
+        <view class="hi">Hi，{{user.name}}</view>
+        <view class="badge-fan">品牌粉丝</view>
+      </view>
+      <view class="quad">
+        <view class="quad-item" bindtap="goOrders"><text class="quad-t">我的订单</text></view>
+        <view class="quad-item" bindtap="goBookings"><text class="quad-t">我的预约</text></view>
+        <view class="quad-item" bindtap="goWishlist"><text class="quad-t">心愿单</text></view>
+        <view class="quad-item" bindtap="goFootprints"><text class="quad-t">我的足迹</text></view>
+      </view>
+    </block>
+
+    <!-- 通用菜单 -->
+    <view class="menu">
+      <view class="menu-row" wx:for="{{menu}}" wx:key="k" data-k="{{item.k}}" bindtap="onMenu">
+        <text class="menu-label">{{item.label}}</text>
+        <view class="menu-arrow" />
+      </view>
+    </view>
+
+    <view class="tab-space" />
+  </scroll-view>
+  <fab-stack show-service above-tab />
+</view>

@@ -27,7 +27,7 @@ async def test_risky_order_note_rejected(client, monkeypatch):
     headers = await login(client, "sec-note")
     addr = await client.post("/api/v1/addresses", headers=headers, json={
         "name": "安审", "phone": "13500000000", "region": "", "detail": "路 7 号"})
-    listing = await client.get("/api/v1/products", params={"q": "头巾"})
+    listing = await client.get("/api/v1/products", params={"q": "项链"})
     spu_id = listing.json()["data"]["items"][0]["id"]
     sku = (await client.get(f"/api/v1/products/{spu_id}")).json()["data"]["skus"][0]
 

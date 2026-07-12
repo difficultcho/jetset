@@ -1,0 +1,45 @@
+<view class="page">
+  <view class="hdr" style="padding-top:{{sbh}}px;">
+    <view class="hdr-bar"><text class="brand-mark hdr-brand">AURELLE</text></view>
+  </view>
+
+  <scroll-view class="body" scroll-y>
+    <view class="sec-title">
+      <view class="eyebrow">A.IMMERSE</view>
+      <view class="sec-sub">探索AURELLE世界</view>
+    </view>
+
+    <view class="block" wx:for="{{blocks}}" wx:key="ph">
+      <view class="block-img" bindtap="{{item.video ? 'togglePlay' : 'go'}}" data-go="{{item.go}}"
+        style="background:repeating-linear-gradient(135deg,{{item.c1}} 0 16rpx,{{item.c2}} 16rpx 32rpx);">
+        <block wx:if="{{item.video}}">
+          <view wx:if="{{!playing}}" class="play-btn"><view class="play-tri" /></view>
+          <block wx:else>
+            <view class="pause-btn"><view class="pause-bar" /><view class="pause-bar" /></view>
+            <view class="vid-progress"><view class="vid-fill" /></view>
+          </block>
+        </block>
+        <text class="ph-label">{{item.ph}}</text>
+        <text wx:if="{{item.time}}" class="time-tag">00:30</text>
+      </view>
+      <view class="block-cap"><text class="cap-link" data-go="{{item.go}}" bindtap="go">{{item.t}}</text></view>
+    </view>
+
+    <view class="sec-title">
+      <view class="eyebrow">EXPLORE</view>
+      <view class="sec-sub">发现AURELLE最新讯息和无穷巧思</view>
+    </view>
+
+    <view class="block" wx:for="{{blocks2}}" wx:key="ph">
+      <view class="block-img" data-go="{{item.go}}" bindtap="go"
+        style="background:repeating-linear-gradient(135deg,{{item.c1}} 0 16rpx,{{item.c2}} 16rpx 32rpx);">
+        <text class="ph-label">{{item.ph}}</text>
+      </view>
+      <view class="block-cap"><text class="cap-link" data-go="{{item.go}}" bindtap="go">{{item.t}}</text></view>
+    </view>
+
+    <view class="tab-space" />
+  </scroll-view>
+
+  <fab-stack show-service above-tab />
+</view>

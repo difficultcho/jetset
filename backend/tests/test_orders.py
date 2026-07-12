@@ -18,7 +18,7 @@ async def _prepare(client, code: str) -> tuple[dict, dict, int]:
     })
     addr_id = addr.json()["data"]["id"]
 
-    listing = await client.get("/api/v1/products", params={"q": "滑雪镜"})
+    listing = await client.get("/api/v1/products", params={"q": "连衣裙"})
     spu_id = listing.json()["data"]["items"][0]["id"]
     detail = await client.get(f"/api/v1/products/{spu_id}")
     sku = detail.json()["data"]["skus"][0]
@@ -26,7 +26,7 @@ async def _prepare(client, code: str) -> tuple[dict, dict, int]:
 
 
 async def _sku_stock(client, sku_id: int) -> int:
-    listing = await client.get("/api/v1/products", params={"q": "滑雪镜"})
+    listing = await client.get("/api/v1/products", params={"q": "连衣裙"})
     spu_id = listing.json()["data"]["items"][0]["id"]
     detail = await client.get(f"/api/v1/products/{spu_id}")
     return next(s["stock"] for s in detail.json()["data"]["skus"] if s["id"] == sku_id)

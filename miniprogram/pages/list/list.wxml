@@ -1,0 +1,51 @@
+<view class="page">
+  <nav-bar title="{{title}}" />
+  <view class="tools">
+    <view class="search-box">
+      <view class="ic-search" />
+      <input class="search-input" value="{{q}}" placeholder="搜索商品" placeholder-class="ph" bindinput="onSearch" />
+    </view>
+    <view class="filter-row">
+      <view class="filter-btn" bindtap="openFilter"><view class="ic-slider" /><text>筛选</text></view>
+      <view class="sort">
+        <text class="sort-item {{sort === 'default' ? 'on' : ''}}" data-s="default" bindtap="setSort">综合</text>
+        <text class="sort-item {{sort === 'newest' ? 'on' : ''}}" data-s="newest" bindtap="setSort">新品</text>
+      </view>
+    </view>
+  </view>
+
+  <scroll-view class="grid-scroll" scroll-y>
+    <view class="grid">
+      <product-card wx:for="{{list}}" wx:key="id" prod="{{item}}" wished="{{wished[item.id]}}"
+        bind:tap="goPdp" bind:star="onStar" bind:bag="onBag" />
+    </view>
+    <view wx:if="{{list.length === 0}}" class="empty">暂无商品</view>
+    <view class="grid-space" />
+  </scroll-view>
+
+  <fab-stack id="fab" show-bag show-service />
+
+  <!-- 筛选抽屉 -->
+  <block wx:if="{{filterOpen}}">
+    <view class="mask" bindtap="closeFilter" />
+    <view class="drawer">
+      <view class="drawer-title">筛选</view>
+      <scroll-view class="drawer-body" scroll-y>
+        <view class="fgroup" wx:for="{{filters}}" wx:key="t" wx:for-index="gi">
+          <view class="fgroup-head" data-i="{{gi}}" bindtap="toggleExp">
+            <text>{{item.t}}</text>
+            <view class="fgroup-arrow {{filterExp === gi ? 'up' : ''}}" />
+          </view>
+          <view wx:if="{{filterExp === gi}}" class="fopts">
+            <view class="fchip {{picked[item.t + ':' + o] ? 'on' : ''}}" wx:for="{{item.opts}}" wx:for-item="o" wx:key="*this"
+              data-g="{{item.t}}" data-o="{{o}}" bindtap="pickOpt">{{o}}</view>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="drawer-foot">
+        <view class="btn btn-grey drawer-btn" bindtap="resetFilter">重置</view>
+        <view class="btn btn-dark drawer-btn" bindtap="applyFilter">应用</view>
+      </view>
+    </view>
+  </block>
+</view>

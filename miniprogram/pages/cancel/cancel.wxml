@@ -1,0 +1,11 @@
+<view class="page">
+  <nav-bar title="取消订单" />
+  <view class="title">请选择取消的理由</view>
+  <view class="reason" wx:for="{{reasons}}" wx:key="*this" data-i="{{index}}" bindtap="pick">
+    <text class="reason-t">{{item}}</text>
+    <view class="radio {{idx === index ? 'on' : ''}}" />
+  </view>
+  <view class="foot">
+    <view class="cancel-btn" bindtap="submit">{{submitting ? '处理中…' : '取消订单'}}</view>
+  </view>
+</view>

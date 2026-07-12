@@ -1,0 +1,17 @@
+<view class="card">
+  <view class="card-img" bindtap="onTap"><prod-img prod="{{prod}}" /></view>
+  <view class="card-name clamp2" bindtap="onTap">{{prod.name}}</view>
+  <view class="card-foot">
+    <view class="card-price">
+      <block wx:if="{{prod.sale}}">
+        <text class="p-old">¥{{prod.saleText}}</text>
+        <text class="p-sale">¥{{prod.priceText}}</text>
+      </block>
+      <text wx:else class="p-now">¥{{prod.priceText}}</text>
+    </view>
+    <view class="card-icons">
+      <view class="ic-star {{wished ? 'on' : ''}}" catchtap="onStar" />
+      <view class="ic-bag" catchtap="onBag" />
+    </view>
+  </view>
+</view>

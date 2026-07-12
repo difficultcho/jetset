@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import (
+    JSON,
     BigInteger,
     Boolean,
     DateTime,
@@ -18,11 +19,14 @@ from app.utils import utcnow
 
 
 class Category(Base):
+    """品类树：一级 parent_id=None，二级 parent_id 指向一级。商品挂在二级（叶子）。"""
+
     __tablename__ = "category"
 
     id: Mapped[int] = mapped_column(BigIntPK, primary_key=True, autoincrement=True)
-    parent_id: Mapped[int | None] = mapped_column(BigInteger, default=None)
+    parent_id: Mapped[int | None] = mapped_column(BigInteger, default=None, index=True)
     name: Mapped[str] = mapped_column(String(64))
+    en: Mapped[str] = mapped_column(String(64), default="", server_default="")
     sort: Mapped[int] = mapped_column(Integer, default=0)
     status: Mapped[int] = mapped_column(SmallInteger, default=1)
 
@@ -31,15 +35,21 @@ class Spu(Base):
     __tablename__ = "spu"
 
     id: Mapped[int] = mapped_column(BigIntPK, primary_key=True, autoincrement=True)
-    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"), index=True)
+    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"), index=True)  # 二级品类
+    series_id: Mapped[int | None] = mapped_column(ForeignKey("series.id"), default=None, index=True)
     name: Mapped[str] = mapped_column(String(128))
-    en_model: Mapped[str] = mapped_column(String(64), default="")
+    sub: Mapped[str] = mapped_column(String(128), default="", server_default="")  # 短名（卡片/走马灯）
+    en_model: Mapped[str] = mapped_column(String(64), default="")  # 保留兼容
+    code: Mapped[str] = mapped_column(String(64), default="", server_default="")   # 款号 AU433DSS266
     brief: Mapped[str] = mapped_column(Text, default="")
     detail: Mapped[str] = mapped_column(Text, default="")
+    bullets: Mapped[list | None] = mapped_column(JSON, default=None)  # 产品细节条目
     badge: Mapped[str | None] = mapped_column(String(16), default=None)
     featured: Mapped[bool] = mapped_column(Boolean, default=False)
+    has_video: Mapped[bool] = mapped_column(Boolean, default=False, server_default="0")
     # 展示价（分）= SKU 最低价，SKU 变更时同步维护，用于列表排序与展示
     price: Mapped[int] = mapped_column(Integer, default=0)
+    original_price: Mapped[int | None] = mapped_column(Integer, default=None)  # 划线原价（折扣款）
     sales: Mapped[int] = mapped_column(Integer, default=0)
     sort: Mapped[int] = mapped_column(Integer, default=0)
     status: Mapped[int] = mapped_column(SmallInteger, default=1)  # 1 上架 0 下架

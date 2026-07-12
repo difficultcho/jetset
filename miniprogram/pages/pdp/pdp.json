@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "prod-img": "/components/prod-img/prod-img",
+    "product-card": "/components/product-card/product-card",
+    "fab-stack": "/components/fab-stack/fab-stack"
+  }
+}

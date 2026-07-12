@@ -1,0 +1,13 @@
+<view class="page">
+  <nav-bar title="门店导购" />
+  <view class="dark">
+    <view wx:if="{{stores.length}}" class="card">
+      <view class="store-name">{{stores[idx].name}}</view>
+      <image wx:if="{{stores[idx].qr}}" class="qr-img" src="{{stores[idx].qr}}" mode="aspectFit" />
+      <view wx:else class="qr" />
+      <view class="tip">长按识别二维码
+添加您的专属顾问</view>
+      <view class="switch" bindtap="next">⇄ 切换门店</view>
+    </view>
+  </view>
+</view>

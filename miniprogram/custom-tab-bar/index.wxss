@@ -4,81 +4,52 @@
   left: 0;
   right: 0;
   height: 100rpx;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding: 18rpx 4rpx;
+  padding-bottom: calc(18rpx + env(safe-area-inset-bottom));
   background: #fff;
-  border-top: 1rpx solid #e8e8e8;
+  border-top: 1rpx solid #e6e6e6;
   display: flex;
   z-index: 900;
+  box-sizing: content-box;
 }
 .tab-item {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 4rpx;
+  gap: 10rpx;
 }
 .tab-icon {
-  width: 48rpx;
-  height: 48rpx;
-  position: relative;
+  width: 46rpx;
+  height: 46rpx;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
 .tab-label {
-  font-size: 20rpx;
-  color: #bbb;
+  font-size: 22rpx;
+  color: #9a9a9a;
 }
 .tab-label.active {
-  color: #000;
-  font-weight: 600;
+  color: #111;
 }
-.badge {
-  position: absolute;
-  top: -8rpx;
-  left: 50%;
-  margin-left: 12rpx;
-  background: #ff3b30;
-  color: #fff;
-  border-radius: 20rpx;
-  font-size: 18rpx;
-  font-weight: 700;
-  min-width: 30rpx;
-  height: 30rpx;
-  line-height: 30rpx;
-  text-align: center;
-  padding: 0 8rpx;
-  box-sizing: border-box;
+.tab-label.brand-mark-home {
+  font-size: 20rpx;
+  letter-spacing: 0.12em;
+  font-weight: 300;
 }
 
-.icon-home {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M3 10.5L12 3l9 7.5V21h-6v-6H9v6H3z' stroke='%23bbbbbb' stroke-width='1.6'/%3E%3C/svg%3E");
-}
-.icon-home.active {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M3 10.5L12 3l9 7.5V21h-6v-6H9v6H3z' stroke='%23000000' stroke-width='1.6' fill='%23000000'/%3E%3C/svg%3E");
-}
-.icon-shop {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Crect x='3' y='7' width='18' height='14' rx='2' stroke='%23bbbbbb' stroke-width='1.6'/%3E%3Cpath d='M8 7V5a4 4 0 018 0v2' stroke='%23bbbbbb' stroke-width='1.6' stroke-linecap='round'/%3E%3Cpath d='M8 13h8M8 17h5' stroke='%23bbbbbb' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-}
-.icon-shop.active {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Crect x='3' y='7' width='18' height='14' rx='2' stroke='%23000000' stroke-width='1.6'/%3E%3Cpath d='M8 7V5a4 4 0 018 0v2' stroke='%23000000' stroke-width='1.6' stroke-linecap='round'/%3E%3Cpath d='M8 13h8M8 17h5' stroke='%23000000' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-}
-.icon-cart {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M2 3h2.2l2.8 10.5H17l2.5-8H6' stroke='%23bbbbbb' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='10' cy='20' r='1.5' fill='%23bbbbbb'/%3E%3Ccircle cx='16' cy='20' r='1.5' fill='%23bbbbbb'/%3E%3C/svg%3E");
-}
-.icon-cart.active {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M2 3h2.2l2.8 10.5H17l2.5-8H6' stroke='%23000000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='10' cy='20' r='1.5' fill='%23000000'/%3E%3Ccircle cx='16' cy='20' r='1.5' fill='%23000000'/%3E%3C/svg%3E");
-}
-.icon-wholesale {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Crect x='4' y='2' width='16' height='20' rx='2' stroke='%23bbbbbb' stroke-width='1.6'/%3E%3Cpath d='M8 8h8M8 12h8M8 16h5' stroke='%23bbbbbb' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-}
-.icon-wholesale.active {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Crect x='4' y='2' width='16' height='20' rx='2' stroke='%23000000' stroke-width='1.6'/%3E%3Cpath d='M8 8h8M8 12h8M8 16h5' stroke='%23000000' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-}
-.icon-mine {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='8' r='4' stroke='%23bbbbbb' stroke-width='1.6'/%3E%3Cpath d='M4 20c0-4 3.6-7 8-7s8 3 8 7' stroke='%23bbbbbb' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
-}
-.icon-mine.active {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='8' r='4' stroke='%23000000' stroke-width='1.6'/%3E%3Cpath d='M4 20c0-4 3.6-7 8-7s8 3 8 7' stroke='%23000000' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
-}
+.icon-home { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23' fill='none' stroke='%239a9a9a' stroke-width='1.3' stroke-linecap='round'%3E%3Cpath d='M4 9 L5.5 4.5 H18.5 L20 9'/%3E%3Cpath d='M4 9 H20 V19.5 H4 Z'/%3E%3Crect x='9.5' y='13' width='5' height='6.5'/%3E%3C/svg%3E"); }
+.icon-home.active { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23' fill='none' stroke='%23111111' stroke-width='1.3' stroke-linecap='round'%3E%3Cpath d='M4 9 L5.5 4.5 H18.5 L20 9'/%3E%3Cpath d='M4 9 H20 V19.5 H4 Z'/%3E%3Crect x='9.5' y='13' width='5' height='6.5'/%3E%3C/svg%3E"); }
+
+.icon-brand { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23' fill='none' stroke='%239a9a9a' stroke-width='1.3' stroke-linecap='round'%3E%3Crect x='5' y='4' width='14' height='16.5' rx='1'/%3E%3Cpath d='M8.5 9 H15.5'/%3E%3Cpath d='M8.5 13 H15.5'/%3E%3Cpath d='M8.5 17 H13'/%3E%3C/svg%3E"); }
+.icon-brand.active { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23' fill='none' stroke='%23111111' stroke-width='1.3' stroke-linecap='round'%3E%3Crect x='5' y='4' width='14' height='16.5' rx='1'/%3E%3Cpath d='M8.5 9 H15.5'/%3E%3Cpath d='M8.5 13 H15.5'/%3E%3Cpath d='M8.5 17 H13'/%3E%3C/svg%3E"); }
+
+.icon-shop { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23' fill='none' stroke='%239a9a9a' stroke-width='1.3' stroke-linecap='round'%3E%3Cpath d='M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9'/%3E%3Crect x='5' y='9' width='14' height='11' rx='1'/%3E%3C/svg%3E"); }
+.icon-shop.active { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23' fill='none' stroke='%23111111' stroke-width='1.3' stroke-linecap='round'%3E%3Cpath d='M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9'/%3E%3Crect x='5' y='9' width='14' height='11' rx='1'/%3E%3C/svg%3E"); }
+
+.icon-me { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23' fill='none' stroke='%239a9a9a' stroke-width='1.3' stroke-linecap='round'%3E%3Ccircle cx='12' cy='8' r='3.6'/%3E%3Cpath d='M5 20.5 C5.5 15.8 9 14.5 12 14.5 C15 14.5 18.5 15.8 19 20.5'/%3E%3C/svg%3E"); }
+.icon-me.active { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23' fill='none' stroke='%23111111' stroke-width='1.3' stroke-linecap='round'%3E%3Ccircle cx='12' cy='8' r='3.6'/%3E%3Cpath d='M5 20.5 C5.5 15.8 9 14.5 12 14.5 C15 14.5 18.5 15.8 19 20.5'/%3E%3C/svg%3E"); }
+
+.icon-stores { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23' fill='none' stroke='%239a9a9a' stroke-width='1.3' stroke-linecap='round'%3E%3Cpath d='M12 21 C7.5 16 5.5 13 5.5 9.9 A6.5 6.5 0 0 1 18.5 9.9 C18.5 13 16.5 16 12 21 Z'/%3E%3C/svg%3E"); }
+.icon-stores.active { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='23' height='23' fill='none' stroke='%23111111' stroke-width='1.3' stroke-linecap='round'%3E%3Cpath d='M12 21 C7.5 16 5.5 13 5.5 9.9 A6.5 6.5 0 0 1 18.5 9.9 C18.5 13 16.5 16 12 21 Z'/%3E%3C/svg%3E"); }

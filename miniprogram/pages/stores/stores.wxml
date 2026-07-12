@@ -1,0 +1,20 @@
+<view class="page">
+  <view class="hdr" style="padding-top:{{sbh}}px;">
+    <view class="hdr-bar"><text class="brand-mark hdr-brand">AURELLE</text></view>
+  </view>
+  <scroll-view class="body" scroll-y>
+    <view class="pad">
+      <view class="entry" bindtap="goNearby">
+        <view class="entry-img" style="background:repeating-linear-gradient(135deg,#c9cdd4 0 16rpx,#bfc4cc 16rpx 32rpx);"><text class="ph-label">storefront · 夜幕店面</text></view>
+        <view class="entry-en">FIND A STORE</view>
+        <view class="entry-cn">附近的门店</view>
+      </view>
+      <view class="entry" bindtap="goIntro">
+        <view class="entry-img" style="background:repeating-linear-gradient(135deg,#e8e0d3 0 16rpx,#e1d7c6 16rpx 32rpx);"><text class="ph-label">interior · 精品店内景</text></view>
+        <view class="entry-en">OUR STORES</view>
+        <view class="entry-cn">门店介绍</view>
+      </view>
+    </view>
+    <view class="tab-space" />
+  </scroll-view>
+</view>

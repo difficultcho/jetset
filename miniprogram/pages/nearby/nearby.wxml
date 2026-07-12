@@ -1,0 +1,33 @@
+<view class="page">
+  <nav-bar title="附近门店" />
+  <view class="filters">
+    <view class="search"><view class="ic-search" /><input class="si" placeholder="搜索门店" placeholder-class="ph" /></view>
+    <view class="drops">
+      <view class="drop" bindtap="toggleProv"><text>{{prov || '请选择省份'}}</text><view class="da" /></view>
+      <view class="drop" bindtap="toggleCity"><text>{{city || '请选择城市'}}</text><view class="da" /></view>
+    </view>
+    <view wx:if="{{provOpen}}" class="popover">
+      <view class="pop-item" wx:for="{{provs}}" wx:key="*this" data-v="{{item}}" bindtap="pickProv">{{item}}</view>
+    </view>
+    <view wx:if="{{cityOpen && prov}}" class="popover right">
+      <view class="pop-item" wx:for="{{cities[prov]}}" wx:key="*this" data-v="{{item}}" bindtap="pickCity">{{item}}</view>
+    </view>
+  </view>
+
+  <scroll-view class="body" scroll-y>
+    <view class="store" wx:for="{{list}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
+      <view class="store-img">
+        <image wx:if="{{item.images[0]}}" class="store-real" src="{{item.images[0]}}" mode="aspectFill" />
+        <view wx:else class="store-ph" style="background:repeating-linear-gradient(135deg,#d8cfc0 0 16rpx,#cfc4b2 16rpx 32rpx);"><text class="ph-label">storefront · {{item.short}}</text></view>
+      </view>
+      <view class="store-head">
+        <text class="store-name">{{item.name}}</text>
+        <view class="store-nav"><view class="ic-nav" /></view>
+      </view>
+      <view class="store-line">地址：{{item.addr}}</view>
+      <view class="store-line">联系方式：<text class="tel" data-tel="{{item.tel}}" catchtap="call">{{item.tel}}</text></view>
+      <view class="store-line">营业时间：{{item.hours}}</view>
+    </view>
+    <view class="body-space" />
+  </scroll-view>
+</view>

@@ -1,92 +1,77 @@
 const app = getApp();
 const api = require('../../utils/api.js');
-const { toProd, toDetail } = require('../../utils/mapper.js');
-const { toastError } = require('../../utils/request.js');
-
-const SORT_KEYS = ['default', 'sales', 'price_asc', 'newest'];
+const { toCard } = require('../../utils/mapper.js');
 
 Page({
   data: {
-    cats: [],
-    cat: '',
-    q: '',
-    sorts: ['综合', '销量', '价格', '上新'],
-    sortIdx: 0,
-    list: [],
-    quickAdd: null
+    sbh: 20,
+    rail: [],        // [{kind:'series'|'cat', id, en, cn, subs?}]
+    curKey: '',      // 'series-1' / 'cat-3'
+    card: null,      // 系列大卡
+    subs: [],        // 品类二级 chips
+    subCur: '',
+    tiles: []
   },
 
   async onLoad() {
+    this.setData({ sbh: app.globalData.statusBarHeight });
     try {
-      const cats = await api.categories();
-      const names = cats.map((c) => c.name);
-      this.setData({ cats: names, cat: names[0] || '' });
-      await this.fetchList();
-    } catch (e) {
-      toastError(e);
-    }
+      const [series, cats] = await Promise.all([api.series(), api.categories()]);
+      const rail = series.map((s) => ({ kind: 'series', id: s.id, en: s.en, cn: s.name, tint: s.cover_tint, subtitle: s.subtitle }))
+        .concat(cats.map((c) => ({ kind: 'cat', id: c.id, en: c.en, cn: c.name, subs: c.children || [] })));
+      this.setData({ rail });
+      if (rail.length) this.pick({ currentTarget: { dataset: { i: 0 } } });
+    } catch (e) { /* 静默 */ }
   },
 
   onShow() {
-    if (typeof this.getTabBar === 'function') this.getTabBar().refresh(1);
-    app.refreshCartCount().then(() => {
-      if (typeof this.getTabBar === 'function') this.getTabBar().refresh(1);
-    });
+    if (typeof this.getTabBar === 'function') this.getTabBar().refresh(2);
+    app.refreshCartCount();
+    const f = this.selectComponent('#fab');
+    if (f) f.refresh();
   },
 
-  async fetchList() {
-    const { cat, q, sortIdx } = this.data;
-    try {
-      const page = await api.products({ cat, q, sort: SORT_KEYS[sortIdx], page_size: 50 });
-      this.setData({ list: page.items.map(toProd) });
-    } catch (e) {
-      toastError(e);
+  async pick(e) {
+    const item = this.data.rail[e.currentTarget.dataset.i];
+    this.setData({ curKey: item.kind + '-' + item.id });
+    if (item.kind === 'series') {
+      this.setData({
+        card: { name: item.cn, en: item.en, subtitle: item.subtitle, tint: item.tint || '#e8dcc8', seriesId: item.id },
+        subs: [], subCur: ''
+      });
+      await this._load({ series: item.id });
+    } else {
+      this.setData({
+        card: null,
+        subs: item.subs,
+        subCur: ''
+      });
+      await this._load({ cat: item.cn });
     }
   },
 
-  onSearch(e) {
-    this.setData({ q: e.detail.value });
-    clearTimeout(this.searchTimer);
-    this.searchTimer = setTimeout(() => this.fetchList(), 300);
+  async pickSub(e) {
+    const name = e.currentTarget.dataset.name;
+    this.setData({ subCur: name });
+    await this._load({ cat: name || this._curCatName() });
   },
 
-  pickCat(e) {
-    this.setData({ cat: e.currentTarget.dataset.c });
-    this.fetchList();
+  _curCatName() {
+    const item = this.data.rail.find((r) => r.kind + '-' + r.id === this.data.curKey);
+    return item ? item.cn : '';
   },
 
-  pickSort(e) {
-    this.setData({ sortIdx: e.currentTarget.dataset.i });
-    this.fetchList();
-  },
-
-  goDetail(e) {
-    wx.navigateTo({ url: '/pages/product/product?id=' + e.currentTarget.dataset.id });
-  },
-
-  // 点击列表项的圆形购物车图标：拉详情（含 SKU）后弹配置选择弹窗
-  async openQuick(e) {
+  async _load(params) {
     try {
-      const d = await api.productDetail(e.currentTarget.dataset.id);
-      this.setData({ quickAdd: toDetail(d) });
-    } catch (err) {
-      toastError(err);
-    }
+      const page = await api.products(Object.assign({ page_size: 30 }, params));
+      this.setData({ tiles: page.items.map(toCard) });
+    } catch (e) { this.setData({ tiles: [] }); }
   },
 
-  closeQuick() {
-    this.setData({ quickAdd: null });
+  goCard() {
+    const c = this.data.card;
+    if (c) wx.navigateTo({ url: '/pages/list/list?series=' + c.seriesId + '&title=' + encodeURIComponent(c.en) });
   },
-
-  async confirmQuick(e) {
-    try {
-      await api.cartAdd(e.detail.skuId, e.detail.qty);
-      this.setData({ quickAdd: null });
-      await app.refreshCartCount();
-      if (typeof this.getTabBar === 'function') this.getTabBar().refresh(1);
-      wx.showToast({ title: '已加入购物车', icon: 'success' });
-    } catch (err) {
-      toastError(err);
-    }
-  }
+  goPdp(e) { wx.navigateTo({ url: '/pages/pdp/pdp?id=' + e.currentTarget.dataset.id }); },
+  goSearch() { wx.navigateTo({ url: '/pages/list/list' }); }
 });

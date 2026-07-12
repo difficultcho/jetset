@@ -1,40 +1,53 @@
 <view class="page">
-  <!-- 搜索 -->
-  <view class="search-wrap">
-    <view class="search-box">
-      <view class="search-icon" />
-      <input class="search-input" value="{{q}}" placeholder="搜索商品" placeholder-class="ph" bindinput="onSearch" />
-      <text class="search-btn">搜索</text>
+  <view class="hdr" style="padding-top:{{sbh}}px;">
+    <view class="hdr-bar"><text class="brand-mark hdr-brand">AURELLE</text></view>
+    <view class="search-wrap">
+      <view class="search-box">
+        <view class="ic-search" />
+        <input class="search-input" placeholder="搜索商品" placeholder-class="ph" bindconfirm="goSearch" />
+      </view>
     </view>
   </view>
 
-  <!-- 排序 -->
-  <view class="sort-row">
-    <text class="sort-item {{sortIdx === index ? 'on' : ''}}" wx:for="{{sorts}}" wx:key="*this" data-i="{{index}}" bindtap="pickSort">{{item}}</text>
-  </view>
-
   <view class="body">
-    <!-- 左侧分类 -->
-    <scroll-view class="side" scroll-y>
-      <view class="side-head">阿尔卑斯系列</view>
-      <view class="side-item {{cat === item ? 'on' : ''}}" wx:for="{{cats}}" wx:key="*this" data-c="{{item}}" bindtap="pickCat">{{item}}</view>
+    <scroll-view class="rail" scroll-y>
+      <view class="rail-item {{curKey === item.kind + '-' + item.id ? 'on' : ''}}" wx:for="{{rail}}" wx:key="cn" data-i="{{index}}" bindtap="pick">
+        <text class="rail-en">{{item.en}}</text>
+        <text class="rail-cn">{{item.cn}}</text>
+      </view>
     </scroll-view>
 
-    <!-- 右侧商品列表 -->
-    <scroll-view class="list" scroll-y>
-      <view wx:if="{{list.length === 0}}" class="empty">该分类暂无商品</view>
-      <view class="row" wx:for="{{list}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
-        <view class="row-img"><prod-img prod="{{item}}" size="{{90}}" /></view>
-        <view class="row-info">
-          <view class="row-name clamp2">{{item.name}}</view>
-          <text wx:if="{{item.badge}}" class="row-badge">{{item.badge}}</text>
-          <view class="row-price">¥{{item.price}}<text class="row-price-dec">.0</text></view>
+    <scroll-view class="content" scroll-y>
+      <!-- 系列大卡 -->
+      <view wx:if="{{card}}" class="big-card" bindtap="goCard">
+        <view class="big-img" style="background:repeating-linear-gradient(135deg,{{card.tint}} 0 28rpx,{{card.tint}} 28rpx 56rpx);">
+          <text class="ph-label">series · {{card.en}}</text>
         </view>
-        <view class="row-add" data-id="{{item.id}}" catchtap="openQuick" />
+        <view class="big-en">{{card.en}}</view>
+        <view class="big-cn">{{card.name}}</view>
       </view>
-      <view class="list-space" />
+
+      <!-- 品类二级 chips -->
+      <view wx:if="{{subs.length}}" class="subs">
+        <view class="sub-chip {{subCur === '' ? 'on' : ''}}" data-name="" bindtap="pickSub">全部</view>
+        <view class="sub-chip {{subCur === item.name ? 'on' : ''}}" wx:for="{{subs}}" wx:key="id" data-name="{{item.name}}" bindtap="pickSub">{{item.name}}</view>
+      </view>
+
+      <view class="tiles">
+        <view class="tile" wx:for="{{tiles}}" wx:key="id" data-id="{{item.id}}" bindtap="goPdp">
+          <view class="tile-img"><prod-img prod="{{item}}" /></view>
+          <view class="tile-en">{{item.en}}</view>
+          <view class="tile-cn clamp2">{{item.sub}}</view>
+          <view class="tile-price">
+            <text wx:if="{{item.sale}}" class="tp-old">¥{{item.saleText}}</text>
+            <text class="{{item.sale ? 'tp-sale' : 'tp-now'}}">¥{{item.priceText}}</text>
+          </view>
+        </view>
+      </view>
+      <view wx:if="{{tiles.length === 0}}" class="empty">该类目即将上架，敬请期待</view>
+      <view class="content-space" />
     </scroll-view>
   </view>
 
-  <atc-modal wx:if="{{quickAdd}}" prod="{{quickAdd}}" mode="cart" bind:close="closeQuick" bind:confirm="confirmQuick" />
+  <fab-stack id="fab" show-bag above-tab />
 </view>

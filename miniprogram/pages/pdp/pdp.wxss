@@ -1,0 +1,79 @@
+.page { height: 100vh; display: flex; flex-direction: column; background: #fff; position: relative; }
+.back-hit {
+  position: absolute; left: 12rpx; z-index: 30;
+  width: 76rpx; height: 76rpx; display: flex; align-items: center; justify-content: center;
+  margin-top: 12rpx;
+}
+.arrow {
+  width: 22rpx; height: 22rpx;
+  border-left: 3rpx solid #111; border-bottom: 3rpx solid #111;
+  transform: rotate(45deg); margin-left: 8rpx;
+}
+.body { flex: 1; height: 0; }
+.hero { width: 100%; aspect-ratio: 3 / 3.6; overflow: hidden; background: #f6f6f6; }
+
+.info { padding: 28rpx 32rpx 0; }
+.name-row { display: flex; align-items: flex-start; justify-content: space-between; }
+.p-name { font-size: 31rpx; color: #111; line-height: 1.5; flex: 1; padding-right: 20rpx; }
+.ic-share { width: 40rpx; height: 40rpx; flex-shrink: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='20' height='20' fill='none' stroke='%23555' stroke-width='1.3'%3E%3Ccircle cx='6' cy='12' r='2.4'/%3E%3Ccircle cx='17' cy='6' r='2.4'/%3E%3Ccircle cx='17' cy='18' r='2.4'/%3E%3Cpath d='M8.2 11 L14.8 7 M8.2 13 L14.8 17'/%3E%3C/svg%3E") no-repeat center / contain; }
+.p-series { font-size: 22rpx; letter-spacing: 0.24em; color: #9a9a9a; margin-bottom: 12rpx; }
+.p-price { font-size: 30rpx; color: #111; margin-top: 16rpx; display: flex; align-items: baseline; gap: 16rpx; }
+.p-orig { font-size: 25rpx; color: #b0b0b0; text-decoration: line-through; }
+.p-sale { color: #d0342c; }
+.acc-bullet { font-size: 24rpx; color: #666; line-height: 1.8; margin-top: 8rpx; }
+
+.sec-head { display: flex; align-items: center; justify-content: space-between; margin-top: 40rpx; }
+.sec-t { font-size: 27rpx; color: #111; }
+.sec-link { font-size: 24rpx; color: #576b95; border-bottom: 1rpx solid #576b95; padding-bottom: 2rpx; }
+.size-row { display: flex; flex-wrap: wrap; gap: 16rpx; margin-top: 22rpx; }
+.size-blk {
+  min-width: 92rpx; height: 76rpx; padding: 0 20rpx;
+  border: 1rpx solid #ddd; display: flex; align-items: center; justify-content: center;
+  font-size: 26rpx; color: #333; box-sizing: border-box;
+}
+.size-blk.on { background: #3a3a3a; color: #fff; border-color: #3a3a3a; }
+.color-row { display: flex; flex-wrap: wrap; gap: 30rpx; margin-top: 22rpx; }
+.color-item { display: flex; align-items: center; gap: 14rpx; }
+.color-dot { width: 44rpx; height: 44rpx; border-radius: 50%; border: 1rpx solid #ddd; box-sizing: border-box; }
+.color-dot.on { box-shadow: 0 0 0 2rpx #fff, 0 0 0 4rpx #111; }
+.color-name { font-size: 25rpx; color: #777; }
+.color-name.on { color: #111; }
+
+.acc { margin-top: 44rpx; }
+.acc-item { border-top: 1rpx solid #eee; }
+.acc-item:last-child { border-bottom: 1rpx solid #eee; }
+.acc-head { display: flex; align-items: center; justify-content: space-between; padding: 32rpx; font-size: 27rpx; letter-spacing: 0.06em; }
+.acc-arrow { width: 16rpx; height: 16rpx; border-right: 2rpx solid #999; border-bottom: 2rpx solid #999; transform: rotate(45deg); }
+.acc-arrow.up { transform: rotate(-135deg); }
+.acc-body { padding: 0 32rpx 32rpx; }
+.acc-desc { font-size: 25rpx; color: #666; line-height: 1.85; }
+.acc-code { font-size: 24rpx; color: #999; margin-top: 20rpx; }
+
+.services { display: flex; padding: 44rpx 20rpx; }
+.svc { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 14rpx; }
+.svc-ic { width: 52rpx; height: 52rpx; background-size: contain; background-repeat: no-repeat; background-position: center; }
+.ic-vip { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='26' height='26' fill='none' stroke='%23555' stroke-width='1.2'%3E%3Ccircle cx='12' cy='9' r='4'/%3E%3Cpath d='M5 20 C6 15 9 14 12 14 C15 14 18 15 19 20'/%3E%3C/svg%3E"); }
+.ic-return { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='26' height='26' fill='none' stroke='%23555' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M4 9 a8 8 0 1 1 -1 4'/%3E%3Cpath d='M4 4 v5 h5'/%3E%3C/svg%3E"); }
+.ic-ship { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='26' height='26' fill='none' stroke='%23555' stroke-width='1.2' stroke-linecap='round'%3E%3Crect x='2' y='7' width='13' height='9' rx='1'/%3E%3Cpath d='M15 10 h3 l3 3 v3 h-6z'/%3E%3Ccircle cx='7' cy='18' r='1.6'/%3E%3Ccircle cx='17.5' cy='18' r='1.6'/%3E%3C/svg%3E"); }
+.ic-gift { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='26' height='26' fill='none' stroke='%23555' stroke-width='1.2'%3E%3Crect x='4' y='9' width='16' height='11' rx='1'/%3E%3Cpath d='M4 13 h16 M12 9 v11'/%3E%3C/svg%3E"); }
+.svc-t { font-size: 24rpx; color: #444; }
+
+.recs-title { text-align: center; font-size: 28rpx; font-weight: 600; padding: 20rpx 0 30rpx; }
+.recs { display: grid; grid-template-columns: 1fr 1fr; gap: 60rpx 40rpx; padding: 0 40rpx; }
+.body-space { height: 180rpx; }
+
+.action-bar {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 18rpx;
+  padding: 16rpx 28rpx calc(16rpx + env(safe-area-inset-bottom));
+  border-top: 1rpx solid #eee; background: #fff;
+}
+.act-add { flex: 1; height: 88rpx; background: #f4f4f4; color: #111; display: flex; align-items: center; justify-content: center; font-size: 27rpx; }
+.act-buy { flex: 1; height: 88rpx; background: #111; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 27rpx; letter-spacing: 0.08em; }
+.act-star {
+  width: 88rpx; height: 88rpx; border: 1rpx solid #ddd; flex-shrink: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='%23111' stroke-width='1.3' stroke-linejoin='round'%3E%3Cpath d='M12 3.5 L14.6 9 L20.5 9.7 L16 13.8 L17.3 19.6 L12 16.5 L6.7 19.6 L8 13.8 L3.5 9.7 L9.4 9 Z'/%3E%3C/svg%3E") no-repeat center / 40rpx;
+}
+.act-star.on {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='22' height='22' fill='%23111' stroke='%23111' stroke-width='1.3' stroke-linejoin='round'%3E%3Cpath d='M12 3.5 L14.6 9 L20.5 9.7 L16 13.8 L17.3 19.6 L12 16.5 L6.7 19.6 L8 13.8 L3.5 9.7 L9.4 9 Z'/%3E%3C/svg%3E") no-repeat center / 40rpx;
+}

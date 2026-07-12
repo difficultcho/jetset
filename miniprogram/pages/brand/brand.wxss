@@ -1,0 +1,51 @@
+.page { height: 100vh; display: flex; flex-direction: column; background: #fff; }
+.hdr { background: rgba(255,255,255,0.97); flex-shrink: 0; }
+.hdr-bar { height: 88rpx; display: flex; align-items: center; justify-content: center; }
+.hdr-brand { font-size: 40rpx; }
+.body { flex: 1; height: 0; }
+
+.sec-title { text-align: center; padding: 52rpx 0 40rpx; }
+.sec-sub { font-size: 24rpx; color: #8a8a8a; margin-top: 16rpx; letter-spacing: 0.14em; }
+
+.block { margin-bottom: 16rpx; }
+.block-img {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 3.3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ph-label {
+  position: absolute;
+  bottom: 24rpx; left: 0; right: 0;
+  text-align: center;
+  font-family: monospace;
+  font-size: 20rpx;
+  letter-spacing: 0.2em;
+  color: rgba(70, 55, 45, 0.6);
+}
+.time-tag { position: absolute; right: 24rpx; bottom: 24rpx; color: #fff; font-size: 22rpx; }
+.play-btn, .pause-btn {
+  width: 112rpx; height: 112rpx;
+  border: 3rpx solid rgba(255,255,255,0.95);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.1);
+}
+.pause-btn { gap: 12rpx; background: rgba(0,0,0,0.18); }
+.play-tri {
+  width: 0; height: 0;
+  border-left: 28rpx solid #fff;
+  border-top: 18rpx solid transparent;
+  border-bottom: 18rpx solid transparent;
+  margin-left: 8rpx;
+}
+.pause-bar { width: 10rpx; height: 36rpx; background: #fff; }
+.vid-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 6rpx; background: rgba(255,255,255,0.35); }
+.vid-fill { height: 100%; background: #fff; width: 100%; animation: vidbar 30s linear forwards; }
+@keyframes vidbar { from { width: 0; } to { width: 100%; } }
+.block-cap { padding: 20rpx 28rpx 36rpx; }
+.cap-link { font-size: 24rpx; letter-spacing: 0.14em; color: #333; }
+
+.tab-space { height: calc(180rpx + env(safe-area-inset-bottom)); }

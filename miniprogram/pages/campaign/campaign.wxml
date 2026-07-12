@@ -1,0 +1,27 @@
+<view class="page">
+  <nav-bar title="" brand />
+  <scroll-view class="body" scroll-y>
+    <view wx:if="{{post}}" class="title-sec">
+      <view class="eyebrow">{{post.title}}</view>
+      <view class="t-cn">{{post.subtitle}}</view>
+      <view class="t-sub">现已于精品店及线上同步发售</view>
+    </view>
+
+    <block wx:if="{{post}}" wx:for="{{post.body}}" wx:key="ph">
+      <view wx:if="{{item.kind === 'image'}}" class="cimg {{item.inset ? 'inset' : ''}}" style="aspect-ratio:{{item.ratio}};">
+        <image wx:if="{{item.img}}" class="real" src="{{item.img}}" mode="aspectFill" />
+        <view wx:else class="ph" style="background:{{item.tint}};"><text class="ph-label">{{item.ph}}</text></view>
+      </view>
+      <view wx:elif="{{item.kind === 'text'}}" class="para">{{item.text}}</view>
+    </block>
+
+    <view class="prod-strip">
+      <view class="prod-item" wx:for="{{prods}}" wx:key="id" data-id="{{item.id}}" bindtap="goPdp">
+        <view class="prod-img"><prod-img prod="{{item}}" /></view>
+        <text class="prod-en">{{item.en}}</text>
+        <text class="prod-sub">{{item.sub}}</text>
+      </view>
+    </view>
+    <view class="body-space" />
+  </scroll-view>
+</view>

@@ -1,0 +1,20 @@
+<view class="page">
+  <nav-bar title="尺码指南" />
+  <scroll-view class="body" scroll-y>
+    <view class="tbl-wrap" wx:for="{{tables}}" wx:key="title">
+      <view class="tbl-title">{{item.title}}</view>
+      <scroll-view scroll-x class="tbl-scroll">
+        <view class="tbl">
+          <view class="tr head">
+            <view class="td" wx:for="{{item.t.head}}" wx:for-item="h" wx:key="index">{{h}}</view>
+          </view>
+          <view class="tr" wx:for="{{item.t.rows}}" wx:for-item="row" wx:key="index">
+            <view class="td {{ci === 0 ? 'first' : ''}}" wx:for="{{row}}" wx:for-item="cell" wx:for-index="ci" wx:key="index">{{cell}}</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+    <view class="note">0P 为娇小版型（Petite），适合身高较小的顾客。</view>
+    <view class="body-space" />
+  </scroll-view>
+</view>

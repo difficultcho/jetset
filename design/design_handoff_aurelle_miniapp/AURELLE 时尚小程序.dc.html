@@ -1,0 +1,2041 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#e9e7e4}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+a{color:#111;text-decoration:underline}
+a:hover{color:#666}
+input{font:inherit;color:inherit;border:none;outline:none;background:transparent;padding:0;width:100%}
+::-webkit-scrollbar{width:0;height:0}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes drawerIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes vidbar{from{width:0}to{width:100%}}
+</style>
+</helmet>
+<div style="position:relative;margin:0 auto;width:100%;max-width:430px;height:100vh;background:#fff;overflow:hidden;font-family:'Jost','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;color:#111">
+
+  <div style="position:absolute;top:0;left:0;right:0;height:32px;z-index:72;display:flex;align-items:center;justify-content:space-between;padding:8px 16px 0 26px;pointer-events:none">
+    <div style="font-size:14px;font-weight:600;letter-spacing:.5px">{{clock}}</div>
+    <div style="display:flex;align-items:center;gap:5px">
+      <div style="display:flex;align-items:flex-end;gap:1.5px">
+        <div style="width:3px;height:4px;background:#111;border-radius:1px"></div>
+        <div style="width:3px;height:6px;background:#111;border-radius:1px"></div>
+        <div style="width:3px;height:8px;background:#111;border-radius:1px"></div>
+        <div style="width:3px;height:10px;background:#111;border-radius:1px"></div>
+      </div>
+      <div style="font-size:12px;font-weight:600">5G</div>
+      <div style="width:22px;height:11px;border:1px solid rgba(17,17,17,.4);border-radius:3px;padding:1.5px;display:flex"><div style="width:55%;height:100%;background:#111;border-radius:1px"></div></div>
+    </div>
+  </div>
+  <div style="position:absolute;top:36px;right:10px;z-index:72;width:87px;height:32px;border:0.5px solid rgba(0,0,0,.1);background:rgba(255,255,255,.9);border-radius:16px;display:flex;align-items:center">
+    <div style="flex:1;display:flex;justify-content:center;gap:3.5px">
+      <div style="width:3.5px;height:3.5px;border-radius:50%;background:#111"></div>
+      <div style="width:3.5px;height:3.5px;border-radius:50%;background:#111"></div>
+      <div style="width:3.5px;height:3.5px;border-radius:50%;background:#111"></div>
+    </div>
+    <div style="width:0.5px;height:18px;background:rgba(0,0,0,.12)"></div>
+    <div style="flex:1;display:flex;justify-content:center"><div style="width:15px;height:15px;border:1.5px solid #111;border-radius:50%;display:flex;align-items:center;justify-content:center"><div style="width:5px;height:5px;background:#111;border-radius:50%"></div></div></div>
+  </div>
+
+  <sc-if value="{{s.home}}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="首页tab" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:rgba(255,255,255,.97);padding-top:32px">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 14px">
+          <div style="display:flex;gap:16px;align-items:center">
+            <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="#111" stroke-width="1.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16 L20.5 20.5"></path></svg>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#111" stroke-width="1.4" stroke-linecap="round"><path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"></path><rect x="5" y="9" width="14" height="11" rx="1"></rect></svg>
+          </div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:300;font-size:19px;letter-spacing:.32em;padding-left:.32em">AURELLE</div>
+        </div>
+      </div>
+      <div ref="{{homeRef}}" style="position:absolute;top:76px;bottom:84px;left:0;right:0;overflow-y:auto">
+        <div style="position:relative;overflow:hidden">
+          <div style="display:flex;transition:transform .6s ease;transform:{{heroTx}}">
+            <sc-for list="{{heroSlides}}" as="h" hint-placeholder-count="3">
+              <div onClick="{{h.go}}" style="flex:0 0 100%;cursor:pointer">
+                <div style="width:100%;aspect-ratio:3/3.9;background:repeating-linear-gradient(135deg,{{h.c1}} 0 16px,{{h.c2}} 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:28px">
+                  <span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(80,60,45,.6)">{{h.label}}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:5px">
+            <sc-for list="{{heroDots}}" as="d" hint-placeholder-count="3"><div style="width:5px;height:5px;border-radius:50%;background:{{d.c}}"></div></sc-for>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:12px 14px 4px">
+          <span onClick="{{goSeries}}" style="font-size:12px;letter-spacing:.1em;border-bottom:1px solid #111;padding-bottom:2px;cursor:pointer">探索HIGH SUMMER系列</span>
+          <span onClick="{{goCampaign}}" style="font-size:12px;letter-spacing:.1em;border-bottom:1px solid #111;padding-bottom:2px;cursor:pointer">探索广告大片</span>
+        </div>
+        <div style="padding:38px 0 8px;overflow:hidden">
+          <div style="display:flex;transition:transform .6s ease;transform:{{prodTx}}">
+            <sc-for list="{{homeProds}}" as="p" hint-placeholder-count="3">
+              <div onClick="{{p.open}}" style="flex:0 0 100%;display:flex;flex-direction:column;align-items:center;cursor:pointer">
+                <div style="width:54%;aspect-ratio:3/3.6;background:{{p.tint}};display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.16em;color:rgba(90,70,55,.55);text-align:center;padding:0 10px">{{p.label}}</span></div>
+                <div style="margin-top:18px;font-size:12px;letter-spacing:.24em;color:#3a3a3a">SOLEIL</div>
+                <div style="margin-top:6px;font-size:12px;color:#9a9a9a;letter-spacing:.05em">{{p.subName}}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;justify-content:center;gap:5px;margin-top:16px">
+            <sc-for list="{{prodDots}}" as="d" hint-placeholder-count="3"><div style="width:4px;height:4px;border-radius:50%;background:{{d.c}}"></div></sc-for>
+          </div>
+        </div>
+        <div style="position:relative;margin-top:24px">
+          <div style="width:100%;aspect-ratio:3/3.4;background:repeating-linear-gradient(135deg,#e9ddca 0 16px,#e2d3bc 16px 32px);display:flex;align-items:center;justify-content:center">
+            <div style="width:58px;height:58px;border:1.5px solid rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.08)"><div style="width:0;height:0;border-left:15px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px"></div></div>
+            <span style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(80,60,45,.55)">campaign video · 泳池畔</span>
+          </div>
+          <div style="padding:10px 14px 0"><span onClick="{{goCampaign}}" style="font-size:12px;letter-spacing:.1em;border-bottom:1px solid #111;padding-bottom:2px;cursor:pointer">2026夏日胶囊系列</span></div>
+        </div>
+        <div style="margin-top:26px">
+          <div style="width:100%;aspect-ratio:3/3.2;background:repeating-linear-gradient(135deg,#ecd9c2 0 16px,#e6cfb2 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:24px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(90,60,35,.55)">product still · 木底凉鞋</span></div>
+          <div style="padding:10px 14px 0"><span onClick="{{goShoesList}}" style="font-size:12px;letter-spacing:.1em;border-bottom:1px solid #111;padding-bottom:2px;cursor:pointer">探索鞋履</span></div>
+        </div>
+        <div style="margin-top:26px">
+          <div style="width:100%;aspect-ratio:3/3.2;background:repeating-linear-gradient(135deg,#d9d4cc 0 16px,#cfc8bd 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:24px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(70,60,50,.55)">product still · 编织手袋</span></div>
+          <div style="padding:10px 14px 0"><span onClick="{{goBagsList}}" style="font-size:12px;letter-spacing:.1em;border-bottom:1px solid #111;padding-bottom:2px;cursor:pointer">探索包袋</span></div>
+        </div>
+        <div style="margin-top:26px;padding-bottom:34px">
+          <div style="width:100%;aspect-ratio:3/3.6;background:repeating-linear-gradient(135deg,#dfe6ea 0 16px,#d5dee4 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:24px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(55,70,80,.55)">campaign · 泳池边小憩</span></div>
+          <div style="padding:10px 14px 0"><span onClick="{{goCampaign}}" style="font-size:12px;letter-spacing:.1em;border-bottom:1px solid #111;padding-bottom:2px;cursor:pointer">探索广告大片</span></div>
+        </div>
+      </div>
+      <div style="position:absolute;right:14px;bottom:104px;z-index:12;display:flex;flex-direction:column;gap:12px">
+        <div onClick="{{svcToast}}" style="width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#333" stroke-width="1.4"><rect x="3.5" y="5" width="17" height="13" rx="3"></rect><path d="M9 18 L8 21 L12 18" fill="#333" stroke="none"></path><circle cx="8.5" cy="11.5" r="0.9" fill="#333" stroke="none"></circle><circle cx="12" cy="11.5" r="0.9" fill="#333" stroke="none"></circle><circle cx="15.5" cy="11.5" r="0.9" fill="#333" stroke="none"></circle></svg>
+        </div>
+        <div onClick="{{homeTop}}" style="width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer">
+          <div style="width:11px;height:11px;border-left:1.5px solid #333;border-top:1.5px solid #333;transform:rotate(45deg);margin-top:5px"></div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{tabbar}}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;bottom:0;left:0;right:0;height:84px;z-index:40;background:#fff;border-top:0.5px solid #e6e6e6;display:flex;padding:9px 2px 24px">
+      <div onClick="{{goHome}}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;color:{{tc.home}}">
+        <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M4 9 L5.5 4.5 H18.5 L20 9"></path><path d="M4 9 H20 V19.5 H4 Z"></path><rect x="9.5" y="13" width="5" height="6.5"></rect></svg>
+        <div style="font-size:10px;letter-spacing:.12em">AURELLE</div>
+      </div>
+      <div onClick="{{goBrand}}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;color:{{tc.brand}}">
+        <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="5" y="4" width="14" height="16.5" rx="1"></rect><path d="M8.5 9 H15.5"></path><path d="M8.5 13 H15.5"></path><path d="M8.5 17 H13"></path></svg>
+        <div style="font-size:11px">关于品牌</div>
+      </div>
+      <div onClick="{{goShop}}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;color:{{tc.shop}}">
+        <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"></path><rect x="5" y="9" width="14" height="11" rx="1"></rect></svg>
+        <div style="font-size:11px;font-weight:{{tc.shopW}}">商城</div>
+      </div>
+      <div onClick="{{goMe}}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;color:{{tc.me}}">
+        <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="3.6"></circle><path d="M5 20.5 C5.5 15.8 9 14.5 12 14.5 C15 14.5 18.5 15.8 19 20.5"></path></svg>
+        <div style="font-size:11px;font-weight:{{tc.meW}}">我的</div>
+      </div>
+      <div onClick="{{goStores}}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;color:{{tc.stores}}">
+        <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M12 21 C7.5 16 5.5 13 5.5 9.9 A6.5 6.5 0 0 1 18.5 9.9 C18.5 13 16.5 16 12 21 Z"></path><text x="12" y="12.6" text-anchor="middle" font-size="7" fill="currentColor" stroke="none" font-family="Jost">A</text></svg>
+        <div style="font-size:11px">线下门店</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.brand}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="关于品牌tab" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:rgba(255,255,255,.97);padding-top:32px">
+        <div style="position:relative;display:flex;align-items:center;height:44px"><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:300;font-size:19px;letter-spacing:.32em;padding-left:.32em">AURELLE</div></div>
+      </div>
+      <div style="position:absolute;top:76px;bottom:84px;left:0;right:0;overflow-y:auto">
+        <div style="text-align:center;padding:26px 0 20px">
+          <div style="font-size:13px;letter-spacing:.3em;padding-left:.3em">A.IMMERSE</div>
+          <div style="font-size:12px;color:#8a8a8a;margin-top:8px;letter-spacing:.14em">探索AURELLE世界</div>
+        </div>
+        <sc-for list="{{brandBlocks}}" as="b" hint-placeholder-count="3">
+          <div style="margin-bottom:8px">
+            <div onClick="{{b.go}}" style="position:relative;width:100%;aspect-ratio:3/3.3;background:repeating-linear-gradient(135deg,{{b.c1}} 0 16px,{{b.c2}} 16px 32px);cursor:pointer;display:flex;align-items:center;justify-content:center">
+              <sc-if value="{{b.showPlay}}" hint-placeholder-val="{{ false }}"><div style="width:56px;height:56px;border:1.5px solid rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.08)"><div style="width:0;height:0;border-left:14px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px"></div></div></sc-if>
+              <sc-if value="{{b.playing}}" hint-placeholder-val="{{ false }}"><div style="width:56px;height:56px;border:1.5px solid rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.18);gap:6px"><div style="width:5px;height:18px;background:#fff"></div><div style="width:5px;height:18px;background:#fff"></div></div><div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.35)"><div style="height:100%;background:#fff;animation:vidbar 30s linear forwards"></div></div></sc-if>
+              <span style="position:absolute;bottom:12px;left:0;right:0;text-align:center;font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(70,55,45,.6)">{{b.ph}}</span>
+              <sc-if value="{{b.time}}" hint-placeholder-val="{{ false }}"><span style="position:absolute;right:12px;bottom:12px;color:#fff;font-size:11px;letter-spacing:.08em">00:30</span></sc-if>
+            </div>
+            <div style="padding:10px 14px 18px"><span onClick="{{b.goTitle}}" style="font-size:12px;letter-spacing:.14em;color:#333;cursor:pointer">{{b.t}}</span></div>
+          </div>
+        </sc-for>
+        <div style="text-align:center;padding:18px 0 20px">
+          <div style="font-size:13px;letter-spacing:.3em;padding-left:.3em">EXPLORE</div>
+          <div style="font-size:12px;color:#8a8a8a;margin-top:8px;letter-spacing:.1em">发现AURELLE最新讯息和无穷巧思</div>
+        </div>
+        <sc-for list="{{brandBlocks2}}" as="b" hint-placeholder-count="2">
+          <div style="margin-bottom:8px">
+            <div onClick="{{b.go}}" style="position:relative;width:100%;aspect-ratio:3/3.3;background:repeating-linear-gradient(135deg,{{b.c1}} 0 16px,{{b.c2}} 16px 32px);cursor:pointer;display:flex;align-items:center;justify-content:center">
+              <span style="position:absolute;bottom:12px;left:0;right:0;text-align:center;font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(70,55,45,.6)">{{b.ph}}</span>
+            </div>
+            <div style="padding:10px 14px 22px"><span onClick="{{b.go}}" style="font-size:12px;letter-spacing:.14em;color:#333;cursor:pointer">{{b.t}}</span></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.shop}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="商城tab" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:rgba(255,255,255,.97);padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px"><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:300;font-size:19px;letter-spacing:.32em;padding-left:.32em">AURELLE</div></div>
+        <div style="padding:8px 16px 0 16px;background:#fff">
+          <div style="display:flex;align-items:center;gap:10px;padding-bottom:9px;border-bottom:1px solid #444">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#333" stroke-width="1.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16 L20.5 20.5"></path></svg>
+            <input placeholder="搜索商品" style="font-size:14px;color:#333"></input>
+          </div>
+        </div>
+      </div>
+      <div style="position:absolute;top:133px;bottom:84px;left:0;right:0;display:flex">
+        <div style="width:96px;height:100%;overflow-y:auto;background:#f6f6f6">
+          <sc-for list="{{shopCats}}" as="c" hint-placeholder-count="8">
+            <div onClick="{{c.pick}}" style="padding:20px 8px;text-align:center;cursor:pointer;background:{{c.bg}};color:{{c.fg}}">
+              <div style="font-size:12px;font-weight:500;letter-spacing:.04em;line-height:1.5">{{c.en}}</div>
+              <div style="font-size:11.5px;margin-top:3px;line-height:1.4">{{c.cn}}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="flex:1;height:100%;overflow-y:auto;padding:20px 16px 30px 18px">
+          <sc-for list="{{shopCards}}" as="k" hint-placeholder-count="1">
+            <div onClick="{{k.go}}" style="cursor:pointer;margin-bottom:26px">
+              <div style="width:100%;aspect-ratio:16/12;background:repeating-linear-gradient(135deg,{{k.c1}} 0 14px,{{k.c2}} 14px 28px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:9px;letter-spacing:.18em;color:rgba(80,60,45,.6)">{{k.ph}}</span></div>
+              <div style="margin-top:12px;font-size:13px;letter-spacing:.16em;color:#222">{{k.en}}</div>
+              <div style="margin-top:4px;font-size:14px;color:#333">{{k.cn}}</div>
+            </div>
+          </sc-for>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px 18px">
+            <sc-for list="{{shopTiles}}" as="k" hint-placeholder-count="4">
+              <div onClick="{{k.go}}" style="cursor:pointer;text-align:center">
+                <div style="width:100%;aspect-ratio:3/3.6;background:{{k.tint}};display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:9px;letter-spacing:.14em;color:rgba(90,70,55,.55);padding:0 8px">{{k.ph}}</span></div>
+                <div style="margin-top:12px;font-size:12.5px;letter-spacing:.14em;color:#222">{{k.en}}</div>
+                <div style="margin-top:4px;font-size:13px;color:#333">{{k.cn}}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <div onClick="{{goBag}}" style="position:absolute;right:14px;bottom:104px;z-index:12;width:52px;height:52px;border-radius:50%;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;cursor:pointer">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#111" stroke-width="1.4" stroke-linecap="round"><path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"></path><rect x="5" y="9" width="14" height="11" rx="1"></rect></svg>
+        <sc-if value="{{cartOn}}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:8px;right:8px;min-width:17px;height:17px;border-radius:9px;background:#111;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;padding:0 4px">{{cartN}}</div></sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.stores}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="线下门店tab" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:rgba(255,255,255,.97);padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px"><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:300;font-size:19px;letter-spacing:.32em;padding-left:.32em">AURELLE</div></div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:84px;left:0;right:0;overflow-y:auto;padding:56px 0 30px">
+        <div onClick="{{goNearby}}" style="cursor:pointer;padding:0 40px;margin-bottom:44px">
+          <div style="width:100%;aspect-ratio:16/10.5;background:repeating-linear-gradient(135deg,#c9cdd4 0 16px,#bfc4cc 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(50,55,65,.6)">storefront · 夜幕店面</span></div>
+          <div style="margin-top:14px;font-size:15px;letter-spacing:.22em">FIND A STORE</div>
+          <div style="margin-top:5px;font-size:13px;color:#555;letter-spacing:.08em">附近的门店</div>
+        </div>
+        <div onClick="{{goStoreIntro}}" style="cursor:pointer;padding:0 40px">
+          <div style="width:100%;aspect-ratio:16/10.5;background:repeating-linear-gradient(135deg,#e8e0d3 0 16px,#e1d7c6 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(80,65,50,.6)">interior · 精品店内景</span></div>
+          <div style="margin-top:14px;font-size:15px;letter-spacing:.22em">OUR STORES</div>
+          <div style="margin-top:5px;font-size:13px;color:#555;letter-spacing:.08em">门店介绍</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.me}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="我的tab" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;bottom:84px;left:0;right:0;overflow-y:auto">
+        <sc-if value="{{notRegd}}" hint-placeholder-val="{{ true }}">
+          <div style="background:repeating-linear-gradient(135deg,#f2ede8 0 18px,#ece5dd 18px 36px);padding:106px 20px 40px">
+            <div style="text-align:center;font-size:15.5px;line-height:1.9;color:#222">加入 AURELLE，<br>探索新品、享受独家优惠和个性化体验！</div>
+            <div style="display:flex;margin-top:30px">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:9px">
+                <svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#555" stroke-width="1.1" stroke-linecap="round"><rect x="3.5" y="6" width="17" height="12.5" rx="1"></rect><path d="M4.5 7.5 L12 13 L19.5 7.5"></path></svg>
+                <div style="font-size:12.5px;color:#444">新品资讯</div>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:9px">
+                <svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#555" stroke-width="1.1" stroke-linecap="round"><circle cx="12" cy="11.5" r="7.5"></circle><path d="M8 19.5 L7 22 L11 19.5" fill="none"></path><circle cx="9" cy="11.5" r="0.8" fill="#555" stroke="none"></circle><circle cx="12" cy="11.5" r="0.8" fill="#555" stroke="none"></circle><circle cx="15" cy="11.5" r="0.8" fill="#555" stroke="none"></circle></svg>
+                <div style="font-size:12.5px;color:#444">专属客服</div>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:9px">
+                <svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#555" stroke-width="1.1" stroke-linecap="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 7.5 V12 L15 14"></path><text x="16.5" y="18.5" font-size="6" fill="#555" stroke="none" font-family="Jost">48</text></svg>
+                <div style="font-size:12.5px;color:#444">优先预购</div>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:9px">
+                <svg viewBox="0 0 24 24" width="27" height="27" fill="none" stroke="#555" stroke-width="1.1" stroke-linecap="round"><path d="M4.5 9 L6 4.5 H18 L19.5 9"></path><path d="M4.5 9 C4.5 10.4 5.6 11.2 7 11.2 C8.4 11.2 9.5 10.4 9.5 9 C9.5 10.4 10.6 11.2 12 11.2 C13.4 11.2 14.5 10.4 14.5 9 C14.5 10.4 15.6 11.2 17 11.2 C18.4 11.2 19.5 10.4 19.5 9"></path><path d="M5.5 11.5 V19.5 H18.5 V11.5"></path></svg>
+                <div style="font-size:12.5px;color:#444">品牌活动</div>
+              </div>
+            </div>
+            <div onClick="{{openJoin}}" style="margin:34px 24px 0;height:48px;background:#6d6d67;color:#fff;font-size:15px;letter-spacing:.1em;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer">注册\登录</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{regd}}" hint-placeholder-val="{{ false }}">
+          <div style="position:relative;background:repeating-linear-gradient(135deg,#f2ede8 0 18px,#ece5dd 18px 36px);padding:100px 20px 30px">
+            <div onClick="{{goMemberCode}}" style="position:absolute;top:96px;right:20px;cursor:pointer;opacity:.75">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#333" stroke-width="1.4"><rect x="4" y="4" width="6.5" height="6.5"></rect><rect x="13.5" y="4" width="6.5" height="6.5"></rect><rect x="4" y="13.5" width="6.5" height="6.5"></rect><path d="M13.5 13.5 H16.5 V16.5 H13.5 Z M17.5 17.5 H20"></path></svg>
+            </div>
+            <div style="display:flex;align-items:center;gap:18px">
+              <div style="position:relative">
+                <div style="width:86px;height:86px;border-radius:50%;background:#e9e6e1;display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:300">A</div>
+                <div onClick="{{goProfile}}" style="position:absolute;right:2px;bottom:2px;width:22px;height:22px;border-radius:50%;background:#fff;border:0.5px solid #ddd;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#666" stroke-width="1.6" stroke-linecap="round"><path d="M5 19 L6 15.5 L16.5 5 L19 7.5 L8.5 18 Z"></path></svg>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:21px;font-weight:500;letter-spacing:.04em">Hi，{{dispName}}</div>
+                <div style="display:inline-block;margin-top:9px;background:#57544e;color:#fff;font-size:11px;padding:4px 9px;border-radius:2px;letter-spacing:.08em">品牌粉丝</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;padding:20px 0 16px;border-bottom:8px solid #f7f7f7">
+            <div onClick="{{goOrders}}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;border-right:0.5px solid #ececec">
+              <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="#444" stroke-width="1.1" stroke-linecap="round"><rect x="5" y="4" width="14" height="16.5" rx="1"></rect><path d="M12 8.2 L9 12 H15 Z"></path><path d="M12 8.2 C12 7.4 12.6 7 13.2 7"></path></svg>
+              <div style="font-size:13px;color:#333">我的订单</div>
+            </div>
+            <div onClick="{{goBookings}}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;border-right:0.5px solid #ececec">
+              <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="#444" stroke-width="1.1" stroke-linecap="round"><rect x="4" y="5.5" width="16" height="14.5" rx="1"></rect><path d="M8 4 V7.5 M16 4 V7.5 M4 10 H20"></path><circle cx="14.5" cy="14.5" r="3.2"></circle><path d="M14.5 13 V14.5 L15.6 15.4"></path></svg>
+              <div style="font-size:13px;color:#333">我的预约</div>
+            </div>
+            <div onClick="{{goWishlist}}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;border-right:0.5px solid #ececec">
+              <div style="font-size:22px;line-height:25px;color:#444;font-weight:300">☆</div>
+              <div style="font-size:13px;color:#333">心愿单</div>
+            </div>
+            <div onClick="{{goFootprints}}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer">
+              <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="#444" stroke-width="1.1" stroke-linecap="round"><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"></path><rect x="5" y="8.5" width="14" height="11.5" rx="1.5"></rect><circle cx="14.5" cy="14.5" r="3"></circle><path d="M14.5 13.2 V14.5 L15.4 15.3"></path></svg>
+              <div style="font-size:13px;color:#333">我的足迹</div>
+            </div>
+          </div>
+        </sc-if>
+        <div style="padding:0 16px 30px">
+          <sc-for list="{{meMenu}}" as="m" hint-placeholder-count="6">
+            <div onClick="{{m.go}}" style="display:flex;align-items:center;gap:15px;padding:23px 2px;border-bottom:0.5px solid #ededed;cursor:pointer">
+              <sc-if value="{{m.i1}}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#777" stroke-width="1.2" stroke-linecap="round"><circle cx="12" cy="11.5" r="7.5"></circle><path d="M8 19.5 L7 22 L11 19.5"></path><circle cx="9" cy="11.5" r="0.8" fill="#777" stroke="none"></circle><circle cx="12" cy="11.5" r="0.8" fill="#777" stroke="none"></circle><circle cx="15" cy="11.5" r="0.8" fill="#777" stroke="none"></circle></svg></sc-if>
+              <sc-if value="{{m.i2}}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#777" stroke-width="1.2" stroke-linecap="round"><rect x="3" y="7" width="12" height="9"></rect><path d="M15 10 H19 L21 13 V16 H15"></path><circle cx="7.5" cy="17.5" r="1.6"></circle><circle cx="17" cy="17.5" r="1.6"></circle></svg></sc-if>
+              <sc-if value="{{m.i3}}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#777" stroke-width="1.2" stroke-linecap="round"><path d="M12 21 C7.5 16 5.5 13 5.5 9.9 A6.5 6.5 0 0 1 18.5 9.9 C18.5 13 16.5 16 12 21 Z"></path><text x="12" y="12.6" text-anchor="middle" font-size="7" fill="#777" stroke="none" font-family="Jost">A</text></svg></sc-if>
+              <sc-if value="{{m.i4}}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#777" stroke-width="1.2" stroke-linecap="round"><circle cx="12" cy="8" r="3.6"></circle><path d="M5 20.5 C5.5 15.8 9 14.5 12 14.5 C15 14.5 18.5 15.8 19 20.5"></path></svg></sc-if>
+              <sc-if value="{{m.i5}}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#777" stroke-width="1.2" stroke-linecap="round"><rect x="3.5" y="6" width="17" height="12.5" rx="1"></rect><path d="M4.5 7.5 L12 13 L19.5 7.5"></path></svg></sc-if>
+              <sc-if value="{{m.i6}}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#777" stroke-width="1.2" stroke-linecap="round"><circle cx="9.5" cy="10" r="6"></circle><circle cx="16" cy="14" r="4.8"></circle><path d="M6.5 18 L5.8 20 L8.8 18.4"></path></svg></sc-if>
+              <div style="flex:1;font-size:15px;color:#222">{{m.t}}</div>
+              <div style="width:9px;height:9px;border-top:1.2px solid #999;border-right:1.2px solid #999;transform:rotate(45deg)"></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="height:30px"></div>
+      </div>
+      <div onClick="{{svcToast}}" style="position:absolute;right:14px;bottom:104px;z-index:12;width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#333" stroke-width="1.4"><rect x="3.5" y="5" width="17" height="13" rx="3"></rect><path d="M9 18 L8 21 L12 18" fill="#333" stroke="none"></path><circle cx="8.5" cy="11.5" r="0.9" fill="#333" stroke="none"></circle><circle cx="12" cy="11.5" r="0.9" fill="#333" stroke="none"></circle><circle cx="15.5" cy="11.5" r="0.9" fill="#333" stroke="none"></circle></svg>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{joinOpen}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="点击注册弹层" style="position:absolute;inset:0;z-index:60">
+      <div onClick="{{closeJoin}}" style="position:absolute;inset:0;background:rgba(0,0,0,.4);animation:fadeIn .25s"></div>
+      <div style="position:absolute;left:0;right:0;bottom:0;background:#fff;padding:20px 24px 40px;animation:sheetUp .3s ease">
+        <div onClick="{{closeJoin}}" style="position:absolute;top:18px;right:18px;width:26px;height:26px;cursor:pointer">
+          <div style="position:absolute;top:12px;left:2px;width:22px;height:1.5px;background:#333;transform:rotate(45deg)"></div>
+          <div style="position:absolute;top:12px;left:2px;width:22px;height:1.5px;background:#333;transform:rotate(-45deg)"></div>
+        </div>
+        <div style="text-align:center;font-size:22px;margin:30px 0 22px;letter-spacing:.08em">加入我们</div>
+        <div style="text-align:center;font-size:15px;line-height:1.9;color:#222">加入 AURELLE，<br>探索新品、享受独家优惠和个性化体验！</div>
+        <div style="margin-top:40px">
+          <div onClick="{{togAgP}}" style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:8px 0">
+            <div style="width:20px;height:20px;border:1px solid {{agPB}};border-radius:3px;background:{{agPBg}};display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px">{{agPCh}}</div>
+            <div style="font-size:14px;color:#666">我已阅读并同意 <span style="color:#111;text-decoration:underline">《隐私政策》</span></div>
+          </div>
+          <div onClick="{{togAgM}}" style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:8px 0">
+            <div style="width:20px;height:20px;border:1px solid {{agMB}};border-radius:3px;background:{{agMBg}};display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px">{{agMCh}}</div>
+            <div style="font-size:14px;color:#666">我同意品牌向我发送邮件、短信、彩信或致电</div>
+          </div>
+        </div>
+        <div onClick="{{joinGo}}" style="margin-top:26px;height:48px;background:#6d6d67;color:#fff;font-size:16px;letter-spacing:.14em;display:flex;align-items:center;justify-content:center;cursor:pointer">注册会员</div>
+        <div style="text-align:center;margin-top:18px"><span onClick="{{closeJoin}}" style="font-size:14px;color:#888;text-decoration:underline;cursor:pointer">游客模式</span></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.openCard}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="注册会员卡" style="position:absolute;inset:0;background:#ededed">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#ededed;padding-top:32px">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">会员开卡</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto;padding:12px 12px 40px">
+        <div style="height:150px;border-radius:10px;background:linear-gradient(135deg,#ababab,#5f5f5f);display:flex;align-items:flex-start;gap:16px;padding:24px 20px">
+          <div style="width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fdfdfd,#c9c9c9);display:flex;align-items:center;justify-content:center;font-size:8px;letter-spacing:.18em;color:#333">AURELLE</div>
+          <div style="color:#fff;font-size:17px;letter-spacing:.06em;margin-top:16px">AURELLE</div>
+        </div>
+        <div style="margin-top:14px;background:#fff;border-radius:10px;overflow:hidden">
+          <div style="padding:22px 16px;background:#fafafa;text-align:center;border-bottom:1px dashed #ddd">
+            <div style="font-size:14px;color:#888">激活立享会员特权</div>
+            <div onClick="{{cardDetailToast}}" style="margin-top:12px;font-size:16px;color:#333;cursor:pointer">会员卡详情 <span style="color:#bbb">›</span></div>
+          </div>
+          <div style="padding:18px 16px 8px;font-size:14px;color:#b0b0b0">必填信息</div>
+          <div style="display:flex;align-items:center;padding:16px;border-bottom:0.5px solid #f0f0f0">
+            <div style="width:76px;font-size:17px">姓名</div>
+            <input value="{{cf.name}}" onChange="{{onCfName}}" style="flex:1;font-size:17px"></input>
+          </div>
+          <div style="display:flex;align-items:center;padding:16px;border-bottom:0.5px solid #f0f0f0">
+            <div style="width:76px;font-size:17px">手机</div>
+            <input value="{{cf.phone}}" onChange="{{onCfPhone}}" style="flex:1;font-size:17px"></input>
+          </div>
+          <div onClick="{{cfGenderCycle}}" style="display:flex;align-items:center;padding:16px;border-bottom:0.5px solid #f0f0f0;cursor:pointer">
+            <div style="width:76px;font-size:17px">性别</div>
+            <div style="flex:1;font-size:17px;color:#333">{{cf.gender}}</div>
+            <div style="width:9px;height:9px;border-top:1.5px solid #c0c0c0;border-right:1.5px solid #c0c0c0;transform:rotate(45deg)"></div>
+          </div>
+          <div style="display:flex;align-items:center;padding:16px">
+            <div style="width:76px;font-size:17px">生日</div>
+            <input value="{{cf.birthday}}" onChange="{{onCfBirthday}}" placeholder="1999-07-30" style="flex:1;font-size:17px"></input>
+          </div>
+        </div>
+        <div onClick="{{togAgCard}}" style="display:flex;align-items:center;gap:8px;margin:18px 6px 0;cursor:pointer">
+          <div style="width:17px;height:17px;border:1px solid {{agCardB}};border-radius:50%;background:{{agCardBg}};display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px">{{agCardCh}}</div>
+          <div style="font-size:14px;color:#555">我已阅读并同意<span style="color:#576b95">会员卡信息使用声明</span></div>
+        </div>
+        <div onClick="{{register}}" style="margin:30px 60px 0;height:48px;background:#07c160;color:#fff;font-size:17px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;letter-spacing:.2em">提交</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.profile}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="编辑个人信息" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:300;font-size:18px;letter-spacing:.3em;padding-left:.3em">AURELLE</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto;padding:0 24px 40px">
+        <div style="text-align:center;font-size:22px;letter-spacing:.12em;margin:30px 0 26px">个人信息完善</div>
+        <div style="display:flex;justify-content:center;margin-bottom:34px">
+          <div style="position:relative">
+            <div style="width:104px;height:104px;border-radius:50%;background:#e5e3df;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:300">A</div>
+            <div style="position:absolute;right:2px;bottom:4px;width:24px;height:24px;border-radius:50%;background:#fff;border:0.5px solid #ddd;display:flex;align-items:center;justify-content:center">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#888" stroke-width="1.5"><rect x="3.5" y="7" width="17" height="12" rx="2"></rect><path d="M8.5 7 L10 4.5 H14 L15.5 7"></path><circle cx="12" cy="13" r="3"></circle></svg>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;margin-bottom:26px">
+          <div style="width:76px;font-size:14px;color:#222">*昵称</div>
+          <input value="{{ef.nick}}" onChange="{{onEfNick}}" style="flex:1;height:48px;background:#f6f6f6;padding:0 14px;font-size:15px"></input>
+        </div>
+        <div style="display:flex;align-items:center;margin-bottom:26px">
+          <div style="width:76px;font-size:14px;color:#222">*手机号</div>
+          <div style="flex:1;height:48px;background:#f6f6f6;padding:0 14px;font-size:15px;color:#b5b5b5;display:flex;align-items:center">{{maskedPhone}}</div>
+        </div>
+        <div style="display:flex;align-items:center;margin-bottom:26px">
+          <div style="width:76px;font-size:14px;color:#222">*姓名</div>
+          <div style="flex:1;height:48px;background:#f6f6f6;padding:0 14px;font-size:15px;color:#b5b5b5;display:flex;align-items:center">{{userName}}</div>
+        </div>
+        <div style="display:flex;align-items:center;margin-bottom:26px">
+          <div style="width:76px;font-size:14px;color:#222">*称谓</div>
+          <div style="flex:1;display:flex;gap:40px">
+            <div onClick="{{efMale}}" style="display:flex;align-items:center;gap:10px;cursor:pointer">
+              <div style="width:22px;height:22px;border-radius:50%;border:1px solid #bbb;display:flex;align-items:center;justify-content:center"><div style="width:11px;height:11px;border-radius:50%;background:{{maleDot}}"></div></div>
+              <span style="font-size:15px">男士</span>
+            </div>
+            <div onClick="{{efFemale}}" style="display:flex;align-items:center;gap:10px;cursor:pointer">
+              <div style="width:22px;height:22px;border-radius:50%;border:1px solid #bbb;display:flex;align-items:center;justify-content:center"><div style="width:11px;height:11px;border-radius:50%;background:{{femaleDot}}"></div></div>
+              <span style="font-size:15px">女士</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;margin-bottom:26px">
+          <div style="width:76px;font-size:14px;color:#222;padding-top:14px">*生日</div>
+          <div style="flex:1">
+            <div style="position:relative;height:48px;background:#f6f6f6;display:flex;align-items:center">
+              <input value="{{ef.birthday}}" onChange="{{onEfBirthday}}" style="padding:0 14px;font-size:15px;color:#b5b5b5"></input>
+              <div style="position:absolute;right:14px;width:9px;height:9px;border-right:1.3px solid #999;border-bottom:1.3px solid #999;transform:rotate(45deg);margin-top:-4px"></div>
+            </div>
+            <div style="font-size:12px;color:#b0b0b0;margin-top:8px">*生日每人仅可修改一次，请谨慎选择</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;margin-bottom:26px">
+          <div style="width:76px;font-size:14px;color:#222">地区</div>
+          <div style="position:relative;flex:1;height:48px;background:#f6f6f6;display:flex;align-items:center">
+            <input value="{{ef.region}}" onChange="{{onEfRegion}}" style="padding:0 14px;font-size:15px"></input>
+            <div style="position:absolute;right:14px;width:9px;height:9px;border-right:1.3px solid #999;border-bottom:1.3px solid #999;transform:rotate(45deg);margin-top:-4px"></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;margin-bottom:40px">
+          <div style="width:76px;font-size:14px;color:#222">邮箱</div>
+          <input value="{{ef.email}}" onChange="{{onEfEmail}}" style="flex:1;height:48px;background:#f6f6f6;padding:0 14px;font-size:15px"></input>
+        </div>
+        <div onClick="{{saveProfile}}" style="height:50px;background:#6d6d67;color:#fff;font-size:16px;letter-spacing:.3em;display:flex;align-items:center;justify-content:center;cursor:pointer">保存</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.memberCode}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="展示会员码" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">会员卡</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto">
+        <div style="width:100%;height:260px;background:repeating-linear-gradient(135deg,#ece7e0 0 16px,#e5ded4 16px 32px);display:flex;align-items:flex-start;justify-content:center;padding-top:14px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(90,75,60,.55)">boutique interior · 衣架陈列</span></div>
+        <div style="position:relative;margin:-90px auto 0;width:84%;background:#fff;padding:0 20px 30px;text-align:center">
+          <div style="position:relative;top:-44px;margin-bottom:-30px">
+            <div style="width:88px;height:88px;border-radius:50%;background:#e9e6e1;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:300;border:3px solid #fff">A</div>
+            <div style="margin-top:12px;font-size:17px;letter-spacing:.35em;padding-left:.35em">{{dispName}}</div>
+          </div>
+          <div style="display:flex;align-items:stretch;justify-content:center;height:88px;margin-top:10px">
+            <sc-for list="{{bars}}" as="b" hint-placeholder-count="40">
+              <div style="width:{{b.w}}px;background:#141414;margin-right:{{b.g}}px"></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;justify-content:center;margin-top:26px">
+            <canvas ref="{{qrRef}}" width="180" height="180" style="width:170px;height:170px"></canvas>
+          </div>
+          <div style="margin-top:20px;font-size:16px;letter-spacing:.12em">{{userCode}}</div>
+          <div style="margin-top:12px;font-size:13px;color:#b0b0b0">使用时，出示此码</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.orders}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="我的订单" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">我的订单</div>
+        </div>
+        <div style="display:flex;border-top:0.5px solid #eee">
+          <div onClick="{{pickMp}}" style="flex:1;text-align:center;padding:14px 0 12px;font-size:15px;color:{{ordTabMpC}};border-bottom:{{ordTabMpB}};cursor:pointer">小程序</div>
+          <div onClick="{{pickSt}}" style="flex:1;text-align:center;padding:14px 0 12px;font-size:15px;color:{{ordTabStC}};border-bottom:{{ordTabStB}};cursor:pointer">门店</div>
+        </div>
+        <div style="display:flex;padding:0 10px">
+          <sc-for list="{{ordSubs}}" as="t" hint-placeholder-count="4">
+            <div onClick="{{t.pick}}" style="flex:1;text-align:center;padding:16px 0 10px;cursor:pointer">
+              <span style="font-size:14px;color:{{t.c}};padding-bottom:8px;border-bottom:{{t.bd}}">{{t.t}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="position:absolute;top:185px;bottom:0;left:0;right:0;overflow-y:auto;background:#f7f7f7">
+        <sc-for list="{{ordersList}}" as="o" hint-placeholder-count="1">
+          <div style="background:#fff;margin-bottom:10px;padding:14px 16px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div>
+                <div style="font-size:12px;color:#999">订单编号：{{o.id}}</div>
+                <div style="font-size:12px;color:#999;margin-top:5px">下单时间：{{o.time}}</div>
+              </div>
+              <div style="font-size:14px;color:#333">{{o.statusText}}</div>
+            </div>
+            <div style="display:flex;gap:14px;margin-top:16px">
+              <div style="width:88px;height:110px;background:{{o.p.tint}};flex:0 0 auto;display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:8px;letter-spacing:.1em;color:rgba(90,70,55,.55);text-align:center;padding:0 6px">{{o.p.label}}</span></div>
+              <div style="flex:1">
+                <div style="font-size:14px;line-height:1.5">{{o.p.name}}</div>
+                <div style="display:flex;justify-content:space-between;margin-top:10px"><span style="font-size:13px;color:#555">价格</span><span style="font-size:13px;color:#555">{{o.p.priceFmt}}</span></div>
+                <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:13px;color:#555">规格名称</span><span style="font-size:13px;color:#999">{{o.spec}}</span></div>
+                <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font-size:13px;color:#555">数量</span><span style="font-size:13px;color:#555">1</span></div>
+              </div>
+            </div>
+            <div style="border-top:0.5px solid #f0f0f0;margin-top:14px;padding-top:14px;text-align:right">
+              <span style="font-size:15px">总计： <span style="font-weight:600">{{o.totalFmt}}</span></span>
+            </div>
+            <div style="display:flex;justify-content:flex-end;margin-top:14px">
+              <div onClick="{{o.view}}" style="padding:10px 22px;background:#6d6d67;color:#fff;font-size:13px;border-radius:3px;cursor:pointer">订单详情</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.bookings}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="我的预约" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">我的预约</div>
+        </div>
+        <div style="display:flex;border-top:0.5px solid #eee">
+          <div onClick="{{pickBook0}}" style="flex:1;text-align:center;padding:15px 0 13px;font-size:15px;color:{{bookTab0C}};border-bottom:{{bookTab0B}};cursor:pointer">未开始</div>
+          <div onClick="{{pickBook1}}" style="flex:1;text-align:center;padding:15px 0 13px;font-size:15px;color:{{bookTab1C}};border-bottom:{{bookTab1B}};cursor:pointer">历史记录</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.wishlist}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="我的心愿单" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">我的心愿单</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto;padding:0 16px 30px">
+        <div style="display:flex;justify-content:flex-end;padding:14px 0">
+          <div onClick="{{shareToast}}" style="display:flex;align-items:center;gap:6px;cursor:pointer">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#666" stroke-width="1.4"><circle cx="6" cy="12" r="2.4"></circle><circle cx="17" cy="6" r="2.4"></circle><circle cx="17" cy="18" r="2.4"></circle><path d="M8.2 10.9 L14.8 7.1 M8.2 13.1 L14.8 16.9"></path></svg>
+            <span style="font-size:14px;color:#333">分享</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:34px 20px">
+          <sc-for list="{{wlProds}}" as="p" hint-placeholder-count="2">
+            <div>
+              <div onClick="{{p.open}}" style="width:100%;aspect-ratio:3/3.8;background:{{p.tint}};cursor:pointer;display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:9px;letter-spacing:.12em;color:rgba(90,70,55,.55);text-align:center;padding:0 8px">{{p.label}}</span></div>
+              <div style="margin-top:12px;font-size:13.5px;letter-spacing:.05em;line-height:1.55;min-height:42px">{{p.name}}</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+                <span style="font-size:14px">{{p.priceFmt}}</span>
+                <div style="display:flex;gap:12px;align-items:center">
+                  <span onClick="{{p.wish}}" style="font-size:17px;color:{{p.starC}};cursor:pointer">{{p.starCh}}</span>
+                  <svg onClick="{{p.bag}}" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#b9b9b9" stroke-width="1.4" style="cursor:pointer"><path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"></path><rect x="5" y="9" width="14" height="11" rx="1"></rect></svg>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.footprints}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="我的足迹" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">我的足迹</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto;padding:0 16px 30px">
+        <div style="display:flex;justify-content:flex-end;padding:16px 0 24px">
+          <span onClick="{{clearFp}}" style="font-size:14px;color:#333;cursor:pointer">清空我的足迹</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:34px 20px">
+          <sc-for list="{{fpProds}}" as="p" hint-placeholder-count="1">
+            <div>
+              <div onClick="{{p.open}}" style="width:100%;aspect-ratio:3/3.8;background:{{p.tint}};cursor:pointer;display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:9px;letter-spacing:.12em;color:rgba(90,70,55,.55);text-align:center;padding:0 8px">{{p.label}}</span></div>
+              <div style="margin-top:12px;font-size:13.5px;letter-spacing:.05em;line-height:1.55;min-height:42px">{{p.name}}</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+                <span style="font-size:14px">{{p.priceFmt}}</span>
+                <div style="display:flex;gap:12px;align-items:center">
+                  <span onClick="{{p.wish}}" style="font-size:17px;color:{{p.starC}};cursor:pointer">{{p.starCh}}</span>
+                  <svg onClick="{{p.bag}}" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#b9b9b9" stroke-width="1.4" style="cursor:pointer"><path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"></path><rect x="5" y="9" width="14" height="11" rx="1"></rect></svg>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.guide}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="门店导购" style="position:absolute;inset:0;background:#3c4038">
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,#474b43 0 18px,#3d413a 18px 36px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:16px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.35)">storefront · 树影招牌</span></div>
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;padding-top:32px">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #fff;border-bottom:1.5px solid #fff;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600;color:#fff">门店导购</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:150px;left:30px;right:30px;background:#fff;padding:36px 24px 26px;text-align:center">
+        <div style="font-size:16px;letter-spacing:.1em;font-weight:500">{{guideStore}}</div>
+        <div style="display:flex;justify-content:center;margin-top:26px">
+          <canvas ref="{{qrRef}}" width="200" height="200" style="width:190px;height:190px"></canvas>
+        </div>
+        <div style="margin-top:24px;font-size:13px;color:#b0b0b0;line-height:1.8">长按识别二维码<br>添加您的专属顾问</div>
+        <div onClick="{{guideNext}}" style="margin-top:30px;font-size:15px;color:#111;cursor:pointer">⇄ 切换门店</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.addresses}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="收货地址" style="position:absolute;inset:0;background:#f2f2f2">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">收货地址</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:90px;left:0;right:0;overflow-y:auto;padding:14px 12px">
+        <div onClick="{{wechatAddr}}" style="background:#fff;border-radius:8px;padding:20px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+          <span style="font-size:15px">获取微信收货地址</span>
+          <div style="width:9px;height:9px;border-top:1.3px solid #999;border-right:1.3px solid #999;transform:rotate(45deg)"></div>
+        </div>
+        <sc-for list="{{addrs}}" as="a" hint-placeholder-count="1">
+          <div style="background:#fff;border-radius:8px;padding:18px 16px 12px;margin-top:14px">
+            <div onClick="{{a.pick}}" style="display:flex;align-items:center;gap:12px;cursor:pointer">
+              <div style="flex:1">
+                <div style="display:flex;gap:18px;font-size:15px;font-weight:500"><span>{{a.name}}</span><span>{{a.phone}}</span></div>
+                <div style="margin-top:10px;font-size:14.5px;line-height:1.6;color:#222">{{a.full}}</div>
+              </div>
+              <sc-if value="{{a.sel}}" hint-placeholder-val="{{ false }}"><div style="width:14px;height:8px;border-left:2px solid #111;border-bottom:2px solid #111;transform:rotate(-45deg);flex:0 0 auto"></div></sc-if>
+            </div>
+            <div style="border-top:0.5px solid #eee;margin-top:14px;padding-top:12px;display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:6px;color:#9a9a9a;font-size:13px">
+                <div style="width:11px;height:6px;border-left:1.6px solid #9a9a9a;border-bottom:1.6px solid #9a9a9a;transform:rotate(-45deg)"></div>
+                <span>已设为默认地址</span>
+              </div>
+              <div style="display:flex;gap:22px">
+                <span onClick="{{a.del}}" style="font-size:13px;color:#9a9a9a;cursor:pointer">🗑 删除</span>
+                <span onClick="{{a.edit}}" style="font-size:13px;color:#9a9a9a;cursor:pointer">✎ 编辑</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="position:absolute;bottom:0;left:0;right:0;background:#f2f2f2;padding:12px 12px 28px">
+        <div onClick="{{addAddr}}" style="height:48px;background:#6d6d67;color:#fff;font-size:16px;letter-spacing:.12em;display:flex;align-items:center;justify-content:center;cursor:pointer">新增地址</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.nearby}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="附近门店" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">附近门店</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto;padding:16px 16px 30px">
+        <div style="display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid #444">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#555" stroke-width="1.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16 L20.5 20.5"></path></svg>
+          <input value="{{qVal}}" onChange="{{onQ}}" placeholder="搜索门店" style="font-size:14px"></input>
+        </div>
+        <div style="display:flex;gap:14px;margin-top:18px;position:relative;z-index:5">
+          <div onClick="{{togProv}}" style="flex:1;height:46px;background:#f2f2f2;display:flex;align-items:center;justify-content:center;gap:14px;cursor:pointer;position:relative">
+            <span style="font-size:14px;letter-spacing:.2em">{{provLabel}}</span>
+            <div style="width:8px;height:8px;border-right:1.3px solid #555;border-bottom:1.3px solid #555;transform:rotate(45deg);margin-top:-4px"></div>
+            <sc-if value="{{provOpen}}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:48px;left:0;right:0;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.12)">
+                <sc-for list="{{provOpts}}" as="o" hint-placeholder-count="3"><div onClick="{{o.pick}}" style="padding:13px;text-align:center;font-size:14px;border-bottom:0.5px solid #f0f0f0;cursor:pointer">{{o.v}}</div></sc-for>
+              </div>
+            </sc-if>
+          </div>
+          <div onClick="{{togCity}}" style="flex:1;height:46px;background:#f2f2f2;display:flex;align-items:center;justify-content:center;gap:14px;cursor:pointer;position:relative">
+            <span style="font-size:14px;letter-spacing:.2em">{{cityLabel}}</span>
+            <div style="width:8px;height:8px;border-right:1.3px solid #555;border-bottom:1.3px solid #555;transform:rotate(45deg);margin-top:-4px"></div>
+            <sc-if value="{{cityOpen}}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:48px;left:0;right:0;background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.12)">
+                <sc-for list="{{cityOpts}}" as="o" hint-placeholder-count="3"><div onClick="{{o.pick}}" style="padding:13px;text-align:center;font-size:14px;border-bottom:0.5px solid #f0f0f0;cursor:pointer">{{o.v}}</div></sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+        <sc-for list="{{storesF}}" as="st" hint-placeholder-count="2">
+          <div style="margin-top:26px">
+            <div onClick="{{st.open}}" style="width:100%;aspect-ratio:16/10;background:repeating-linear-gradient(135deg,{{st.c1}} 0 16px,{{st.c2}} 16px 32px);cursor:pointer;display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(60,60,65,.55)">{{st.ph}}</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px">
+              <div onClick="{{st.open}}" style="font-size:16.5px;font-weight:600;cursor:pointer">{{st.name}}</div>
+              <div style="display:flex;align-items:center;gap:5px">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#333" stroke-width="1.5"><path d="M20 4 L4 11 L11 13 L13 20 Z"></path></svg>
+                <span style="font-size:13.5px">{{st.dist}}</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:7px;margin-top:12px;font-size:13.5px;color:#333;line-height:1.55"><span style="color:#888">◎</span><span>地址： {{st.addr}}</span></div>
+            <div style="display:flex;gap:7px;margin-top:8px;font-size:13.5px;color:#333"><span style="color:#888">✆</span><span>联系方式： <span style="text-decoration:underline">{{st.tel}}</span></span></div>
+            <div style="display:flex;gap:7px;margin-top:8px;font-size:13.5px;color:#333"><span style="color:#888">◷</span><span>营业时间： {{st.hours}}</span></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.settings}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="个人设置" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">个人设置</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto;padding:0 16px">
+        <div onClick="{{privacyToast}}" style="display:flex;align-items:center;justify-content:space-between;padding:22px 2px;border-bottom:0.5px solid #ececec;cursor:pointer">
+          <span style="font-size:15px">隐私政策</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:14px;color:#b0b0b0">{{agreedDateText}}</span>
+            <div style="width:9px;height:9px;border-top:1.2px solid #999;border-right:1.2px solid #999;transform:rotate(45deg)"></div>
+          </div>
+        </div>
+        <div style="position:absolute;bottom:60px;left:0;right:0;text-align:center">
+          <span onClick="{{logoffToast}}" style="font-size:14px;color:#9a9a9a;text-decoration:underline;cursor:pointer">注销账号请联系客服</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.help}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="帮助中心" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">帮助中心</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto">
+        <div style="text-align:center;font-size:17px;font-weight:500;padding:20px 0 18px">常见问题</div>
+        <div style="width:100%;aspect-ratio:16/10.5;background:repeating-linear-gradient(135deg,#e7ded1 0 16px,#e0d5c4 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(85,70,55,.55)">editorial · 海崖白西装</span></div>
+        <div style="padding:0 16px">
+          <sc-for list="{{helpRows}}" as="h" hint-placeholder-count="5">
+            <div onClick="{{h.open}}" style="display:flex;align-items:baseline;gap:12px;padding:24px 2px;border-bottom:0.5px solid #ececec;cursor:pointer">
+              <span style="font-size:16.5px;color:#222">{{h.cn}}</span>
+              <span style="font-size:12.5px;color:#b0b0b0;letter-spacing:.12em">{{h.en}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.helpDetail}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="帮助中心详情" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">{{helpTitle}}</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto;padding:22px 18px 40px">
+        <div style="font-size:16px;font-weight:600">{{helpH}}</div>
+        <sc-if value="{{isSizeTopic}}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:24px">
+            <div style="font-size:15px;font-weight:600">尺码参照</div>
+            <div style="font-size:15px;font-weight:600;margin-top:20px">Q: 购买AURELLE该如何选择服装尺码？</div>
+            <div style="font-size:14.5px;color:#555;line-height:1.85;margin-top:10px">如果您对于中国标准尺码或者国际尺码较为了解，您可直接参考<span onClick="{{goSizeGuide}}" style="color:#7c9cc4;text-decoration:underline;cursor:pointer">尺码指南</span>进行尺码转化适合您的尺码。您亦可将净身测量的三维数据与"身体维度测量"表中的数据进行比对，从而选择合适的尺码。如您有尺码相关的问题，欢迎咨询客服。</div>
+            <div style="font-size:15px;font-weight:600;margin-top:26px">保养指南</div>
+          </div>
+        </sc-if>
+        <sc-for list="{{helpQas}}" as="qa" hint-placeholder-count="3">
+          <div style="margin-top:24px">
+            <div style="font-size:15px;font-weight:600;line-height:1.6">{{qa.qf}}</div>
+            <div style="font-size:14.5px;color:#555;line-height:1.85;margin-top:8px">{{qa.a}}</div>
+            <sc-if value="{{qa.hasB}}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:12px;padding-left:6px">
+                <sc-for list="{{qa.b}}" as="bl" hint-placeholder-count="3">
+                  <div style="display:flex;gap:9px;font-size:14px;color:#555;line-height:1.75;margin-top:8px"><span>o</span><span style="flex:1">{{bl.v}}</span></div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.sizeGuide}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="尺码指南" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">尺码指南</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto;padding:20px 14px 40px">
+        <div style="font-size:15px;font-weight:600;padding-bottom:14px;border-bottom:0.5px solid #ddd">服饰-尺码指南</div>
+        <div style="margin-top:16px">
+          <sc-for list="{{sizeHead}}" as="r" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:76px repeat(6,1fr);padding:7px 0">
+              <sc-for list="{{r.cells}}" as="c" hint-placeholder-count="7"><div style="text-align:center;font-size:13px;font-weight:600">{{c.v}}</div></sc-for>
+            </div>
+          </sc-for>
+          <sc-for list="{{sizeRows}}" as="r" hint-placeholder-count="7">
+            <div style="display:grid;grid-template-columns:76px repeat(6,1fr);padding:10px 0">
+              <sc-for list="{{r.cells}}" as="c" hint-placeholder-count="7"><div style="text-align:center;font-size:11.5px;color:#333;white-space:nowrap">{{c.v}}</div></sc-for>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12.5px;color:#555;line-height:1.7;margin-top:14px">0P尺码专门为体型娇小的女士设计，适合身高低于160厘米的顾客穿着</div>
+        <div style="font-size:15px;font-weight:600;padding:34px 0 14px;border-bottom:0.5px solid #ddd">服饰-身体围度测量（厘米）</div>
+        <div style="margin-top:12px">
+          <div style="display:grid;grid-template-columns:76px repeat(6,1fr);padding:9px 0">
+            <sc-for list="{{bodyHead.cells}}" as="c" hint-placeholder-count="7"><div style="text-align:center;font-size:13px;font-weight:600">{{c.v}}</div></sc-for>
+          </div>
+          <sc-for list="{{bodyRows}}" as="r" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:76px repeat(6,1fr);padding:10px 0">
+              <sc-for list="{{r.cells}}" as="c" hint-placeholder-count="7"><div style="text-align:center;font-size:12px;color:#333">{{c.v}}</div></sc-for>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:15px;font-weight:600;padding:34px 0 14px;border-bottom:0.5px solid #ddd">鞋履-尺码指南</div>
+        <div style="margin-top:12px">
+          <div style="display:grid;grid-template-columns:56px repeat(6,1fr);padding:9px 0">
+            <sc-for list="{{shoeHead.cells}}" as="c" hint-placeholder-count="7"><div style="text-align:center;font-size:13px;font-weight:600">{{c.v}}</div></sc-for>
+          </div>
+          <sc-for list="{{shoeRows}}" as="r" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:56px repeat(6,1fr);padding:10px 0">
+              <sc-for list="{{r.cells}}" as="c" hint-placeholder-count="7"><div style="text-align:center;font-size:10.5px;color:#333;white-space:nowrap">{{c.v}}</div></sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.follow}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="关注我们" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">关注我们</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto">
+        <div style="width:100%;aspect-ratio:16/11;background:repeating-linear-gradient(135deg,#f2ddc2 0 16px,#eed2b0 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(120,85,50,.55)">editorial · 落日蕾丝背影</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:46px 0;padding:44px 10px 60px">
+          <div onClick="{{wbToast}}" style="text-align:center;cursor:pointer;border-right:0.5px solid #e5e5e5">
+            <div style="width:46px;height:46px;border-radius:12px;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;margin:0 auto">微博</div>
+            <div style="font-size:13px;color:#333;line-height:1.8;margin-top:12px">前往新浪微博<br>关注@AURELLE</div>
+          </div>
+          <div onClick="{{xhsToast}}" style="text-align:center;cursor:pointer">
+            <div style="width:46px;height:46px;border-radius:12px;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;margin:0 auto">笔记</div>
+            <div style="font-size:13px;color:#333;line-height:1.8;margin-top:12px">前往种草社区<br>关注AURELLE</div>
+          </div>
+          <div style="text-align:center;border-right:0.5px solid #e5e5e5">
+            <canvas ref="{{qrRef}}" width="88" height="88" style="width:62px;height:62px"></canvas>
+            <div style="font-size:13px;color:#333;line-height:1.8;margin-top:4px">扫描公众号二维码<br>关注AURELLE官方账号</div>
+          </div>
+          <div onClick="{{tmToast}}" style="text-align:center;cursor:pointer">
+            <div style="width:46px;height:46px;border-radius:12px;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;margin:0 auto">旗舰</div>
+            <div style="font-size:13px;color:#333;line-height:1.8;margin-top:12px">探索更多<br>前往AURELLE官方旗舰店</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.storeIntro}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="门店介绍" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">门店介绍</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto;padding:20px 16px 40px">
+        <sc-for list="{{storesIntro}}" as="st" hint-placeholder-count="3">
+          <div style="margin-bottom:34px">
+            <div onClick="{{st.open}}" style="width:100%;aspect-ratio:16/11;background:repeating-linear-gradient(135deg,{{st.c1}} 0 16px,{{st.c2}} 16px 32px);cursor:pointer;display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(60,60,65,.55)">{{st.ph}}</span></div>
+            <div style="font-size:16.5px;font-weight:600;margin-top:14px">{{st.name}}</div>
+            <div style="margin-top:10px"><span onClick="{{st.open}}" style="font-size:13.5px;color:#555;text-decoration:underline;cursor:pointer">查看详情</span></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.storeDetail}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="门店详情" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{curStore.name}}</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto;padding:16px 16px 40px">
+        <div style="width:100%;aspect-ratio:16/11;background:repeating-linear-gradient(135deg,{{curStore.c1}} 0 16px,{{curStore.c2}} 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(60,60,65,.55)">{{curStore.ph}}</span></div>
+        <div style="font-size:16px;font-weight:600;margin-top:20px">店铺信息</div>
+        <div style="display:flex;gap:7px;margin-top:14px;font-size:14px;color:#333;line-height:1.6"><span style="color:#888">◎</span><span>地址： {{curStore.addr}}</span></div>
+        <div style="display:flex;gap:7px;margin-top:9px;font-size:14px;color:#333"><span style="color:#888">✆</span><span>联系方式： <span style="text-decoration:underline">{{curStore.tel}}</span></span></div>
+        <div style="display:flex;gap:7px;margin-top:9px;font-size:14px;color:#333"><span style="color:#888">◷</span><span>营业时间： {{curStore.hours2}}</span></div>
+        <div style="width:100%;aspect-ratio:16/12;margin-top:24px;background:repeating-linear-gradient(135deg,#e9e2d6 0 16px,#e2d9c9 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(80,70,55,.55)">facade · 白日门头</span></div>
+        <div style="width:100%;aspect-ratio:16/12;margin-top:16px;background:repeating-linear-gradient(135deg,#e6e0d7 0 16px,#ded7ca 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(80,70,55,.55)">interior · 试衣沙龙</span></div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{s.list}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="类目商品列表" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+        </div>
+        <div style="padding:4px 16px 0">
+          <div style="display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid #444">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#333" stroke-width="1.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16 L20.5 20.5"></path></svg>
+            <input placeholder="搜索商品" style="font-size:14px;color:#333"></input>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px">
+          <div onClick="{{openFilter}}" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#333" stroke-width="1.4" stroke-linecap="round"><path d="M4 7 H20 M4 12 H20 M4 17 H20"></path><circle cx="9" cy="7" r="1.8" fill="#fff"></circle><circle cx="15" cy="12" r="1.8" fill="#fff"></circle><circle cx="8" cy="17" r="1.8" fill="#fff"></circle></svg>
+            <span style="font-size:15px">筛选</span>
+          </div>
+          <div style="display:flex;gap:22px">
+            <span onClick="{{pickSortAll}}" style="font-size:15px;color:{{sortAllC}};font-weight:{{sortAllW}};cursor:pointer">综合</span>
+            <span onClick="{{pickSortNew}}" style="font-size:15px;color:{{sortNewC}};font-weight:{{sortNewW}};cursor:pointer">新品</span>
+          </div>
+        </div>
+      </div>
+      <div style="position:absolute;top:190px;bottom:0;left:0;right:0;overflow-y:auto;padding:24px 16px 40px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:44px 22px">
+          <sc-for list="{{listProds}}" as="p" hint-placeholder-count="4">
+            <div>
+              <div onClick="{{p.open}}" style="width:100%;aspect-ratio:3/4;background:{{p.tint}};cursor:pointer;display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:9px;letter-spacing:.12em;color:rgba(90,70,55,.55);text-align:center;padding:0 8px">{{p.label}}</span></div>
+              <div onClick="{{p.open}}" style="margin-top:14px;font-size:14px;letter-spacing:.06em;line-height:1.6;min-height:44px;cursor:pointer">{{p.name}}</div>
+              <sc-if value="{{p.hasSale}}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:6px">
+                  <div style="display:flex;align-items:center;justify-content:space-between">
+                    <span style="font-size:13px;color:#9a9a9a">原价 <span style="text-decoration:line-through">{{p.priceFmt}}</span></span>
+                    <div style="display:flex;gap:12px;align-items:center">
+                      <span onClick="{{p.wish}}" style="font-size:18px;color:{{p.starC}};cursor:pointer">{{p.starCh}}</span>
+                      <svg onClick="{{p.bag}}" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b9b9b9" stroke-width="1.4" style="cursor:pointer"><path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"></path><rect x="5" y="9" width="14" height="11" rx="1"></rect></svg>
+                    </div>
+                  </div>
+                  <div style="font-size:14px;color:#d0342c;margin-top:4px">现价 {{p.saleFmt}}</div>
+                </div>
+              </sc-if>
+              <sc-if value="{{p.noSale}}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+                  <span style="font-size:14.5px">{{p.priceFmt}}</span>
+                  <div style="display:flex;gap:12px;align-items:center">
+                    <span onClick="{{p.wish}}" style="font-size:18px;color:{{p.starC}};cursor:pointer">{{p.starCh}}</span>
+                    <svg onClick="{{p.bag}}" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b9b9b9" stroke-width="1.4" style="cursor:pointer"><path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"></path><rect x="5" y="9" width="14" height="11" rx="1"></rect></svg>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div onClick="{{goBag}}" style="position:absolute;right:14px;bottom:104px;z-index:12;width:52px;height:52px;border-radius:50%;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;cursor:pointer">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#111" stroke-width="1.4" stroke-linecap="round"><path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"></path><rect x="5" y="9" width="14" height="11" rx="1"></rect></svg>
+        <sc-if value="{{cartOn}}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:8px;right:8px;min-width:17px;height:17px;border-radius:9px;background:#111;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;padding:0 4px">{{cartN}}</div></sc-if>
+      </div>
+      <sc-if value="{{filterOpen}}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="类目列表筛选" style="position:absolute;inset:0;z-index:50">
+          <div onClick="{{closeFilter}}" style="position:absolute;inset:0;background:rgba(0,0,0,.35);animation:fadeIn .25s"></div>
+          <div style="position:absolute;top:0;right:0;bottom:0;width:86%;background:#fff;animation:drawerIn .28s ease;display:flex;flex-direction:column">
+            <div style="padding:44px 0 16px;text-align:center;font-size:17px;font-weight:600;border-bottom:0.5px solid #eee">筛选</div>
+            <div style="flex:1;overflow-y:auto;padding:0 22px">
+              <sc-for list="{{filters}}" as="f" hint-placeholder-count="8">
+                <div style="border-bottom:0.5px solid #ececec">
+                  <div onClick="{{f.toggle}}" style="display:flex;align-items:center;justify-content:space-between;padding:22px 0;cursor:pointer">
+                    <span style="font-size:15px;color:#555">{{f.t}}</span>
+                    <span style="font-size:12px;color:#999">{{f.ch}}</span>
+                  </div>
+                  <sc-if value="{{f.open}}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;flex-wrap:wrap;gap:10px;padding:0 0 20px">
+                      <sc-for list="{{f.opts}}" as="o" hint-placeholder-count="4">
+                        <div style="padding:8px 16px;border:0.5px solid #ddd;font-size:13px;color:#555;cursor:pointer">{{o.v}}</div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:14px;padding:14px 16px 30px">
+              <div onClick="{{resetFilter}}" style="flex:1;height:46px;background:#f2f2f2;color:#555;font-size:15px;letter-spacing:.3em;display:flex;align-items:center;justify-content:center;cursor:pointer">重置</div>
+              <div onClick="{{applyFilter}}" style="flex:1;height:46px;background:#565656;color:#fff;font-size:15px;letter-spacing:.3em;display:flex;align-items:center;justify-content:center;cursor:pointer">应用</div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.seriesList}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="系列商品列表" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+        </div>
+        <div style="padding:4px 16px 0">
+          <div style="display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid #444">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#333" stroke-width="1.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16 L20.5 20.5"></path></svg>
+            <input placeholder="搜索商品" style="font-size:14px;color:#333"></input>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px">
+          <div onClick="{{openFilter}}" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#333" stroke-width="1.4" stroke-linecap="round"><path d="M4 7 H20 M4 12 H20 M4 17 H20"></path><circle cx="9" cy="7" r="1.8" fill="#fff"></circle><circle cx="15" cy="12" r="1.8" fill="#fff"></circle><circle cx="8" cy="17" r="1.8" fill="#fff"></circle></svg>
+            <span style="font-size:15px">筛选</span>
+          </div>
+          <div style="display:flex;gap:22px">
+            <span onClick="{{pickSortAll}}" style="font-size:15px;color:{{sortAllC}};font-weight:{{sortAllW}};cursor:pointer">综合</span>
+            <span onClick="{{pickSortNew}}" style="font-size:15px;color:{{sortNewC}};font-weight:{{sortNewW}};cursor:pointer">新品</span>
+          </div>
+        </div>
+      </div>
+      <div style="position:absolute;top:190px;bottom:0;left:0;right:0;overflow-y:auto;padding:24px 16px 40px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:44px 22px">
+          <sc-for list="{{seriesProds}}" as="p" hint-placeholder-count="4">
+            <div>
+              <div onClick="{{p.open}}" style="width:100%;aspect-ratio:3/4;background:{{p.tint}};cursor:pointer;display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:9px;letter-spacing:.12em;color:rgba(90,70,55,.55);text-align:center;padding:0 8px">{{p.label}}</span></div>
+              <div onClick="{{p.open}}" style="margin-top:14px;font-size:14px;letter-spacing:.06em;line-height:1.6;min-height:44px;cursor:pointer">{{p.name}}</div>
+              <sc-if value="{{p.hasSale}}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:6px">
+                  <div style="display:flex;align-items:center;justify-content:space-between">
+                    <span style="font-size:13px;color:#9a9a9a">原价 <span style="text-decoration:line-through">{{p.priceFmt}}</span></span>
+                    <div style="display:flex;gap:12px;align-items:center">
+                      <span onClick="{{p.wish}}" style="font-size:18px;color:{{p.starC}};cursor:pointer">{{p.starCh}}</span>
+                      <svg onClick="{{p.bag}}" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b9b9b9" stroke-width="1.4" style="cursor:pointer"><path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"></path><rect x="5" y="9" width="14" height="11" rx="1"></rect></svg>
+                    </div>
+                  </div>
+                  <div style="font-size:14px;color:#d0342c;margin-top:4px">现价 {{p.saleFmt}}</div>
+                </div>
+              </sc-if>
+              <sc-if value="{{p.noSale}}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+                  <span style="font-size:14.5px">{{p.priceFmt}}</span>
+                  <div style="display:flex;gap:12px;align-items:center">
+                    <span onClick="{{p.wish}}" style="font-size:18px;color:{{p.starC}};cursor:pointer">{{p.starCh}}</span>
+                    <svg onClick="{{p.bag}}" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#b9b9b9" stroke-width="1.4" style="cursor:pointer"><path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"></path><rect x="5" y="9" width="14" height="11" rx="1"></rect></svg>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div onClick="{{goBag}}" style="position:absolute;right:14px;bottom:104px;z-index:13;width:52px;height:52px;border-radius:50%;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;cursor:pointer">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#111" stroke-width="1.4" stroke-linecap="round"><path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"></path><rect x="5" y="9" width="14" height="11" rx="1"></rect></svg>
+        <sc-if value="{{cartOn}}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:8px;right:8px;min-width:17px;height:17px;border-radius:9px;background:#111;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;padding:0 4px">{{cartN}}</div></sc-if>
+      </div>
+      <sc-if value="{{filterOpen}}" hint-placeholder-val="{{ false }}">
+        <div data-screen-label="系列列表筛选" style="position:absolute;inset:0;z-index:50">
+          <div onClick="{{closeFilter}}" style="position:absolute;inset:0;background:rgba(0,0,0,.35);animation:fadeIn .25s"></div>
+          <div style="position:absolute;top:0;right:0;bottom:0;width:86%;background:#fff;animation:drawerIn .28s ease;display:flex;flex-direction:column">
+            <div style="padding:44px 0 16px;text-align:center;font-size:17px;font-weight:600;border-bottom:0.5px solid #eee">筛选</div>
+            <div style="flex:1;overflow-y:auto;padding:0 22px">
+              <sc-for list="{{filters}}" as="f" hint-placeholder-count="8">
+                <div style="border-bottom:0.5px solid #ececec">
+                  <div onClick="{{f.toggle}}" style="display:flex;align-items:center;justify-content:space-between;padding:22px 0;cursor:pointer">
+                    <span style="font-size:15px;color:#555">{{f.t}}</span>
+                    <span style="font-size:12px;color:#999">{{f.ch}}</span>
+                  </div>
+                  <sc-if value="{{f.open}}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;flex-wrap:wrap;gap:10px;padding:0 0 20px">
+                      <sc-for list="{{f.opts}}" as="o" hint-placeholder-count="4">
+                        <div style="padding:8px 16px;border:0.5px solid #ddd;font-size:13px;color:#555;cursor:pointer">{{o.v}}</div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:14px;padding:14px 16px 30px">
+              <div onClick="{{resetFilter}}" style="flex:1;height:46px;background:#f2f2f2;color:#555;font-size:15px;letter-spacing:.3em;display:flex;align-items:center;justify-content:center;cursor:pointer">重置</div>
+              <div onClick="{{applyFilter}}" style="flex:1;height:46px;background:#565656;color:#fff;font-size:15px;letter-spacing:.3em;display:flex;align-items:center;justify-content:center;cursor:pointer">应用</div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.pdp}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="商品详情页" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:300;font-size:18px;letter-spacing:.3em;padding-left:.3em">AURELLE</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:84px;left:0;right:0;overflow-y:auto">
+        <div style="position:relative">
+          <div style="width:100%;aspect-ratio:3/3.6;background:{{P.tint}};display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:11px;letter-spacing:.16em;color:rgba(90,70,55,.55);text-align:center;padding:0 20px">{{P.label}}</span></div>
+          <div style="position:absolute;right:14px;bottom:64px;display:flex;flex-direction:column;gap:12px">
+            <div onClick="{{goBag}}" style="position:relative;width:44px;height:44px;border-radius:50%;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#333" stroke-width="1.4"><path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"></path><rect x="5" y="9" width="14" height="11" rx="1"></rect></svg>
+              <sc-if value="{{cartOn}}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;border-radius:9px;background:#111;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;padding:0 4px">{{cartN}}</div></sc-if>
+            </div>
+            <div onClick="{{svcToast}}" style="width:44px;height:44px;border-radius:50%;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#333" stroke-width="1.4"><rect x="3.5" y="5" width="17" height="13" rx="3"></rect><path d="M9 18 L8 21 L12 18" fill="#333" stroke="none"></path><circle cx="8.5" cy="11.5" r="0.9" fill="#333" stroke="none"></circle><circle cx="12" cy="11.5" r="0.9" fill="#333" stroke="none"></circle><circle cx="15.5" cy="11.5" r="0.9" fill="#333" stroke="none"></circle></svg>
+            </div>
+          </div>
+          <div onClick="{{videoToast}}" style="position:absolute;left:14px;bottom:18px;display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.85);border:0.5px solid #ddd;border-radius:16px;padding:6px 14px;cursor:pointer">
+            <div style="width:0;height:0;border-left:8px solid #333;border-top:5px solid transparent;border-bottom:5px solid transparent"></div>
+            <span style="font-size:12px;color:#333">视频</span>
+          </div>
+        </div>
+        <div style="padding:18px 16px 0">
+          <div style="display:flex;align-items:flex-start;gap:14px">
+            <div style="flex:1;font-size:15.5px;letter-spacing:.05em;line-height:1.5">{{P.name}}</div>
+            <svg onClick="{{shareToast}}" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#555" stroke-width="1.4" style="cursor:pointer;margin-top:2px"><circle cx="6" cy="12" r="2.4"></circle><circle cx="17" cy="6" r="2.4"></circle><circle cx="17" cy="18" r="2.4"></circle><path d="M8.2 10.9 L14.8 7.1 M8.2 13.1 L14.8 16.9"></path></svg>
+          </div>
+          <div style="font-size:15px;margin-top:10px">{{P.priceFmt}}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:26px">
+            <span style="font-size:14.5px;font-weight:600">尺码</span>
+            <span onClick="{{goSizeGuide}}" style="font-size:12.5px;color:#888;text-decoration:underline;cursor:pointer">尺码指南</span>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:14px">
+            <sc-for list="{{sizes}}" as="z" hint-placeholder-count="5">
+              <div onClick="{{z.click}}" style="min-width:46px;height:38px;border:0.5px solid {{z.bd}};background:{{z.bg}};color:{{z.fg}};display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer">{{z.v}}</div>
+            </sc-for>
+          </div>
+          <div style="font-size:14.5px;font-weight:600;margin-top:26px">颜色</div>
+          <div style="display:inline-flex;flex-direction:column;align-items:center;margin-top:12px">
+            <div style="width:30px;height:30px;border-radius:50%;background:{{P.colorHex}};border:0.5px solid rgba(0,0,0,.15)"></div>
+            <span style="font-size:12px;color:#555;margin-top:7px">{{P.color}}</span>
+          </div>
+          <div style="border-top:0.5px solid #eaeaea;margin-top:24px">
+            <div onClick="{{togD}}" style="display:flex;align-items:center;justify-content:space-between;padding:18px 0;cursor:pointer">
+              <div><span style="font-size:14.5px;font-weight:600">产品细节</span><span style="font-size:11.5px;color:#b0b0b0;letter-spacing:.12em;margin-left:10px">DETAILS</span></div>
+              <span style="font-size:12px;color:#999">{{accDCh}}</span>
+            </div>
+            <sc-if value="{{accD}}" hint-placeholder-val="{{ true }}">
+              <div style="padding-bottom:20px">
+                <div style="font-size:14px;color:#555;line-height:1.9">{{P.desc}}</div>
+                <div style="margin-top:14px">
+                  <sc-for list="{{pdpBullets}}" as="b" hint-placeholder-count="5">
+                    <div style="display:flex;gap:9px;font-size:13.5px;color:#555;line-height:1.8"><span>·</span><span style="flex:1">{{b.v}}</span></div>
+                  </sc-for>
+                </div>
+                <div style="font-size:13.5px;color:#555;margin-top:16px">款号： {{P.code}}</div>
+              </div>
+            </sc-if>
+          </div>
+          <div style="border-top:0.5px solid #eaeaea">
+            <div onClick="{{togS}}" style="display:flex;align-items:center;justify-content:space-between;padding:18px 0;cursor:pointer">
+              <div><span style="font-size:14.5px;font-weight:600">尺码和版型</span><span style="font-size:11.5px;color:#b0b0b0;letter-spacing:.12em;margin-left:10px">SIZE&amp;FIT</span></div>
+              <span style="font-size:12px;color:#999">{{accSCh}}</span>
+            </div>
+            <sc-if value="{{accS}}" hint-placeholder-val="{{ false }}">
+              <div style="padding-bottom:20px;font-size:14px;color:#555;line-height:1.9">模特身高175cm，穿着尺码0。该款式为常规版型，若介于两个尺码之间，建议选择较小尺码。</div>
+            </sc-if>
+          </div>
+          <div style="border-top:0.5px solid #eaeaea;border-bottom:0.5px solid #eaeaea">
+            <div onClick="{{togC}}" style="display:flex;align-items:center;justify-content:space-between;padding:18px 0;cursor:pointer">
+              <div><span style="font-size:14.5px;font-weight:600">洗护说明</span><span style="font-size:11.5px;color:#b0b0b0;letter-spacing:.12em;margin-left:10px">CARE</span></div>
+              <span style="font-size:12px;color:#999">{{accCCh}}</span>
+            </div>
+            <sc-if value="{{accC}}" hint-placeholder-val="{{ false }}">
+              <div style="padding-bottom:20px;font-size:14px;color:#555;line-height:1.9">建议专业干洗。请勿漂白；低温熨烫时请垫布；悬挂于阴凉干燥处保存。</div>
+            </sc-if>
+          </div>
+          <div style="text-align:center;font-size:15px;font-weight:600;margin-top:30px">尊享服务</div>
+          <div style="display:flex;margin-top:22px">
+            <div style="flex:1;text-align:center;padding:0 4px">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#555" stroke-width="1.1" stroke-linecap="round"><circle cx="12" cy="11.5" r="7.5"></circle><path d="M8 19.5 L7 22 L11 19.5"></path><circle cx="9" cy="11.5" r="0.8" fill="#555" stroke="none"></circle><circle cx="12" cy="11.5" r="0.8" fill="#555" stroke="none"></circle><circle cx="15" cy="11.5" r="0.8" fill="#555" stroke="none"></circle></svg>
+              <div style="font-size:12.5px;margin-top:8px">专属客服</div>
+              <div style="font-size:10.5px;color:#b0b0b0;margin-top:6px;line-height:1.6">为您提供一对一<br>专属客服服务</div>
+            </div>
+            <div style="flex:1;text-align:center;padding:0 4px">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#555" stroke-width="1.1" stroke-linecap="round"><circle cx="12" cy="12" r="8"></circle><path d="M12 8 V12 L14.8 13.8"></path></svg>
+              <div style="font-size:12.5px;margin-top:8px">退换货服务</div>
+              <div style="font-size:10.5px;color:#b0b0b0;margin-top:6px;line-height:1.6">自发货日起14天内<br>可享受退换货服务</div>
+            </div>
+            <div style="flex:1;text-align:center;padding:0 4px">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#555" stroke-width="1.1" stroke-linecap="round"><rect x="3" y="7" width="12" height="9"></rect><path d="M15 10 H19 L21 13 V16 H15"></path><circle cx="7.5" cy="17.5" r="1.6"></circle><circle cx="17" cy="17.5" r="1.6"></circle></svg>
+              <div style="font-size:12.5px;margin-top:8px">顺丰速达</div>
+              <div style="font-size:10.5px;color:#b0b0b0;margin-top:6px;line-height:1.6">享受免费顺丰速运</div>
+            </div>
+            <div style="flex:1;text-align:center;padding:0 4px">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#555" stroke-width="1.1" stroke-linecap="round"><rect x="4" y="9" width="16" height="11" rx="1"></rect><path d="M4 12 H20 M12 9 V20"></path><path d="M12 9 C9 9 7.5 7.5 8.5 6 C9.5 4.5 12 6.5 12 9 C12 6.5 14.5 4.5 15.5 6 C16.5 7.5 15 9 12 9 Z"></path></svg>
+              <div style="font-size:12.5px;margin-top:8px">礼品包装</div>
+              <div style="font-size:10.5px;color:#b0b0b0;margin-top:6px;line-height:1.6">尊享品牌包装</div>
+            </div>
+          </div>
+          <div style="font-size:15px;font-weight:600;margin-top:36px">热门推荐</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:18px">
+            <sc-for list="{{recs}}" as="p" hint-placeholder-count="2">
+              <div>
+                <div onClick="{{p.open}}" style="width:100%;aspect-ratio:3/3.8;background:{{p.tint}};cursor:pointer;display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:9px;letter-spacing:.12em;color:rgba(90,70,55,.55);text-align:center;padding:0 8px">{{p.label}}</span></div>
+                <div style="margin-top:12px;font-size:13px;line-height:1.55;min-height:40px">{{p.name}}</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+                  <span style="font-size:13.5px">{{p.priceFmt}}</span>
+                  <div style="display:flex;gap:10px;align-items:center">
+                    <span onClick="{{p.wish}}" style="font-size:16px;color:{{p.starC}};cursor:pointer">{{p.starCh}}</span>
+                    <svg onClick="{{p.bag}}" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#b9b9b9" stroke-width="1.4" style="cursor:pointer"><path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"></path><rect x="5" y="9" width="14" height="11" rx="1"></rect></svg>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;justify-content:center;gap:5px;margin-top:20px">
+            <div style="width:4px;height:4px;border-radius:50%;background:#111"></div>
+            <div style="width:4px;height:4px;border-radius:50%;background:rgba(120,120,120,.4)"></div>
+            <div style="width:4px;height:4px;border-radius:50%;background:rgba(120,120,120,.4)"></div>
+          </div>
+          <div style="text-align:center;margin:22px 0 30px"><span onClick="{{goShoesList}}" style="font-size:12.5px;color:#888;text-decoration:underline;cursor:pointer">查看更多</span></div>
+        </div>
+      </div>
+      <div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:0.5px solid #eee;padding:12px 16px 26px;z-index:11">
+        <div style="display:flex;gap:12px">
+          <div onClick="{{addBagFn}}" style="flex:1;height:44px;background:#f4f4f4;color:#333;font-size:13.5px;letter-spacing:.08em;display:flex;align-items:center;justify-content:center;cursor:pointer">加入购物袋</div>
+          <div onClick="{{buyNow}}" style="flex:1;height:44px;background:#111;color:#fff;font-size:13.5px;letter-spacing:.08em;display:flex;align-items:center;justify-content:center;cursor:pointer">即刻选购</div>
+          <div onClick="{{pdpWish}}" style="width:44px;height:44px;border:0.5px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:19px;color:{{P.starC}};cursor:pointer">{{P.starCh}}</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.confirm}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="订单确认页" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:300;font-size:18px;letter-spacing:.3em;padding-left:.3em">AURELLE</div>
+        </div>
+        <div style="background:#000;color:#fff;text-align:center;font-size:12.5px;padding:9px 0;letter-spacing:.06em">下单即可享受包邮服务</div>
+        <div style="display:flex;padding:16px 30px 0;background:#fff;border-bottom:0.5px solid #eee">
+          <div style="flex:1;text-align:center;padding-bottom:12px;border-bottom:2px solid #111">
+            <div style="font-size:13px;letter-spacing:.1em">01</div>
+            <div style="font-size:14px;margin-top:4px">配送</div>
+          </div>
+          <div style="flex:1;text-align:center;padding-bottom:12px;color:#b5b5b5">
+            <div style="font-size:13px;letter-spacing:.1em">02</div>
+            <div style="font-size:14px;margin-top:4px">付款</div>
+          </div>
+          <div style="flex:1;text-align:center;padding-bottom:12px;color:#b5b5b5">
+            <div style="font-size:13px;letter-spacing:.1em">03</div>
+            <div style="font-size:14px;margin-top:4px">确认</div>
+          </div>
+        </div>
+      </div>
+      <div style="position:absolute;top:175px;bottom:88px;left:0;right:0;overflow-y:auto;padding:18px 16px 30px">
+        <div style="font-size:16px;font-weight:600">订单详情</div>
+        <div style="display:flex;gap:14px;margin-top:16px;padding-bottom:18px;border-bottom:0.5px solid #eee">
+          <div style="width:96px;height:120px;background:{{P.tint}};flex:0 0 auto;display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:8px;letter-spacing:.1em;color:rgba(90,70,55,.55);text-align:center;padding:0 6px">{{P.label}}</span></div>
+          <div style="flex:1">
+            <div style="font-size:14px;line-height:1.5">{{P.name}}</div>
+            <div style="display:flex;justify-content:space-between;margin-top:12px"><span style="font-size:13px;color:#555">价格</span><span style="font-size:13px">{{confirmPriceFmt}}</span></div>
+            <div style="display:flex;justify-content:space-between;margin-top:7px"><span style="font-size:13px;color:#555">规格名称</span><span style="font-size:13px;color:#999">{{confirmSpec}}</span></div>
+            <div style="display:flex;justify-content:space-between;margin-top:7px"><span style="font-size:13px;color:#555">数量</span><span style="font-size:13px">1</span></div>
+          </div>
+        </div>
+        <div style="padding:16px 0;border-bottom:0.5px solid #eee">
+          <div style="display:flex;justify-content:space-between;padding:5px 0"><span style="font-size:14px;color:#333">商品金额：</span><span style="font-size:14px">{{confirmPriceFmt}}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0"><span style="font-size:14px;color:#333">会员奢享：</span><span style="font-size:14px">¥ 0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0"><span style="font-size:14px;color:#333">活动优惠：</span><span style="font-size:14px">¥ 0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0"><span style="font-size:14px;color:#333">运费：</span><span style="font-size:14px">¥ 0</span></div>
+        </div>
+        <div style="text-align:center;font-size:16px;font-weight:600;margin-top:24px">配送信息</div>
+        <div onClick="{{goPickAddr}}" style="display:flex;align-items:center;justify-content:space-between;padding:20px 2px;border-bottom:0.5px solid #eee;cursor:pointer">
+          <sc-if value="{{hasSelA}}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1">
+              <div style="font-size:14.5px;font-weight:500">{{selAName}}</div>
+              <div style="font-size:13.5px;color:#555;line-height:1.6;margin-top:6px">{{selAFull}}</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{noSelA}}" hint-placeholder-val="{{ true }}">
+            <span style="font-size:14.5px">选择收货地址</span>
+          </sc-if>
+          <div style="width:9px;height:9px;border-top:1.3px solid #999;border-right:1.3px solid #999;transform:rotate(45deg);flex:0 0 auto"></div>
+        </div>
+        <div style="text-align:center;font-size:16px;font-weight:600;margin-top:26px">配送方式</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:18px;padding:0 2px">
+          <div style="width:22px;height:22px;border-radius:50%;border:1px solid #bbb;display:flex;align-items:center;justify-content:center"><div style="width:11px;height:11px;border-radius:50%;background:#b5b5b5"></div></div>
+          <span style="font-size:14.5px;color:#9a9a9a">顺丰包邮</span>
+        </div>
+        <div style="text-align:center;font-size:16px;font-weight:600;margin:30px 0 4px">包装选择</div>
+        <div style="display:flex;gap:14px">
+          <div onClick="{{pickPackC}}" style="flex:1;cursor:pointer">
+            <div style="display:flex;align-items:center;gap:10px;padding:14px 0">
+              <div style="width:22px;height:22px;border-radius:50%;border:1px solid #bbb;display:flex;align-items:center;justify-content:center"><div style="width:11px;height:11px;border-radius:50%;background:{{packCDot}}"></div></div>
+              <span style="font-size:14.5px">经典包装</span>
+            </div>
+            <div style="width:100%;aspect-ratio:4/3.2;background:repeating-linear-gradient(135deg,#f0efed 0 14px,#eae8e5 14px 28px);display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:9px;letter-spacing:.12em;color:rgba(90,80,70,.5)">gift box · 白色礼盒</span></div>
+            <div style="text-align:center;font-size:12px;color:#9a9a9a;line-height:1.7;margin-top:10px">选择我们的品牌专属<br>AURELLE包装</div>
+          </div>
+          <div onClick="{{pickPackE}}" style="flex:1;cursor:pointer">
+            <div style="display:flex;align-items:center;gap:10px;padding:14px 0">
+              <div style="width:22px;height:22px;border-radius:50%;border:1px solid #bbb;display:flex;align-items:center;justify-content:center"><div style="width:11px;height:11px;border-radius:50%;background:{{packEDot}}"></div></div>
+              <span style="font-size:14.5px">环保包装</span>
+            </div>
+            <div style="width:100%;aspect-ratio:4/3.2;background:repeating-linear-gradient(135deg,#edeae4 0 14px,#e6e2da 14px 28px);display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:9px;letter-spacing:.12em;color:rgba(90,80,70,.5)">eco box · 环保纸盒</span></div>
+            <div style="text-align:center;font-size:12px;color:#9a9a9a;line-height:1.7;margin-top:10px">选择我们的环保包装<br>呵护我们共同的家园</div>
+          </div>
+        </div>
+        <div style="text-align:center;font-size:13px;color:#9a9a9a;margin-top:30px">如需开发票请联系在线客服</div>
+        <div onClick="{{togAgT}}" style="display:flex;align-items:center;gap:10px;margin-top:30px;cursor:pointer">
+          <div style="width:18px;height:18px;border:1px solid {{agTB}};border-radius:3px;background:{{agTBg}};display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px">{{agTCh}}</div>
+          <span style="font-size:13px;color:#555">提交订单即表明您接受我们的<span style="text-decoration:underline">销售条款</span></span>
+        </div>
+      </div>
+      <div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:0.5px solid #eee;display:flex;align-items:center;justify-content:space-between;padding:14px 16px 28px;z-index:11">
+        <div style="font-size:14px">共1件商品 总计： <span style="font-size:16px;font-weight:600">{{confirmPriceFmt}}</span></div>
+        <div onClick="{{submitOrder}}" style="padding:13px 26px;background:#565656;color:#fff;font-size:14px;letter-spacing:.1em;cursor:pointer">提交订单</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.payment}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="支付页" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:300;font-size:18px;letter-spacing:.3em;padding-left:.3em">AURELLE</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:96px;left:0;right:0;overflow-y:auto">
+        <div style="text-align:center;padding:36px 0 30px;background:#fff">
+          <div><span style="font-size:18px;vertical-align:10px">¥</span><span style="font-size:38px;font-weight:500;letter-spacing:.02em">{{payAmount}}</span></div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:18px">
+            <span style="font-size:13.5px;color:#555">剩余支付时间</span>
+            <span style="background:#f2f2f2;padding:4px 7px;font-size:13px">00</span><span style="color:#999">:</span>
+            <span style="background:#f2f2f2;padding:4px 7px;font-size:13px">{{cdM}}</span><span style="color:#999">:</span>
+            <span style="background:#f2f2f2;padding:4px 7px;font-size:13px">{{cdS}}</span>
+          </div>
+        </div>
+        <div style="background:#f6f6f6;min-height:100%;padding:20px 14px">
+          <div style="background:#fff;border-radius:10px;padding:8px 16px">
+            <div style="display:flex;align-items:center;gap:12px;padding:16px 0;cursor:pointer">
+              <div style="width:26px;height:26px;border-radius:6px;background:#07c160;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700">✓</div>
+              <span style="flex:1;font-size:15px">微信支付</span>
+              <div style="width:22px;height:22px;border-radius:50%;background:#111;display:flex;align-items:center;justify-content:center"><span style="color:#fff;font-size:12px">✓</span></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:16px 0;cursor:pointer">
+              <div style="width:26px;height:26px;border-radius:50%;background:#1677ff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px">支</div>
+              <span style="flex:1;font-size:15px">支付宝</span>
+              <div style="width:22px;height:22px;border-radius:50%;border:1px solid #ccc"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:0.5px solid #eee;display:flex;align-items:center;justify-content:space-between;padding:14px 16px 28px;z-index:11">
+        <div style="font-size:14px">待支付 <span style="color:#d0342c;font-size:17px;font-weight:600">¥{{payAmount}}</span></div>
+        <div onClick="{{pay}}" style="padding:14px 40px;background:#111;color:#fff;font-size:15px;letter-spacing:.2em;cursor:pointer">去支付</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.orderDetail}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="订单详情页" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">订单详情</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto;padding:18px 16px 50px">
+        <sc-if value="{{O.pending}}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:17px;font-weight:600;padding-bottom:16px;border-bottom:0.5px solid #eee">待支付00 : {{cdM}} : {{cdS}}</div>
+        </sc-if>
+        <sc-if value="{{O.cancelled}}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:17px;font-weight:600;padding-bottom:16px;border-bottom:0.5px solid #eee">已取消</div>
+        </sc-if>
+        <div style="display:flex;gap:14px;padding:18px 0;border-bottom:0.5px solid #eee">
+          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#111" stroke-width="1.2"><path d="M12 21 C7.5 16 5.5 13 5.5 9.9 A6.5 6.5 0 0 1 18.5 9.9 C18.5 13 16.5 16 12 21 Z"></path><circle cx="12" cy="10" r="2.2"></circle></svg>
+          <div>
+            <div style="font-size:15px;font-weight:600">{{O.addrTop}}</div>
+            <div style="font-size:13px;color:#555;margin-top:7px">{{O.addrName}}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:15px 0;border-bottom:0.5px solid #eee">
+          <span style="font-size:13px;color:#999">订单号： {{O.id}}</span>
+          <svg onClick="{{copyToast}}" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#999" stroke-width="1.3" style="cursor:pointer"><rect x="8" y="8" width="12" height="12" rx="1"></rect><path d="M5 15 H4 V4 H15 V5"></path></svg>
+        </div>
+        <div style="display:flex;gap:14px;padding:18px 0;border-bottom:0.5px solid #eee">
+          <div style="width:92px;height:114px;background:{{O.p.tint}};flex:0 0 auto;display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:8px;letter-spacing:.1em;color:rgba(90,70,55,.55);text-align:center;padding:0 6px">{{O.p.label}}</span></div>
+          <div style="flex:1">
+            <div style="font-size:14px;line-height:1.5">{{O.p.name}}</div>
+            <div style="display:flex;justify-content:space-between;margin-top:12px"><span style="font-size:13px;color:#555">价格</span><span style="font-size:13px">{{O.p.priceFmt}}</span></div>
+            <div style="display:flex;justify-content:space-between;margin-top:7px"><span style="font-size:13px;color:#555">规格名称</span><span style="font-size:13px;color:#999">{{O.spec}}</span></div>
+            <div style="display:flex;justify-content:space-between;margin-top:7px"><span style="font-size:13px;color:#555">数量</span><span style="font-size:13px">1</span></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 0;border-bottom:0.5px solid #eee">
+          <span style="font-size:16px;font-weight:600">配送方式</span>
+          <span style="font-size:13.5px;color:#333">顺丰包邮</span>
+        </div>
+        <div style="position:relative;text-align:center;padding:26px 0;border-bottom:0.5px solid #eee">
+          <span onClick="{{invoiceToast}}" style="font-size:13.5px;color:#9a9a9a;cursor:pointer">如需开发票请联系在线客服</span>
+          <div onClick="{{svcToast}}" style="position:absolute;right:0;top:-22px;width:44px;height:44px;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;cursor:pointer">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#333" stroke-width="1.4"><rect x="3.5" y="5" width="17" height="13" rx="3"></rect><path d="M9 18 L8 21 L12 18" fill="#333" stroke="none"></path><circle cx="8.5" cy="11.5" r="0.9" fill="#333" stroke="none"></circle><circle cx="12" cy="11.5" r="0.9" fill="#333" stroke="none"></circle><circle cx="15.5" cy="11.5" r="0.9" fill="#333" stroke="none"></circle></svg>
+          </div>
+        </div>
+        <div style="padding:14px 0">
+          <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:14px;font-weight:600">下单时间：</span><span style="font-size:13.5px;color:#555">{{O.time}}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:14px;font-weight:600">商品金额：</span><span style="font-size:13.5px">{{O.totalFmt}}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:14px;font-weight:600">会员奢享：</span><span style="font-size:13.5px">¥0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:14px;font-weight:600">活动优惠：</span><span style="font-size:13.5px">¥0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:14px;font-weight:600">运费：</span><span style="font-size:13.5px">¥0</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="font-size:14px;font-weight:600">实付：</span><span style="font-size:14px;font-weight:600">{{O.totalFmt}}</span></div>
+        </div>
+        <sc-if value="{{O.pending}}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;justify-content:flex-end;gap:14px;margin-top:16px">
+            <div onClick="{{goCancel}}" style="padding:12px 24px;background:#f2f2f2;color:#888;font-size:13.5px;cursor:pointer">取消订单</div>
+            <div onClick="{{goPayScreen}}" style="padding:12px 24px;background:#565656;color:#fff;font-size:13.5px;cursor:pointer">立即支付</div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.cancel}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="取消订单页" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">取消订单</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:110px;left:0;right:0;overflow-y:auto;padding:20px 18px">
+        <div style="font-size:16.5px;font-weight:600;padding-bottom:18px;border-bottom:0.5px solid #eee">请选择取消的理由</div>
+        <sc-for list="{{cancelReasons}}" as="r" hint-placeholder-count="5">
+          <div onClick="{{r.pick}}" style="display:flex;align-items:center;gap:16px;padding:17px 0;cursor:pointer">
+            <div style="width:23px;height:23px;border-radius:50%;border:1px solid #ccc;display:flex;align-items:center;justify-content:center"><div style="width:12px;height:12px;border-radius:50%;background:{{r.dot}}"></div></div>
+            <span style="font-size:15px;color:#9a9a9a">{{r.t}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="position:absolute;bottom:0;left:0;right:0;background:#fff;padding:12px 16px 28px">
+        <div onClick="{{cancelFinal}}" style="height:48px;background:#565656;color:#fff;font-size:15px;letter-spacing:.12em;display:flex;align-items:center;justify-content:center;cursor:pointer">取消订单</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.campaign}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="HIGH SUMMER 2026 夏日胶囊系列" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:16px;font-weight:600;max-width:210px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">HIGH SUMMER 2026…</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto">
+        <div style="text-align:center;padding:28px 0 8px">
+          <div style="font-size:14px;letter-spacing:.3em;padding-left:.3em">HIGH SUMMER</div>
+          <div style="font-size:14px;letter-spacing:.14em;margin-top:8px">2026夏日胶囊系列</div>
+          <div style="font-size:12.5px;color:#9a9a9a;margin-top:20px;letter-spacing:.08em">现已于精品店及线上同步发售</div>
+        </div>
+        <div style="margin-top:18px">
+          <div style="width:100%;aspect-ratio:3/2.2;background:repeating-linear-gradient(135deg,#e9d2b8 0 16px,#e3c8a8 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(110,80,45,.55)">campaign · 金色沙发慵懒时刻</span></div>
+          <div style="width:92%;margin:14px auto 0;aspect-ratio:3/2.4;background:repeating-linear-gradient(135deg,#e6cfae 0 16px,#dfc49d 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(110,80,45,.55)">campaign · 敞篷车旁的印花长袍</span></div>
+        </div>
+        <div style="padding:44px 0 8px;overflow:hidden">
+          <div style="display:flex;transition:transform .6s ease;transform:{{campTx}}">
+            <sc-for list="{{campProds}}" as="p" hint-placeholder-count="3">
+              <div onClick="{{p.open}}" style="flex:0 0 100%;display:flex;flex-direction:column;align-items:center;cursor:pointer">
+                <div style="width:52%;aspect-ratio:3/3.4;background:{{p.tint}};display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:9px;letter-spacing:.14em;color:rgba(90,70,55,.55);text-align:center;padding:0 10px">{{p.label}}</span></div>
+                <div style="margin-top:16px;font-size:12px;letter-spacing:.24em;color:#3a3a3a">SOLEIL</div>
+                <div style="margin-top:6px;font-size:12px;color:#9a9a9a">{{p.sub}}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;justify-content:center;gap:5px;margin-top:16px">
+            <sc-for list="{{campDots}}" as="d" hint-placeholder-count="3"><div style="width:4px;height:4px;border-radius:50%;background:{{d.c}}"></div></sc-for>
+          </div>
+        </div>
+        <div style="margin-top:30px;padding-bottom:40px">
+          <div style="width:100%;aspect-ratio:3/2.3;background:repeating-linear-gradient(135deg,#e4d5c2 0 16px,#ddcab2 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(100,75,50,.55)">campaign · 石墙边的赤陶套装</span></div>
+          <div style="width:92%;margin:14px auto 0;aspect-ratio:3/2.4;background:repeating-linear-gradient(135deg,#e0d0bd 0 16px,#d9c5ab 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(100,75,50,.55)">campaign · 織花壁毯前的流苏裙</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;margin-top:40px">
+            <div onClick="{{campNecklaceOpen}}" style="width:44%;aspect-ratio:3/3.4;background:#f5eddc;display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:9px;letter-spacing:.14em;color:rgba(120,95,55,.55);text-align:center">product · 天然石项链</span></div>
+            <div style="margin-top:16px;font-size:12px;letter-spacing:.24em;color:#3a3a3a">SOLEIL</div>
+            <div style="margin-top:6px;font-size:12px;color:#9a9a9a">天然石坠饰项链</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.projects}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="A.PROJECTS页" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:15px;letter-spacing:.14em">A.PROJECTS</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto">
+        <div style="text-align:center;font-size:12.5px;letter-spacing:.24em;padding:22px 0 16px;color:#333">A.PROJECTS</div>
+        <sc-for list="{{projects}}" as="pj" hint-placeholder-count="6">
+          <div style="margin-bottom:6px">
+            <div onClick="{{pj.go}}" style="width:100%;aspect-ratio:3/2.6;background:repeating-linear-gradient(135deg,{{pj.c1}} 0 16px,{{pj.c2}} 16px 32px);cursor:pointer;display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.18em;color:rgba(75,65,55,.55)">{{pj.ph}}</span></div>
+            <div style="padding:12px 14px 20px">
+              <div style="font-size:13px;letter-spacing:.14em;color:#222">{{pj.t}}</div>
+              <div style="font-size:12px;color:#9a9a9a;margin-top:6px;line-height:1.6">{{pj.c}}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.moments}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="A.MOMENTS页" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:15px;letter-spacing:.14em">A.MOMENTS</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto">
+        <div style="text-align:center;padding:34px 0 10px">
+          <div style="font-weight:300;font-size:18px;letter-spacing:.32em;padding-left:.32em">AURELLE</div>
+          <div style="font-size:13px;letter-spacing:.24em;margin-top:30px">A × MOMENTS</div>
+          <div style="font-size:13.5px;color:#333;line-height:2;margin-top:16px">与AURELLE的朋友们<br>一起探索美好时光和聚会</div>
+        </div>
+        <div style="width:100%;aspect-ratio:3/3.3;margin-top:16px;background:repeating-linear-gradient(135deg,#eccfc0 0 16px,#e6c3b1 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(120,70,50,.55)">event · 珊瑚色软榻聚会</span></div>
+        <div style="text-align:center;padding:34px 20px 8px">
+          <div style="font-size:13.5px;line-height:2.1;color:#222">AURELLE 夏日之声<br>品牌挚友们相聚于此<br>共同庆祝一场 AURELLE 假日逸境</div>
+          <div style="margin-top:22px"><span onClick="{{momentsMore}}" style="font-size:12.5px;color:#9a9a9a;text-decoration:underline;cursor:pointer">更多活动精彩瞬间</span></div>
+        </div>
+        <div style="width:100%;aspect-ratio:3/2.4;margin-top:26px;background:repeating-linear-gradient(135deg,#ecd7bb 0 16px,#e6ccab 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(120,85,45,.55)">event · 海滩落日合影</span></div>
+        <div style="height:50px"></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.story}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="品牌故事" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:600">品牌故事</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:0;left:0;right:0;overflow-y:auto">
+        <div style="text-align:center;padding:30px 0 24px"><span style="font-weight:300;font-size:18px;letter-spacing:.32em;padding-left:.32em">AURELLE</span></div>
+        <div style="width:88%;margin:0 auto;aspect-ratio:3/3.7;background:repeating-linear-gradient(135deg,#e8dcd4 0 16px,#e1d2c7 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(100,75,60,.55)">editorial · 荒漠飘逸印花长裙</span></div>
+        <div style="text-align:center;padding:38px 26px 8px">
+          <div style="font-size:13.5px;line-height:2.2;color:#222">"服装最重要的，是它带给穿着者的愉悦。<br>我们始终希望创造让人一见倾心、<br>并且穿上便感到自在与振奋的衣服。<br>这也是我们设计的初心。"</div>
+          <div style="font-size:13px;color:#555;margin-top:22px;letter-spacing:.06em">创意总监 Aurelie Lin</div>
+        </div>
+        <div style="width:88%;margin:34px auto 0;aspect-ratio:3/2.6;background:repeating-linear-gradient(135deg,#ded8ce 0 16px,#d7cfc2 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(85,75,60,.55)">editorial · 石拱前的黑裙旋舞</span></div>
+        <div style="text-align:center;padding:36px 26px 8px">
+          <div style="font-size:13.5px;line-height:2.2;color:#222">设计师 Aurelie Lin<br>以光影与自然为灵感<br>于2003年的墨尔本<br>创立了同名品牌AURELLE</div>
+        </div>
+        <div style="width:88%;margin:34px auto 0;aspect-ratio:3/3.4;background:repeating-linear-gradient(135deg,#e6dbc8 0 16px,#dfd1b9 16px 32px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:14px"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:10px;letter-spacing:.2em;color:rgba(100,80,50,.55)">editorial · 歌剧院阶梯豹纹造型</span></div>
+        <div style="text-align:center;padding:36px 26px 60px">
+          <div style="font-size:13.5px;line-height:2.2;color:#222">成立以来<br>AURELLE 始终秉持初心<br>以对细节的追求、对色彩和印花的热忱<br>来打造独一无二的自由且精致的女性气质</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{s.bag}}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="我的购物袋" style="position:absolute;inset:0;background:#fff">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;padding-top:32px;border-bottom:0.5px solid #eee">
+        <div style="position:relative;display:flex;align-items:center;height:44px;padding:0 10px">
+          <div onClick="{{goBack}}" style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer"><div style="width:11px;height:11px;border-left:1.5px solid #111;border-bottom:1.5px solid #111;transform:rotate(45deg)"></div></div>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:300;font-size:18px;letter-spacing:.3em;padding-left:.3em">AURELLE</div>
+        </div>
+      </div>
+      <div style="position:absolute;top:77px;bottom:96px;left:0;right:0;overflow-y:auto">
+        <sc-if value="{{bagEmpty}}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center;color:#b5b5b5;font-size:13.5px;padding:70px 0 20px">购物袋暂无商品</div>
+        </sc-if>
+        <sc-for list="{{bagItems}}" as="it" hint-placeholder-count="1">
+          <div style="display:flex;align-items:center;gap:12px;padding:24px 14px;border-bottom:0.5px solid #eee">
+            <div onClick="{{it.tog}}" style="width:20px;height:20px;border:1px solid {{it.chB}};border-radius:4px;background:{{it.chBg}};display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;cursor:pointer;flex:0 0 auto">{{it.chCh}}</div>
+            <div onClick="{{it.p.open}}" style="width:92px;height:118px;background:{{it.p.tint}};flex:0 0 auto;display:flex;align-items:center;justify-content:center;cursor:pointer"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:8px;letter-spacing:.1em;color:rgba(90,70,55,.55);text-align:center;padding:0 6px">{{it.p.label}}</span></div>
+            <div style="flex:1">
+              <div style="font-size:14px;line-height:1.5">{{it.p.name}}</div>
+              <div style="display:flex;justify-content:space-between;margin-top:10px"><span style="font-size:13px;color:#555">价格</span><span style="font-size:13px">{{it.effFmt}}</span></div>
+              <div style="display:flex;justify-content:space-between;margin-top:7px"><span style="font-size:13px;color:#555">规格</span><span style="font-size:13px;color:#999">{{it.spec}}</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:7px">
+                <span style="font-size:13px;color:#555">数量</span>
+                <div style="display:flex;align-items:center;gap:15px">
+                  <span onClick="{{it.minus}}" style="font-size:17px;color:#333;cursor:pointer;padding:0 3px">−</span>
+                  <span style="font-size:14px">{{it.qtyStr}}</span>
+                  <span onClick="{{it.plus}}" style="font-size:17px;color:#333;cursor:pointer;padding:0 3px">＋</span>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+                <span onClick="{{it.p.wish}}" style="font-size:13px;color:#9a9a9a;cursor:pointer">加入心愿单 <span style="font-size:15px;color:{{it.p.starC}}">{{it.p.starCh}}</span></span>
+                <span onClick="{{it.del}}" style="font-size:13px;color:#9a9a9a;cursor:pointer">删除 ✕</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+        <div style="padding:44px 16px 30px">
+          <div style="font-size:16px;letter-spacing:.2em">热门推荐</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:24px">
+            <sc-for list="{{recs}}" as="p" hint-placeholder-count="2">
+              <div>
+                <div onClick="{{p.open}}" style="width:100%;aspect-ratio:3/3.8;background:{{p.tint}};cursor:pointer;display:flex;align-items:center;justify-content:center"><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-size:9px;letter-spacing:.12em;color:rgba(90,70,55,.55);text-align:center;padding:0 8px">{{p.label}}</span></div>
+                <div style="margin-top:12px;font-size:13px;line-height:1.55;min-height:40px">{{p.name}}</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+                  <span style="font-size:13.5px">{{p.priceFmt}}</span>
+                  <div style="display:flex;gap:10px;align-items:center">
+                    <span onClick="{{p.wish}}" style="font-size:16px;color:{{p.starC}};cursor:pointer">{{p.starCh}}</span>
+                    <svg onClick="{{p.bag}}" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#b9b9b9" stroke-width="1.4" style="cursor:pointer"><path d="M8.5 9V7.5a3.5 3.5 0 0 1 7 0V9"></path><rect x="5" y="9" width="14" height="11" rx="1"></rect></svg>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;justify-content:center;gap:5px;margin-top:22px">
+            <div style="width:4px;height:4px;border-radius:50%;background:#111"></div>
+            <div style="width:4px;height:4px;border-radius:50%;background:rgba(120,120,120,.4)"></div>
+            <div style="width:4px;height:4px;border-radius:50%;background:rgba(120,120,120,.4)"></div>
+          </div>
+        </div>
+      </div>
+      <div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:0.5px solid #eee;display:flex;align-items:center;gap:12px;padding:14px 16px 28px;z-index:11">
+        <div onClick="{{togAll}}" style="display:flex;align-items:center;gap:10px;cursor:pointer">
+          <div style="width:20px;height:20px;border:1px solid {{allChB}};border-radius:4px;background:{{allChBg}};display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px">{{allChCh}}</div>
+          <span style="font-size:15px">全选</span>
+        </div>
+        <div style="flex:1;font-size:15px">总计： <span style="font-size:17px;font-weight:600">{{bagTotalFmt}}</span></div>
+        <div onClick="{{bagCheckout}}" style="padding:14px 32px;background:#565656;color:#fff;font-size:14.5px;letter-spacing:.1em;border-radius:8px;cursor:pointer">立即结算</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{toastOn}}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:50%;bottom:150px;transform:translateX(-50%);background:rgba(17,17,17,.88);color:#fff;font-size:13px;padding:11px 20px;border-radius:6px;z-index:99;animation:fadeIn .2s;white-space:nowrap">{{toastMsg}}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;startRegistered&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;演示状态&quot;},&quot;autoCarousel&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;走马灯&quot;},&quot;carouselIntervalSec&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:4,&quot;min&quot;:2,&quot;max&quot;:8,&quot;step&quot;:1,&quot;unit&quot;:&quot;s&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;走马灯&quot;}}">
+class Component extends DCLogic {
+  K = 'aurelle_mp_v1';
+  DB = {
+    products: [
+      {id:'d1',name:'SOLEIL 挂脖牛仔连衣裙',sub:'挂脖牛仔连衣裙',price:9650,cat:'dresses',color:'蓝色',colorHex:'#4a5d7e',tint:'#e2e7ee',label:'product · 挂脖牛仔连衣裙',code:'AU433DSS266',video:true,
+        desc:'这款蓝色 SOLEIL 挂脖连衣裙以轻盈牛仔面料制成，立领挂脖设计，后领处系带，腰间垂褶层叠，裙身紧密缩褶，裙摆呈高低错落的不对称剪裁，复古而优雅。',
+        bullets:['棉质轻牛仔面料','无袖设计，中长款裙长剪裁','领口挂脖系带','腰部褶饰，侧边垂褶式系带','低露背款式','左侧隐形拉链','裙摆高低错落不对称剪裁']},
+      {id:'d2',name:'SOLEIL 领部系带短款连衣裙',sub:'领部系带短款连衣裙',price:12700,cat:'dresses',color:'拼色印花',colorHex:'#b5854f',tint:'#f1e5d3',label:'product · 领部系带短裙',code:'AU433DSS270',desc:'轻薄绢丝面料，领部系带蝴蝶结设计，宽松落肩袖，不规则手帕式裙摆。',bullets:['绢丝雪纺面料','领部系带蝴蝶结','宽松落肩袖型','不规则手帕裙摆']},
+      {id:'d3',name:'SOLEIL 流苏细节长款连衣裙',sub:'流苏细节长款连衣裙',price:12100,cat:'dresses',color:'雾蓝',colorHex:'#8794c9',tint:'#e4e7f3',label:'product · 流苏长裙',code:'AU433DSS281',desc:'层叠式荷叶边裙身，肩部系带缀流苏坠饰，垂坠感极佳的长款剪裁。',bullets:['层叠荷叶边裙身','肩部系带流苏坠饰','长款垂坠剪裁']},
+      {id:'d4',name:'SOLEIL 丝巾拼接设计连衣裙',sub:'丝巾拼接设计连衣裙',price:21750,cat:'dresses',color:'拼色印花',colorHex:'#c08a76',tint:'#f2e4dc',label:'product · 丝巾拼接连衣裙',code:'AU433DSS295',desc:'多幅印花丝巾拼接而成，领部系带，长袖阔摆，裙摆呈自然垂角。',bullets:['真丝斜纹面料','多幅印花拼接','领部系带设计','不对称垂角裙摆']},
+      {id:'t1',name:'SOLEIL 领部系带绢丝上衣',sub:'领部系带绢丝上衣',price:8800,cat:'tops',color:'霞粉',colorHex:'#d9a8a4',tint:'#f5e6e4',label:'product · 领部系带上衣',code:'AU433TOP110',desc:'轻盈绢丝面料，泡泡袖廓形，领口抽褶系带。',bullets:['绢丝雪纺面料','泡泡袖廓形','领口抽褶系带']},
+      {id:'c1',name:'SOLEIL 流苏细节斗篷',sub:'流苏细节斗篷',price:15500,cat:'tops',color:'赤陶',colorHex:'#b96a4d',tint:'#f2decf',label:'product · 流苏斗篷',code:'AU433CAP021',desc:'印花绢丝斗篷，边缘缀以垂坠流苏，领口系带。',bullets:['印花绢丝面料','边缘垂坠流苏','领口系带']},
+      {id:'s1',name:'CALLA 6.5厘米高跟穆勒鞋',sub:'6.5厘米高跟穆勒鞋',price:5350,cat:'shoes',color:'米白',colorHex:'#e6e0d4',tint:'#f3f0e9',label:'product · 米白穆勒鞋',code:'AU433SHO065',desc:'编织纹理粗跟，金属圆扣装饰，一字带穆勒设计。',bullets:['编织纹理粗跟 6.5cm','金属圆扣装饰','小牛皮鞋面']},
+      {id:'s2',name:'CALLA 10.5厘米高跟防水台凉鞋',sub:'10.5厘米防水台凉鞋',price:5700,cat:'shoes',color:'浅驼',colorHex:'#d4b98c',tint:'#f3ecdb',label:'product · 防水台凉鞋',code:'AU433SHO105',desc:'编织包覆防水台与鞋跟，踝部搭扣固定。',bullets:['防水台高度 3cm','编织包覆鞋跟 10.5cm','踝部搭扣']},
+      {id:'s3',name:'铆钉细节花朵造型8.5厘米高跟凉鞋',sub:'花朵造型高跟凉鞋',price:7350,sale:3675,cat:'shoes',color:'棕',colorHex:'#9a5b3c',tint:'#f0e2d8',label:'product · 花朵高跟凉鞋',code:'AU433SHO085',desc:'立体花朵装饰缀铆钉细节，纤细踝带设计。',bullets:['立体花朵装饰','铆钉细节','踝带固定 8.5cm']},
+      {id:'s4',name:'CALLA 6.5厘米高跟穆勒鞋',sub:'6.5厘米高跟穆勒鞋 棕',price:5350,cat:'shoes',color:'焦糖棕',colorHex:'#8e5a34',tint:'#eedfce',label:'product · 焦糖穆勒鞋',code:'AU433SHO066',desc:'编织纹理粗跟，金属圆扣装饰，一字带穆勒设计。',bullets:['编织纹理粗跟 6.5cm','金属圆扣装饰','小牛皮鞋面']},
+      {id:'b1',name:'RIVA 编织手拿包',sub:'编织手拿包',price:6900,cat:'bags',color:'原麻',colorHex:'#cbb28c',tint:'#f1ead9',label:'product · 编织手拿包',code:'AU433BAG031',desc:'手工编织酒椰纤维，褶浪造型包身，附可拆卸长链。',bullets:['酒椰纤维手工编织','褶浪造型包身','可拆卸长链']},
+      {id:'b2',name:'RIVA 皮革单肩包',sub:'皮革单肩包',price:8900,cat:'bags',color:'黑',colorHex:'#2e2c2a',tint:'#e7e4e0',label:'product · 皮革单肩包',code:'AU433BAG045',desc:'柔软小牛皮抽褶包身，磁吸开合。',bullets:['柔软小牛皮','抽褶包身','磁吸开合']},
+      {id:'j1',name:'SOLEIL 天然石坠饰项链',sub:'天然石坠饰项链',price:3200,cat:'jewellery',color:'金',colorHex:'#c9a25a',tint:'#f5eddc',label:'product · 天然石项链',code:'AU433JWL012',desc:'皮革绳链缀天然石坠饰，可调节长度。',bullets:['天然石坠饰','皮革绳链','长度可调']}
+    ],
+    cats: [
+      {id:'hs26',en:'HIGH SUMMER',cn:'2026夏日胶囊系列'},{id:'cruise',en:'CRUISE 2027',cn:'度假成衣秀场'},{id:'new',en:'NEW ARRIVALS',cn:'新品上新'},{id:'rtw',en:'READY TO WEAR',cn:'成衣系列'},{id:'swim',en:'SWIM & RESORT',cn:'泳衣 & 度假'},{id:'dresses',en:'DRESSES',cn:'连衣裙'},{id:'bags',en:'BAGS',cn:'包袋'},{id:'shoes',en:'SHOES',cn:'鞋履'},{id:'jewellery',en:'JEWELLERY',cn:'珠宝'},{id:'acc',en:'ACCESSORIES',cn:'配饰'},{id:'kids',en:'KIDS',cn:'童装'}
+    ],
+    stores: [
+      {id:'bj',name:'北京三里屯精品店',short:'北京三里屯',dist:'21.60km',addr:'北京市朝阳区三里屯路南区，L1层S6-18，L2层S6-25商铺',tel:'010-8860 3618',hours:'周日至周四10:00-22:00, 周五至周六10:00-23:00',hours2:'周一至周日 10:00-22:00',prov:'北京市',city:'北京市',c1:'#ccd2da',c2:'#c2c9d3',ph:'storefront · 三里屯'},
+      {id:'sh',name:'上海南京西路精品店',short:'上海南京西路',dist:'1088.92km',addr:'上海市静安区南京西路1266号，L1层112商铺',tel:'021-6288 1866',hours:'周一至周日 10:00-22:00',hours2:'周一至周日 10:00-22:00',prov:'上海市',city:'上海市',c1:'#dfd8cb',c2:'#d6cdbd',ph:'storefront · 南京西路'},
+      {id:'cd',name:'成都春熙路精品店',short:'成都春熙路',dist:'1518.40km',addr:'成都市锦江区中纱帽街8号，M68商铺',tel:'028-6511 8898',hours:'周一至周日 10:00-22:00',hours2:'周一至周日 10:00-22:00',prov:'四川省',city:'成都市',c1:'#e6ded0',c2:'#ded4c2',ph:'storefront · 春熙路'}
+    ],
+    provs: ['北京市','上海市','四川省'],
+    cities: {'北京市':['北京市'],'上海市':['上海市'],'四川省':['成都市']},
+    filters: [
+      {t:'推荐系列',opts:['SOLEIL','CALLA','RIVA','LUMEN']},
+      {t:'颜色',opts:['蓝色','拼色印花','米白','浅驼','棕色','黑色']},
+      {t:'尺码',opts:['0P','0','1','2','3','4']},
+      {t:'配饰规格',opts:['均码']},
+      {t:'鞋履尺码',opts:['36','37','38','39','40','41']},
+      {t:'材质',opts:['绢丝','棉','亚麻','皮革']},
+      {t:'衣长',opts:['短款','中长款','长款']},
+      {t:'袖长',opts:['无袖','短袖','长袖']}
+    ],
+    projects: [
+      {t:'A X S26 蓝之絮语',c:'探索2026春季成衣系列｜灵感笔记',c1:'#dde3ea',c2:'#d3dbe4',ph:'editorial · 靛蓝织物'},
+      {t:'A X F26 霞光瞬间',c:'探索2026秋季成衣系列的幕后',c1:'#e8dcc8',c2:'#e0d2b9',ph:'editorial · 群像大片'},
+      {t:'A X 创作之旅',c:'探索2026春季成衣系列｜灵感艺游',c1:'#ead9d2',c2:'#e2cec5',ph:'editorial · 色彩秀场'},
+      {t:'A GALLERY',c:'与两位当代艺术家联名合作，共同探索色彩与印花的创造力量',c1:'#d8d8d4',c2:'#cfcfca',ph:'gallery · 展览现场'},
+      {t:'A X 曼谷',c:'探索2025年12月启幕的度假限时精品店',c1:'#e5ddce',c2:'#ddd3c0',ph:'store · 曼谷限时店'},
+      {t:'A X 布鲁塞尔',c:'探索2025年11月启幕的布鲁塞尔精品店',c1:'#e0dbd2',c2:'#d8d2c6',ph:'store · 布鲁塞尔店'}
+    ],
+    helps: {
+      orders:{cn:'关于选购',en:'ORDERS',qas:[
+        {q:'如何确定我所购买的AURELLE商品为正品？',a:'AURELLE线上精品店以及AURELLE官方旗舰店是品牌在国内授权的线上零售渠道，其所销售的商品均为品牌正品。我们无法保证其他任何未经授权渠道所售商品的真伪，建议您不要购买低于官方推荐零售价的AURELLE商品。',b:[]},
+        {q:'想要购买的商品没有库存了，我可以如何购买？',a:'我们的商品数量有限，可能会缺货。有关任何商品的咨询，您可以联系在线客服了解详情。您也可以使用每个商品详情页面上的"查看门店库存"功能来查询各地精品店的产品库存情况。',b:[]},
+        {q:'AURELLE线上精品店是否可以开发票？',a:'为了节约资源，我们将为您于线上精品店订购的商品开具电子发票。其法律效力、基本用途、基本使用规定等与税务机关监制的增值税普通发票相同。',b:['您在确认商品收到后，可以联系客服开具电子发票，并留下您的邮箱及联系方式。','电子发票抬头默认为"个人"。若需开具其他抬头，请在订购完成后联系客服并留下开票详细信息。','不支持一笔订单拆开多张发票，亦不支持多个订单合并成一张发票。']},
+        {q:'AURELLE线上精品店的商品有什么包装选项？',a:'目前提供两种包装选项：经典版礼品盒包装和环保版可回收包装。这两种选项都包括由可回收材料制成的盒子，并含有一定比例的回收纸。',b:[]}
+      ]},
+      payment:{cn:'付款方式',en:'PAYMENT',qas:[
+        {q:'订购商品时需要采用何种支付方式？',a:'AURELLE线上精品店默认使用微信、支付宝为支付方式。',b:[]}
+      ]},
+      shipping:{cn:'配送服务',en:'SHIPPING',qas:[
+        {q:'订单将于何时开始配送？',a:'根据订单的具体情况，订单将在确认后的48小时内发货（国定假期间会顺延），发货后1-4天送达。预售或定制等特殊商品的配送时间，请详询客服。',b:[]},
+        {q:'AURELLE线上精品店使用什么配送服务？',a:'AURELLE选用顺丰速运为您提供免费送货服务。顺丰速运无法送达的地区将转由其他物流公司配送。您可以登录线上精品店或顺丰速运网站跟踪查询您的订单状态。',b:[]},
+        {q:'AURELLE线上精品店可将商品寄往哪些地方？',a:'我们目前仅可将商品寄往中国大陆地区。很抱歉，我们目前无法将商品寄送至中国大陆地区以外的国家及地区。',b:[]}
+      ]},
+      returns:{cn:'售后与退货',en:'RETURNS',qas:[
+        {q:'如何进行换货？',a:'如果您希望更换尺码或其他款式的商品，请您先选择对当前订单进行退货，再下单购买希望更换的产品。',b:[]},
+        {q:'在AURELLE线上精品店购买的商品可以退货吗？',a:'在商品符合退货条件的前提下，您可以在商品发货日起十四（14）天内办理无理由退货。超出期限的货品，除法律另有规定外恕不退款。',b:['退货地址必须来自中国大陆地区。','需要退货的商品及赠品必须完全保持未被使用、修改、清洗且所有吊牌未被剪下的状态。','订单发货的所有包装必须完整被退回。','泳装、比基尼下装的卫生试穿保护条未被撕下或者移位。','鞋具鞋履须维持原装，未经穿着，应和原始包装鞋盒一起退回。','出于卫生原因，贴身内衣、连裤袜等一旦售出，恕不接受退换。']},
+        {q:'如何进行商品的退货？',a:'进入线上精品店，点击"我的"－"我的订单"，选择要退货的商品，点击"申请售后"。客服团队将在工作时间（9:00-22:00）内回复您的咨询，并将在五（5）个工作日内回应您的退款申请。',b:[]}
+      ]},
+      size:{cn:'尺码与保养',en:'SIZE GUIDE & CARE',qas:[
+        {q:'在AURELLE线上精品店购买的成衣要怎么保养及清洗呢?',a:'AURELLE的商品在其内侧附有注明材质信息及洗护信息的标签供您参考进行洗护。您亦可前往专业的、信誉良好的洗衣店进一步洽询衣服的清洁保养方面的资讯。',b:[]}
+      ]}
+    },
+    sizeHead: [['','','S/M','','','M/L',''],['','S','','M','','L',''],['','XS','S','M','','L',''],['','0P','0','1','2','3','4']],
+    sizeRows: [
+      ['中国-上装','155/80A','160/84A','165/88A','170/92A','175/96A','180/100A'],
+      ['中国-下装','155/64A','160/68A','165/72A','170/76A','175/80A','178/84A'],
+      ['澳洲','6P','8','10','12','14','16'],
+      ['英国','6P','8','10','12','14','16'],
+      ['美国','2P','4','6','8','10','12'],
+      ['意大利','38P','40','42','44','46','48'],
+      ['法国','34P','36','38','40','42','44']
+    ],
+    bodyHead: ['','0P','0','1','2','3','4'],
+    bodyRows: [['胸围','79','84','89','94','99','104'],['腰围','62','65','70','75','80','85'],['臀围','86','91','96','101','106','111']],
+    shoeHead: ['','36','37','38','39','40','41'],
+    shoeRows: [['中国','36/230(1.5)','37/235(1.5)','38/240(1.5)','39/245(1.5)','40/250(1.5)','41/255(1.5)'],['澳洲','5','6','7','8','9','10'],['英国','3','4','5','6','7','8']]
+  };
+  BARS = (()=>{let r=7,a=[];const rnd=()=>((r=(r*9301+49297)%233280)/233280);for(let i=0;i<46;i++){a.push({w:(1+Math.floor(rnd()*3))*1.4,g:1+Math.floor(rnd()*2.4)})}return a})();
+  load(){try{return JSON.parse(localStorage.getItem(this.K)||'{}')}catch(e){return {}}}
+  state = (()=>{const s=this.load();return {
+    scr:'home',tab:'home',stack:[],params:{},
+    registered:(this.props&&this.props.startRegistered)||s.registered||false,
+    user:s.user||{nick:'',name:'George',phone:'15501147281',gender:'男士',birthday:'1999-07-30',region:'',email:'',code:'AURL037946'},
+    addresses:s.addresses||[],orders:s.orders||[],wishlist:s.wishlist||[],footprints:s.footprints||[],cartItems:s.cartItems||[],agreedDate:s.agreedDate||'',
+    heroIdx:0,prodIdx:0,campIdx:0,shopCat:'hs26',sort:'new',filterOpen:false,filterExp:-1,
+    joinOpen:false,agP:false,agM:false,cf:{name:'George',phone:'15501147281',gender:'',birthday:''},agCard:true,
+    ef:{nick:'',gender:'男士',birthday:'1999-07-30',region:'',email:''},
+    acc:{d:true,s:false,c:false},size:'0',pid:'d1',oid:null,listCat:'dresses',helpTopic:'orders',storeId:'bj',
+    packaging:'classic',agT:false,cancelIdx:2,selAddr:null,
+    ordTab:'mp',ordSub:'all',bookTab:'0',
+    provOpen:false,cityOpen:false,prov:'',city:'',q:'',
+    guideIdx:0,tick:0,toast:'',brandPlaying:false
+  }})();
+  componentDidMount(){
+    this.iv=setInterval(()=>{
+      const st={tick:this.state.tick+1};
+      const auto=this.props.autoCarousel!==false;
+      const int=Math.max(2,Math.round(this.props.carouselIntervalSec||4));
+      if(auto&&this.state.scr==='home'&&this.state.tick%int===int-1){st.heroIdx=(this.state.heroIdx+1)%3;st.prodIdx=(this.state.prodIdx+1)%3}
+      if(auto&&this.state.scr==='campaign'&&this.state.tick%int===int-1){st.campIdx=(this.state.campIdx+1)%3}
+      this.setState(st);
+    },1000);
+  }
+  componentWillUnmount(){clearInterval(this.iv);clearTimeout(this.tt)}
+  save(){const {registered,user,addresses,orders,wishlist,footprints,cartItems,agreedDate}=this.state;try{localStorage.setItem(this.K,JSON.stringify({registered,user,addresses,orders,wishlist,footprints,cartItems,agreedDate}))}catch(e){}}
+  setS(p){this.setState(p,()=>this.save())}
+  doToast(m){clearTimeout(this.tt);this.setState({toast:m});this.tt=setTimeout(()=>this.setState({toast:''}),1800)}
+  nav(scr,params){this.setState({stack:[...this.state.stack,{scr:this.state.scr,params:this.state.params}],scr,params:params||{},filterOpen:false,provOpen:false,cityOpen:false})}
+  back(){const st=[...this.state.stack];if(!st.length){this.setState({scr:this.state.tab});return}const l=st.pop();this.setState({stack:st,scr:l.scr,params:l.params})}
+  goTab(t){this.setState({tab:t,scr:t,stack:[],params:{}})}
+  openP(id){const fp=[id,...this.state.footprints.filter(x=>x!==id)].slice(0,20);this.setState({pid:id,acc:{d:true,s:false,c:false},size:'0'});this.setS({footprints:fp});this.nav('pdp')}
+  prod(id){return this.DB.products.find(p=>p.id===(id||this.state.pid))||this.DB.products[0]}
+  toggleWish(id){const has=this.state.wishlist.includes(id);const wl=has?this.state.wishlist.filter(x=>x!==id):[...this.state.wishlist,id];this.setS({wishlist:wl});this.doToast(has?'已移出心愿单':'已加入心愿单')}
+  addBag(pid,size){pid=pid||this.state.pid;size=size||'0';const items=[...this.state.cartItems];const i=items.findIndex(x=>x.pid===pid&&x.size===size);if(i>=0){items[i]={...items[i],qty:items[i].qty+1}}else{items.push({pid,size,qty:1,checked:true})}this.setS({cartItems:items});this.doToast('已加入购物袋')}
+  bagQty(idx,d){const items=this.state.cartItems.map((x,i)=>i===idx?{...x,qty:Math.max(1,x.qty+d)}:x);this.setS({cartItems:items})}
+  bagDel(idx){this.setS({cartItems:this.state.cartItems.filter((_,i)=>i!==idx)});this.doToast('已删除')}
+  bagTog(idx){this.setS({cartItems:this.state.cartItems.map((x,i)=>i===idx?{...x,checked:!x.checked}:x)})}
+  bagCheckout(){const it=this.state.cartItems.find(x=>x.checked);if(!it){this.doToast('请先勾选商品');return}this.setState({pid:it.pid,size:it.size,agT:false});this.nav('confirm')}
+  fmt(n){return n.toLocaleString('en-US')}
+  pad(n){return String(n).padStart(2,'0')}
+  fmtTime(d){return d.getFullYear()+'-'+this.pad(d.getMonth()+1)+'-'+this.pad(d.getDate())+' '+this.pad(d.getHours())+':'+this.pad(d.getMinutes())+':'+this.pad(d.getSeconds())}
+  fmtDate(d){return d.getFullYear()+'-'+this.pad(d.getMonth()+1)+'-'+this.pad(d.getDate())}
+  submitOrder(){
+    if(!this.state.agT){this.doToast('请先勾选并同意销售条款');return}
+    if(this.state.selAddr==null||!this.state.addresses[this.state.selAddr]){this.doToast('请选择收货地址');return}
+    const p=this.prod();
+    const o={id:'5305'+String(Date.now()).slice(-12),time:this.fmtTime(new Date()),status:'pending',pid:p.id,size:this.state.size,qty:1,total:p.sale||p.price,addr:this.state.addresses[this.state.selAddr],deadline:Date.now()+30*60*1000};
+    this.setState({oid:o.id});this.setS({orders:[o,...this.state.orders]});this.nav('payment');
+  }
+  order(){return this.state.orders.find(o=>o.id===this.state.oid)}
+  pay(){this.doToast('演示环境：模拟跳转支付');setTimeout(()=>this.nav('orderDetail'),700)}
+  cancelFinal(){const os=this.state.orders.map(o=>o.id===this.state.oid?{...o,status:'cancelled'}:o);this.setS({orders:os});this.doToast('订单已取消');this.setState({stack:[{scr:'me',params:{}}],scr:'orders',params:{}})}
+  wechatAddr(){if(!this.state.addresses.length){this.setS({addresses:[{name:'张淼',phone:'15501147281',full:'北京市 北京市昌平区北七家镇天权路2号20号楼2单元601室',def:true}]})}this.doToast('已获取微信收货地址')}
+  addAddr(){const a={name:'李蔚',phone:'13801234567',full:'上海市 上海市静安区南京西路1266号2908室',def:!this.state.addresses.length};this.setS({addresses:[...this.state.addresses,a]});this.doToast('已添加地址（演示数据）')}
+  delAddr(i){const as=this.state.addresses.filter((_,x)=>x!==i);let sel=this.state.selAddr;if(sel===i)sel=null;else if(sel!=null&&sel>i)sel=sel-1;this.setState({selAddr:sel});this.setS({addresses:as})}
+  pickAddr(i){if(this.state.params.select){this.setState({selAddr:i});this.back()}else{const as=this.state.addresses.map((a,x)=>({...a,def:x===i}));this.setS({addresses:as});this.doToast('已设为默认地址')}}
+  joinGo(){if(!this.state.agP){this.doToast('请先阅读并同意《隐私政策》');return}this.setState({joinOpen:false,cf:{name:'George',phone:'15501147281',gender:'',birthday:''},agCard:true});this.nav('openCard')}
+  register(){if(!this.state.agCard){this.doToast('请先同意会员卡信息使用声明');return}
+    const u={...this.state.user,name:this.state.cf.name||'George',phone:this.state.cf.phone||'15501147281',gender:this.state.cf.gender||'男士',birthday:this.state.cf.birthday||'1999-07-30'};
+    this.setS({registered:true,user:u,agreedDate:this.fmtDate(new Date())});this.doToast('会员开卡成功');this.setState({stack:[],scr:'me',tab:'me'})}
+  saveProfile(){const u={...this.state.user,nick:this.state.ef.nick,gender:this.state.ef.gender,birthday:this.state.ef.birthday,region:this.state.ef.region,email:this.state.ef.email};this.setS({user:u});this.doToast('已保存');this.back()}
+  drawQR(el,size){if(!el||el.dataset.done==='1')return;el.dataset.done='1';const n=25,s=el.width,c=s/n,x=el.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,s,s);x.fillStyle='#141414';let r=13;const rnd=()=>((r=(r*9301+49297)%233280)/233280);
+    const finder=(fx,fy)=>{x.fillRect(fx*c,fy*c,7*c,7*c);x.fillStyle='#fff';x.fillRect((fx+1)*c,(fy+1)*c,5*c,5*c);x.fillStyle='#141414';x.fillRect((fx+2)*c,(fy+2)*c,3*c,3*c)};
+    for(let i=0;i<n;i++){for(let j=0;j<n;j++){const inF=(i<8&&j<8)||(i>n-9&&j<8)||(i<8&&j>n-9);if(!inF&&rnd()>0.52){x.fillRect(i*c,j*c,c,c)}}}
+    finder(0,0);finder(n-7,0);finder(0,n-7);
+  }
+  renderVals(){
+    const st=this.state, DB=this.DB;
+    const scrs=['home','brand','shop','stores','me','openCard','profile','memberCode','orders','bookings','wishlist','footprints','guide','addresses','nearby','settings','help','helpDetail','sizeGuide','follow','storeIntro','storeDetail','list','pdp','confirm','payment','orderDetail','cancel','campaign','projects','moments','story','bag','seriesList'];
+    const s={};scrs.forEach(k=>s[k]=st.scr===k);
+    const tabbar=['home','brand','shop','stores','me'].includes(st.scr);
+    const now=new Date();
+    const dec=p=>({...p,priceFmt:'¥ '+this.fmt(p.price),saleFmt:p.sale?'¥ '+this.fmt(p.sale):'',hasSale:!!p.sale,noSale:!p.sale,wished:st.wishlist.includes(p.id),starCh:st.wishlist.includes(p.id)?'★':'☆',starC:st.wishlist.includes(p.id)?'#111':'#b9b9b9',open:()=>this.openP(p.id),wish:()=>this.toggleWish(p.id),bag:()=>this.addBag(p.id)});
+    const cartCount=st.cartItems.reduce((a,x)=>a+x.qty,0);
+    const bagItems=st.cartItems.map((it,i)=>{const bp=dec(this.prod(it.pid));return {...it,key:String(i),p:bp,effFmt:'¥ '+this.fmt(bp.sale||bp.price),spec:'尺码:'+it.size+',颜色:'+bp.color,qtyStr:String(it.qty),chB:it.checked?'#111':'#ccc',chBg:it.checked?'#111':'#fff',chCh:it.checked?'✓':'',tog:()=>this.bagTog(i),plus:()=>this.bagQty(i,1),minus:()=>this.bagQty(i,-1),del:()=>this.bagDel(i)}});
+    const bagChecked=st.cartItems.filter(x=>x.checked);
+    const bagTotal=bagChecked.reduce((a,x)=>{const p2=this.prod(x.pid);return a+(p2.sale||p2.price)*x.qty},0);
+    const allCh=st.cartItems.length>0&&bagChecked.length===st.cartItems.length;
+    const heroSlides=[
+      {c1:'#ecd9cb',c2:'#e5cebc',label:'campaign · 崖畔印花套装',go:()=>this.nav('campaign')},
+      {c1:'#e9dfce',c2:'#e2d5bf',label:'campaign · 金纱帘光影',go:()=>this.nav('campaign')},
+      {c1:'#dfe5e9',c2:'#d5dde3',label:'campaign · 泳池假日',go:()=>this.nav('campaign')}
+    ];
+    const dots=(len,idx)=>Array.from({length:len},(_,i)=>({c:i===idx?'#111':'rgba(120,120,120,.4)'}));
+    const homeProds=[DB.products[4],DB.products[0],DB.products[3]].map(p=>({...dec(p),subName:p.sub}));
+    const catsSel=DB.cats.map(c=>({...c,bg:st.shopCat===c.id?'#ffffff':'#f6f6f6',fg:st.shopCat===c.id?'#111111':'#9a9a9a',pick:()=>this.setState({shopCat:c.id})}));
+    const tile=(en,cn,tint,ph,cat)=>({en,cn,tint,ph,go:()=>{this.setState({listCat:cat});this.nav('list')}});
+    const tileX=(en,cn,tint,ph)=>({en,cn,tint,ph,go:()=>this.doToast('该类目即将上架，敬请期待')});
+    const goSeriesFn=()=>this.nav('seriesList');
+    const goListFn=cat=>()=>{this.setState({listCat:cat});this.nav('list')};
+    const SHOPC={
+      hs26:{cards:[{en:'HIGH SUMMER',cn:'2026夏日胶囊系列',c1:'#ecdec6',c2:'#e5d4b6',ph:'campaign · 金纱帘光影',go:goSeriesFn}],tiles:[tile('DRESSES','连衣裙','#f1e5d3','product · 流苏斗篷式罩裙','dresses'),tile('TOPS','上衣','#e2e7ee','product · 牛仔挂脖上衣','tops'),tile('SHOES','鞋履','#f0e4d4','product · 木底穆勒鞋','shoes'),tile('JEWELLERY','珠宝','#f5eddc','product · 天然石项链','jewellery')]},
+      cruise:{cards:[{en:'CRUISE 2027',cn:'度假成衣秀场',c1:'#dfe5e9',c2:'#d5dde3',ph:'runway · 港湾暮色秀场',go:goSeriesFn}],tiles:[tile('DRESSES','连衣裙','#e4e7f3','product · 流苏长裙','dresses'),tileX('RESORT SETS','度假套装','#e9e3d6','product · 亚麻套装')]},
+      new:{cards:[{en:'NEW ARRIVALS',cn:'新品上新',c1:'#e9e0d0',c2:'#e2d6c0',ph:'still · 本季新品静物',go:goSeriesFn}],tiles:[tile('DRESSES','连衣裙','#e2e7ee','product · 挂脖牛仔裙','dresses'),tile('SHOES','鞋履','#eedfce','product · 焦糖穆勒鞋','shoes'),tile('BAGS','包袋','#f1ead9','product · 编织手拿包','bags'),tile('JEWELLERY','珠宝','#f5eddc','product · 天然石项链','jewellery')]},
+      rtw:{cards:[{en:'READY TO WEAR',cn:'成衣系列',c1:'#e8e0d3',c2:'#e1d7c6',ph:'editorial · 白裙群像',go:goListFn('dresses')}],tiles:[tile('DRESSES','连衣裙','#f1e5d3','product · 流苏长裙','dresses'),tile('TOPS','上衣','#f5e6e4','product · 系带绢丝上衣','tops'),tileX('KNITWEAR','针织','#efe9dc','product · 钩花针织衫'),tileX('PANTS','裤装','#e4e9ef','product · 牛仔灯笼裤')]},
+      swim:{cards:[{en:'SWIM & RESORT',cn:'泳衣 & 度假',c1:'#dfe6ea',c2:'#d5dee4',ph:'campaign · 泳池假日',go:()=>this.doToast('该类目即将上架，敬请期待')}],tiles:[tileX('SWIMWEAR','泳装','#dce6ea','product · 印花连体泳衣'),tileX('COVER-UPS','罩衫','#efe7d8','product · 流苏罩衫')]},
+      dresses:{cards:[{en:'DRESSES',cn:'连衣裙',c1:'#f0e3d0',c2:'#e9d8bf',ph:'editorial · 花园长裙',go:goListFn('dresses')}],tiles:[tile('MAXI','长款连衣裙','#e4e7f3','product · 流苏长裙','dresses'),tile('MINI','短款连衣裙','#f1e5d3','product · 领部系带短裙','dresses')]},
+      bags:{cards:[{en:'BAGS',cn:'包袋',c1:'#e7e0d2',c2:'#dfd6c3',ph:'still · 编织手袋',go:goListFn('bags')}],tiles:[tile('CLUTCH','手拿包','#f1ead9','product · 编织手拿包','bags'),tile('SHOULDER','单肩包','#e7e4e0','product · 皮革单肩包','bags')]},
+      shoes:{cards:[{en:'',cn:'查看全部',c1:'#e4dcea',c2:'#dcd2e4',ph:'still · 丁香色凉鞋',go:goListFn('shoes')},{en:'',cn:'CALLA & LUMEN 系列',c1:'#efe6df',c2:'#e8dcd2',ph:'runway · 橘色蕾丝长裙',go:goListFn('shoes')}],tiles:[tile('PUMPS & MULES','高跟鞋 & 穆勒鞋','#f0e4d4','product · 木底穆勒鞋','shoes'),tile('FLATS & SNEAKERS','平底鞋 & 运动鞋','#eae4ee','product · 丁香平底凉鞋','shoes')]},
+      jewellery:{cards:[{en:'JEWELLERY',cn:'珠宝',c1:'#f0e8d5',c2:'#e9dfc4',ph:'still · 天然石项链',go:goListFn('jewellery')}],tiles:[tile('NECKLACES','项链','#f5eddc','product · 天然石项链','jewellery'),tileX('EARRINGS','耳饰','#efe4e0','product · 贝母耳环')]},
+      acc:{cards:[{en:'ACCESSORIES',cn:'配饰',c1:'#e9e2d8',c2:'#e2d9cb',ph:'still · 印花丝巾',go:()=>this.doToast('该类目即将上架，敬请期待')}],tiles:[tileX('SCARVES','丝巾','#f2e4dc','product · 印花真丝方巾'),tileX('BELTS','腰带','#eee7db','product · 编织腰带')]},
+      kids:{cards:[{en:'KIDS',cn:'童装',c1:'#ece4d4',c2:'#e5dbc4',ph:'campaign · 夏日童装',go:()=>this.doToast('该类目即将上架，敬请期待')}],tiles:[tileX('GIRLS','女童','#f5e6e4','product · 女童印花裙'),tileX('BOYS','男童','#e2e7ee','product · 男童亚麻衬衫')]}
+    };
+    const scCur=SHOPC[st.shopCat]||SHOPC.hs26;
+    const shopCards=scCur.cards,shopTiles=scCur.tiles;
+    const brandBlocks=[
+      {t:'HIGH SUMMER 2026夏日胶囊系列',c1:'#e6d8c4',c2:'#dfcdb3',ph:'video · 林间白裙',showPlay:!st.brandPlaying,playing:st.brandPlaying,time:false,go:()=>this.setState({brandPlaying:!this.state.brandPlaying}),goTitle:()=>this.nav('campaign')},
+      {t:'A.PROJECTS',c1:'#ecd8c6',c2:'#e5ccb5',ph:'installation · 橘色声场',showPlay:false,playing:false,time:false,go:()=>this.nav('projects'),goTitle:()=>this.nav('projects')},
+      {t:'A.MOMENTS',c1:'#dbe3ec',c2:'#d0dae5',ph:'video · 蓝天彩绸',showPlay:true,playing:false,time:true,go:()=>this.nav('moments'),goTitle:()=>this.nav('moments')}
+    ];
+    const brandBlocks2=[
+      {t:'品牌故事',c1:'#e9e3d8',c2:'#e2dacb',ph:'portrait · 草地挚友',go:()=>this.nav('story')},
+      {t:'走进精品店',c1:'#e6e1da',c2:'#ded8cf',ph:'interior · 门店一隅',go:()=>this.nav('storeIntro')}
+    ];
+    const meMenu=[
+      {t:'门店导购',i1:true,go:()=>this.nav('guide')},
+      {t:'地址管理',i2:true,go:()=>this.nav('addresses')},
+      {t:'附近门店',i3:true,go:()=>this.nav('nearby')},
+      {t:'个人设置',i4:true,go:()=>this.nav('settings')},
+      {t:'帮助中心',i5:true,go:()=>this.nav('help')},
+      {t:'关注我们',i6:true,go:()=>this.nav('follow')}
+    ];
+    const listArr=DB.products.filter(p=>p.cat===st.listCat);
+    const listProds=(st.sort==='new'?listArr:[...listArr].reverse()).map(dec);
+    const hsIds=['d2','c1','d1','t1','s1','d3','j1','b1','d4','s2'];
+    const serArr=hsIds.map(id=>this.prod(id));
+    const seriesProds=(st.sort==='new'?serArr:[...serArr].reverse()).map(dec);
+    const filters=DB.filters.map((f,i)=>({...f,opts:(f.opts||[]).map(o=>({v:o})),open:st.filterExp===i,ch:st.filterExp===i?'︿':'﹀',toggle:()=>this.setState({filterExp:st.filterExp===i?-1:i})}));
+    const P=dec(this.prod());
+    const sizes=['0P','0','1','2','3'].map(v=>{const dis=v==='0P'||v==='3';const sel=st.size===v;return {v,dis,click:()=>{if(!dis)this.setState({size:v})},bg:sel?'#3a3a3a':'#fff',fg:dis?'#ccc':(sel?'#fff':'#333'),bd:sel?'#3a3a3a':(dis?'#eee':'#ddd')}});
+    const recs=[DB.products[2],DB.products[3]].map(dec);
+    const o=this.order();
+    const remain=o&&o.status==='pending'?Math.max(0,o.deadline-Date.now()):0;
+    const cd={m:this.pad(Math.floor(remain/60000)),s:this.pad(Math.floor(remain/1000)%60)};
+    const oDec=o?{...o,p:dec(this.prod(o.pid)),totalFmt:'¥'+this.fmt(o.total),spec:'尺码:'+o.size+',颜色:'+this.prod(o.pid).color,statusText:o.status==='pending'?'待支付':'已取消',pending:o.status==='pending',cancelled:o.status==='cancelled',addrTop:o.addr?o.addr.full.slice(0,12)+'******':'',addrName:o.addr?'*'+o.addr.name.slice(1)+'　'+o.addr.phone.slice(0,3)+'******'+o.addr.phone.slice(-2):''}:{p:P,totalFmt:'',spec:'',statusText:'',pending:false,cancelled:false,id:'',time:'',addrTop:'',addrName:''};
+    const subFilter={all:x=>true,pending:x=>x.status==='pending',shipping:x=>x.status==='paid',after:x=>false}[st.ordSub]||(x=>true);
+    const ordersList=(st.ordTab==='mp'?st.orders.filter(subFilter):[]).map(x=>({...x,p:dec(this.prod(x.pid)),totalFmt:'¥ '+this.fmt(x.total),spec:'尺码:'+x.size+',颜色:'+this.prod(x.pid).color,statusText:x.status==='pending'?'待支付':'已取消',view:()=>{this.setState({oid:x.id});this.nav('orderDetail')}}));
+    const ordSubs=[{k:'all',t:'全部'},{k:'pending',t:'待支付'},{k:'shipping',t:'待收货'},{k:'after',t:'售后记录'}].map(x=>({...x,c:st.ordSub===x.k?'#111':'#9a9a9a',bd:st.ordSub===x.k?'2px solid #111':'2px solid transparent',pick:()=>this.setState({ordSub:x.k})}));
+    const wlProds=st.wishlist.map(id=>dec(this.prod(id)));
+    const fpProds=st.footprints.map(id=>dec(this.prod(id)));
+    const q=st.q.trim();
+    const storesF=DB.stores.filter(x=>(!q||x.name.includes(q))&&(!st.prov||x.prov===st.prov)&&(!st.city||x.city===st.city)).map(x=>({...x,open:()=>{this.setState({storeId:x.id});this.nav('storeDetail')}}));
+    const storesIntro=DB.stores.map(x=>({...x,open:()=>{this.setState({storeId:x.id});this.nav('storeDetail')}}));
+    const curStore=DB.stores.find(x=>x.id===st.storeId)||DB.stores[0];
+    const helpRows=['orders','payment','shipping','returns','size'].map(k=>({k,cn:DB.helps[k].cn,en:DB.helps[k].en,open:()=>{this.setState({helpTopic:k});this.nav('helpDetail')}}));
+    const ht=DB.helps[st.helpTopic]||DB.helps.orders;
+    const helpQas=ht.qas.map(x=>({...x,qf:'Q: '+x.q,hasB:x.b&&x.b.length>0,b:(x.b||[]).map(y=>({v:y}))}));
+    const provOpts=DB.provs.map(p=>({v:p,pick:()=>this.setState({prov:p,city:'',provOpen:false})}));
+    const cityOpts=(st.prov?DB.cities[st.prov]:['北京市','上海市','成都市']).map(c=>({v:c,pick:()=>this.setState({city:c,cityOpen:false})}));
+    const addrs=st.addresses.map((a,i)=>({...a,sel:st.params.select?st.selAddr===i:a.def,pick:()=>this.pickAddr(i),del:()=>this.delAddr(i),edit:()=>this.doToast('编辑功能（演示）')}));
+    const selA=st.selAddr!=null?st.addresses[st.selAddr]:null;
+    const campProds=[DB.products[5],DB.products[11],DB.products[1]].map(dec);
+    const gRows=r=>r.map(row=>({cells:row.map(c=>({v:c}))}));
+    const projGo=()=>this.doToast('内容专题（演示）');
+    return {
+      s,tabbar,clock:this.pad(now.getHours())+':'+this.pad(now.getMinutes()),
+      tc:{home:st.tab==='home'&&tabbar?'#111':'#9a9a9a',brand:st.tab==='brand'&&tabbar?'#111':'#9a9a9a',shop:st.tab==='shop'&&tabbar?'#111':'#9a9a9a',me:st.tab==='me'&&tabbar?'#111':'#9a9a9a',stores:st.tab==='stores'&&tabbar?'#111':'#9a9a9a',shopW:st.tab==='shop'?'600':'400',meW:st.tab==='me'?'600':'400'},
+      goHome:()=>this.goTab('home'),goBrand:()=>this.goTab('brand'),goShop:()=>this.goTab('shop'),goMe:()=>this.goTab('me'),goStores:()=>this.goTab('stores'),
+      goBack:()=>this.back(),
+      heroSlides,heroDots:dots(3,st.heroIdx),heroTx:'translateX(-'+st.heroIdx*100+'%)',
+      homeProds,prodDots:dots(3,st.prodIdx),prodTx:'translateX(-'+st.prodIdx*100+'%)',
+      goCampaign:()=>this.nav('campaign'),
+      goShoesList:()=>{this.setState({listCat:'shoes'});this.nav('list')},
+      goBagsList:()=>{this.setState({listCat:'bags'});this.nav('list')},
+      homeRef:el=>{this.homeEl=el},homeTop:()=>{if(this.homeEl)this.homeEl.scrollTop=0},
+      svcToast:()=>this.doToast('专属客服（演示环境）'),
+      brandBlocks,brandBlocks2,
+      shopCats:catsSel,shopCards,shopTiles,cartOn:cartCount>0,cartN:String(cartCount),
+      notRegd:!st.registered,regd:st.registered,dispName:(st.user.nick||st.user.name),
+      openJoin:()=>this.setState({joinOpen:true,agP:false,agM:false}),closeJoin:()=>this.setState({joinOpen:false}),
+      joinOpen:st.joinOpen,togAgP:()=>this.setState({agP:!st.agP}),togAgM:()=>this.setState({agM:!st.agM}),
+      agPB:st.agP?'#111':'#ccc',agPBg:st.agP?'#111':'#fff',agPCh:st.agP?'✓':'',agMB:st.agM?'#111':'#ccc',agMBg:st.agM?'#111':'#fff',agMCh:st.agM?'✓':'',
+      joinGo:()=>this.joinGo(),
+      goOrders:()=>this.nav('orders'),goBookings:()=>this.nav('bookings'),goWishlist:()=>this.nav('wishlist'),goFootprints:()=>this.nav('footprints'),
+      goProfile:()=>{this.setState({ef:{nick:st.user.nick,gender:st.user.gender||'男士',birthday:st.user.birthday,region:st.user.region,email:st.user.email}});this.nav('profile')},
+      goMemberCode:()=>this.nav('memberCode'),goNearby:()=>this.nav('nearby'),goStoreIntro:()=>this.nav('storeIntro'),
+      meMenu,
+      cf:st.cf,agCard:st.agCard,togAgCard:()=>this.setState({agCard:!st.agCard}),
+      agCardBg:st.agCard?'#07c160':'#fff',agCardB:st.agCard?'#07c160':'#ccc',agCardCh:st.agCard?'✓':'',
+      onCfName:e=>this.setState({cf:{...st.cf,name:e.target.value}}),
+      onCfPhone:e=>this.setState({cf:{...st.cf,phone:e.target.value}}),
+      onCfBirthday:e=>this.setState({cf:{...st.cf,birthday:e.target.value}}),
+      cfGenderCycle:()=>this.setState({cf:{...st.cf,gender:st.cf.gender==='男士'?'女士':'男士'}}),
+      register:()=>this.register(),cardDetailToast:()=>this.doToast('会员卡详情（演示）'),
+      ef:st.ef,
+      onEfNick:e=>this.setState({ef:{...st.ef,nick:e.target.value}}),
+      onEfBirthday:e=>this.setState({ef:{...st.ef,birthday:e.target.value}}),
+      onEfRegion:e=>this.setState({ef:{...st.ef,region:e.target.value}}),
+      onEfEmail:e=>this.setState({ef:{...st.ef,email:e.target.value}}),
+      efMale:()=>this.setState({ef:{...st.ef,gender:'男士'}}),efFemale:()=>this.setState({ef:{...st.ef,gender:'女士'}}),
+      maleDot:st.ef.gender==='男士'?'#777':'transparent',femaleDot:st.ef.gender==='女士'?'#777':'transparent',
+      maskedPhone:st.user.phone.slice(0,3)+'******'+st.user.phone.slice(-2),
+      userName:st.user.name,userCode:st.user.code,
+      saveProfile:()=>this.saveProfile(),
+      qrRef:el=>this.drawQR(el),bars:this.BARS,
+      guideStore:DB.stores[st.guideIdx%DB.stores.length].short,guideNext:()=>this.setState({guideIdx:st.guideIdx+1}),
+      ordTabMpC:st.ordTab==='mp'?'#111':'#9a9a9a',ordTabStC:st.ordTab==='st'?'#111':'#9a9a9a',
+      ordTabMpB:st.ordTab==='mp'?'3px solid #111':'3px solid transparent',ordTabStB:st.ordTab==='st'?'3px solid #111':'3px solid transparent',
+      pickMp:()=>this.setState({ordTab:'mp'}),pickSt:()=>this.setState({ordTab:'st'}),
+      ordSubs,ordersList,hasOrders:ordersList.length>0,
+      bookTab0C:st.bookTab==='0'?'#111':'#9a9a9a',bookTab1C:st.bookTab==='1'?'#111':'#9a9a9a',
+      bookTab0B:st.bookTab==='0'?'2px solid #111':'2px solid transparent',bookTab1B:st.bookTab==='1'?'2px solid #111':'2px solid transparent',
+      pickBook0:()=>this.setState({bookTab:'0'}),pickBook1:()=>this.setState({bookTab:'1'}),
+      wlProds,hasWl:wlProds.length>0,fpProds,hasFp:fpProds.length>0,
+      clearFp:()=>{this.setS({footprints:[]});this.doToast('已清空我的足迹')},
+      shareToast:()=>this.doToast('分享（演示环境）'),
+      addrs,hasAddrs:addrs.length>0,wechatAddr:()=>this.wechatAddr(),addAddr:()=>this.addAddr(),
+      agreedDateText:(st.agreedDate||this.fmtDate(now))+'同意',
+      privacyToast:()=>this.doToast('隐私政策全文（演示）'),logoffToast:()=>this.doToast('请联系在线客服办理'),
+      helpRows,helpTitle:'帮助中心-'+ht.cn,helpH:ht.cn,helpQas,isSizeTopic:st.helpTopic==='size',
+      goSizeGuide:()=>this.nav('sizeGuide'),
+      sizeHead:gRows(DB.sizeHead),sizeRows:gRows(DB.sizeRows),bodyHead:{cells:DB.bodyHead.map(c=>({v:c}))},bodyRows:gRows(DB.bodyRows),shoeHead:{cells:DB.shoeHead.map(c=>({v:c}))},shoeRows:gRows(DB.shoeRows),
+      storesF,storesIntro,curStore,
+      provOpen:st.provOpen,cityOpen:st.cityOpen,provOpts,cityOpts,
+      provLabel:st.prov||'请选择省份',cityLabel:st.city||'请选择城市',
+      togProv:()=>this.setState({provOpen:!st.provOpen,cityOpen:false}),togCity:()=>this.setState({cityOpen:!st.cityOpen,provOpen:false}),
+      onQ:e=>this.setState({q:e.target.value}),qVal:st.q,
+      sortAllC:st.sort==='all'?'#111':'#9a9a9a',sortNewC:st.sort==='new'?'#111':'#9a9a9a',
+      sortAllW:st.sort==='all'?'600':'400',sortNewW:st.sort==='new'?'600':'400',
+      pickSortAll:()=>this.setState({sort:'all'}),pickSortNew:()=>this.setState({sort:'new'}),
+      listProds,seriesProds,goSeries:()=>this.nav('seriesList'),openFilter:()=>this.setState({filterOpen:true}),closeFilter:()=>this.setState({filterOpen:false}),
+      filterOpen:st.filterOpen,filters,
+      resetFilter:()=>this.doToast('已重置（演示）'),applyFilter:()=>{this.setState({filterOpen:false});this.doToast('筛选已应用（演示）')},
+      P,sizes,recs,
+      pdpBullets:(P.bullets||[]).map(v=>({v})),
+      pdpWish:()=>this.toggleWish(P.id),
+      noSelA:!selA,
+      campNecklaceOpen:()=>this.openP('j1'),
+      payAmount:o?this.fmt(o.total)+'.00':'',
+      goBag:()=>this.nav('bag'),
+      bagItems,bagEmpty:st.cartItems.length===0,
+      allChB:allCh?'#111':'#ccc',allChBg:allCh?'#111':'#fff',allChCh:allCh?'✓':'',
+      togAll:()=>this.setS({cartItems:st.cartItems.map(x=>({...x,checked:!allCh}))}),
+      bagTotalFmt:'¥'+this.fmt(bagTotal),
+      bagCheckout:()=>this.bagCheckout(),
+      accD:st.acc.d,accS:st.acc.s,accC:st.acc.c,
+      accDCh:st.acc.d?'︿':'﹀',accSCh:st.acc.s?'︿':'﹀',accCCh:st.acc.c?'︿':'﹀',
+      togD:()=>this.setState({acc:{...st.acc,d:!st.acc.d}}),togS:()=>this.setState({acc:{...st.acc,s:!st.acc.s}}),togC:()=>this.setState({acc:{...st.acc,c:!st.acc.c}}),
+      buyNow:()=>{this.setState({agT:false});this.nav('confirm')},
+      addBagFn:()=>this.addBag(st.pid,st.size),
+      goStock:()=>this.nav('nearby'),
+      videoToast:()=>this.doToast('商品视频（演示）'),
+      selA,hasSelA:!!selA,selAName:selA?selA.name+'　'+selA.phone:'',selAFull:selA?selA.full:'',
+      goPickAddr:()=>this.nav('addresses',{select:true}),
+      packC:st.packaging==='classic',packE:st.packaging==='eco',
+      packCDot:st.packaging==='classic'?'#777':'transparent',packEDot:st.packaging==='eco'?'#777':'transparent',
+      pickPackC:()=>this.setState({packaging:'classic'}),pickPackE:()=>this.setState({packaging:'eco'}),
+      agT:st.agT,togAgT:()=>this.setState({agT:!st.agT}),agTB:st.agT?'#111':'#ccc',agTBg:st.agT?'#111':'#fff',agTCh:st.agT?'✓':'',
+      confirmPriceFmt:'¥ '+this.fmt(P.sale||P.price),confirmSpec:'尺码:'+st.size+',颜色:'+P.color,
+      submitOrder:()=>this.submitOrder(),
+      cdM:cd.m,cdS:cd.s,payTotal:o?'¥'+this.fmt(o.total)+'.00':'',
+      pay:()=>this.pay(),
+      O:oDec,
+      goCancel:()=>this.nav('cancel'),goPayScreen:()=>this.nav('payment'),
+      copyToast:()=>this.doToast('订单号已复制'),invoiceToast:()=>this.doToast('如需开发票请联系在线客服'),
+      cancelReasons:['订单款式错误','订单数量错误','改变主意','订单信息填写错误','与门店导购协商一致'].map((t,i)=>({t,dot:st.cancelIdx===i?'#777':'transparent',pick:()=>this.setState({cancelIdx:i})})),
+      cancelFinal:()=>this.cancelFinal(),
+      campProds,campDots:dots(3,st.campIdx),campTx:'translateX(-'+st.campIdx*100+'%)',
+      projects:DB.projects.map(x=>({...x,go:projGo})),
+      momentsMore:()=>this.doToast('更多活动瞬间（演示）'),
+      wbToast:()=>this.doToast('前往新浪微博（演示）'),xhsToast:()=>this.doToast('前往小红书（演示）'),tmToast:()=>this.doToast('前往官方旗舰店（演示）'),
+      toastOn:!!st.toast,toastMsg:st.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

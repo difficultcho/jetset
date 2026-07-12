@@ -1,0 +1,12 @@
+<view class="page">
+  <nav-bar title="{{title}}" />
+  <scroll-view class="body" scroll-y>
+    <view class="qa" wx:for="{{qas}}" wx:key="q">
+      <view class="q">{{item.q}}</view>
+      <view class="a">{{item.a}}</view>
+      <view class="bullet" wx:for="{{item.b}}" wx:for-item="bi" wx:key="*this">· {{bi}}</view>
+    </view>
+    <view wx:if="{{isSize}}" class="size-link" bindtap="goSizeGuide">查看尺码指南 ›</view>
+    <view class="body-space" />
+  </scroll-view>
+</view>

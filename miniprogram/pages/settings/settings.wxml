@@ -1,0 +1,8 @@
+<view class="page">
+  <nav-bar title="个人设置" />
+  <view class="row">
+    <text class="rl">隐私政策</text>
+    <view class="rr"><text class="rd">{{date}}同意</text><view class="arrow" /></view>
+  </view>
+  <view class="logoff" bindtap="logoff">注销账号请联系客服</view>
+</view>

@@ -10,7 +10,7 @@ async def _first_sku(client, q: str) -> dict:
 
 async def test_cart_flow(client):
     headers = await login(client, "cart-user")
-    sku = await _first_sku(client, "背包")
+    sku = await _first_sku(client, "手拿包")
 
     # 加购
     resp = await client.post("/api/v1/cart/items", headers=headers,
@@ -40,7 +40,7 @@ async def test_cart_flow(client):
 async def test_cart_isolated_between_users(client):
     h1 = await login(client, "cart-a")
     h2 = await login(client, "cart-b")
-    sku = await _first_sku(client, "头巾")
+    sku = await _first_sku(client, "项链")
 
     await client.post("/api/v1/cart/items", headers=h1, json={"sku_id": sku["id"], "qty": 1})
     resp = await client.get("/api/v1/cart", headers=h2)

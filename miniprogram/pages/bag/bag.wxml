@@ -1,0 +1,45 @@
+<view class="page">
+  <nav-bar title="我的购物袋" />
+  <scroll-view class="body" scroll-y>
+    <view wx:if="{{items.length === 0}}" class="empty">
+      <view class="empty-txt">购物袋暂无商品</view>
+      <view class="empty-btn" bindtap="goShop">去逛逛</view>
+    </view>
+
+    <view class="cart-item" wx:for="{{items}}" wx:key="id">
+      <view class="checkbox {{sel[index] ? 'on' : ''}}" data-i="{{index}}" bindtap="toggleSel" />
+      <view class="ci-img"><prod-img prod="{{item.prod}}" /></view>
+      <view class="ci-info">
+        <view class="ci-name clamp2">{{item.name}}</view>
+        <view class="ci-spec">{{item.spec}}</view>
+        <view class="ci-price">¥ {{item.priceText}}</view>
+        <view class="ci-foot">
+          <view class="stepper">
+            <view class="step" data-i="{{index}}" data-d="{{-1}}" bindtap="chQty">−</view>
+            <text class="step-n">{{item.qty}}</text>
+            <view class="step" data-i="{{index}}" data-d="{{1}}" bindtap="chQty">＋</view>
+          </view>
+          <view class="ci-actions">
+            <text class="ci-act" data-i="{{index}}" bindtap="wishItem">加入心愿单 ☆</text>
+            <text class="ci-act" data-i="{{index}}" bindtap="del">删除 ✕</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{recs.length}}" class="recs-wrap">
+      <view class="recs-title">热门推荐</view>
+      <view class="recs">
+        <product-card wx:for="{{recs}}" wx:key="id" prod="{{item}}" bind:tap="goPdp" bind:star="goPdp" bind:bag="goPdp" />
+      </view>
+    </view>
+    <view class="body-space" />
+  </scroll-view>
+
+  <view wx:if="{{items.length > 0}}" class="settle">
+    <view class="checkbox {{allSel ? 'on' : ''}}" bindtap="toggleAll" />
+    <text class="settle-all">全选</text>
+    <view class="settle-total"><text class="st-label">总计：</text><text class="st-num">¥ {{totalText}}</text></view>
+    <view class="settle-btn" bindtap="checkout">立即结算</view>
+  </view>
+</view>

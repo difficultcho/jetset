@@ -1,0 +1,15 @@
+<view class="page">
+  <nav-bar title="A.PROJECTS" />
+  <scroll-view class="body" scroll-y>
+    <view class="eyebrow head">A.PROJECTS</view>
+    <view class="item" wx:for="{{projects}}" wx:key="id">
+      <view class="item-img">
+        <image wx:if="{{item.cover}}" class="item-real" src="{{item.cover}}" mode="aspectFill" />
+        <view wx:else class="item-ph" style="background:{{item.tint}};"><text class="ph-label">editorial · {{item.title}}</text></view>
+      </view>
+      <view class="item-t">{{item.title}}</view>
+      <view class="item-c">{{item.subtitle}}</view>
+    </view>
+    <view class="body-space" />
+  </scroll-view>
+</view>
