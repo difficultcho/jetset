@@ -5,23 +5,27 @@
       @click="$emit('update:modelValue', '')">删除</el-button>
   </div>
   <el-upload v-else :show-file-list="false" :http-request="doUpload" accept="image/*">
-    <div class="iu-box" :style="box">+ 上传</div>
+    <div class="iu-box" :style="box">{{ pct ? pct + '%' : '+ 上传' }}</div>
   </el-upload>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import http, { imgUrl } from '../api.js'
+import { computed, ref } from 'vue'
+import { imgUrl, uploadImage } from '../api.js'
 
 const props = defineProps({ modelValue: { type: String, default: '' }, size: { type: Number, default: 96 } })
 const emit = defineEmits(['update:modelValue'])
 const box = computed(() => ({ width: props.size + 'px', height: props.size + 'px' }))
+const pct = ref(0)
 
 async function doUpload({ file }) {
-  const fd = new FormData()
-  fd.append('file', file)
-  const data = await http.post('/api/v1/uploads', fd)
-  emit('update:modelValue', data.url)
+  pct.value = 1
+  try {
+    const data = await uploadImage(file, (p) => { pct.value = p })
+    emit('update:modelValue', data.url)
+  } finally {
+    pct.value = 0
+  }
 }
 </script>
 

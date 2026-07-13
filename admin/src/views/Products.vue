@@ -128,7 +128,7 @@
             </div>
           </div>
           <el-upload :show-file-list="false" :http-request="doUpload" accept="image/*">
-            <div class="upload-box">+ 上传</div>
+            <div class="upload-box">{{ upPct ? upPct + '%' : '+ 上传' }}</div>
           </el-upload>
         </div>
       </el-form-item>
@@ -143,7 +143,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import http, { imgUrl } from '../api.js'
+import http, { imgUrl, uploadImage } from '../api.js'
 
 const list = ref([])
 const total = ref(0)
@@ -218,11 +218,16 @@ async function openEdit(id) {
   dialog.value = true
 }
 
+const upPct = ref(0)
+
 async function doUpload({ file }) {
-  const fd = new FormData()
-  fd.append('file', file)
-  const data = await http.post('/api/v1/uploads', fd)
-  form.value.images.push({ color_index: 0, url: data.url, sort: form.value.images.length })
+  upPct.value = 1
+  try {
+    const data = await uploadImage(file, (p) => { upPct.value = p })
+    form.value.images.push({ color_index: 0, url: data.url, sort: form.value.images.length })
+  } finally {
+    upPct.value = 0
+  }
 }
 
 async function save() {

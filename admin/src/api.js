@@ -37,4 +37,16 @@ export function imgUrl(path) {
   return path.startsWith('http') ? path : apiBase + path
 }
 
+// 图片上传：大图 + 慢上行不适用全局 15s 超时，单独放宽并回报进度
+export function uploadImage(file, onProgress) {
+  const fd = new FormData()
+  fd.append('file', file)
+  return http.post('/api/v1/uploads', fd, {
+    timeout: 120000,
+    onUploadProgress: (e) => {
+      if (onProgress && e.total) onProgress(Math.round((e.loaded / e.total) * 100))
+    }
+  })
+}
+
 export default http
