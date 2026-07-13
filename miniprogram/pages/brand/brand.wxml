@@ -1,12 +1,12 @@
 <view class="page">
   <view class="hdr" style="padding-top:{{sbh}}px;">
-    <view class="hdr-bar"><text class="brand-mark hdr-brand">AURELLE</text></view>
+    <view class="hdr-bar"><image class="hdr-logo" src="/assets/jetset-logo.png" mode="aspectFit" /></view>
   </view>
 
   <scroll-view class="body" scroll-y>
     <view class="sec-title">
       <view class="eyebrow">A.IMMERSE</view>
-      <view class="sec-sub">探索AURELLE世界</view>
+      <view class="sec-sub">探索JET SET世界</view>
     </view>
 
     <view class="block" wx:for="{{blocks}}" wx:key="ph">
@@ -27,7 +27,7 @@
 
     <view class="sec-title">
       <view class="eyebrow">EXPLORE</view>
-      <view class="sec-sub">发现AURELLE最新讯息和无穷巧思</view>
+      <view class="sec-sub">发现JET SET最新讯息和无穷巧思</view>
     </view>
 
     <view class="block" wx:for="{{blocks2}}" wx:key="ph">

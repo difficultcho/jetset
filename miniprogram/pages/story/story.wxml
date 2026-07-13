@@ -1,7 +1,7 @@
 <view class="page">
   <nav-bar title="品牌故事" />
   <scroll-view class="body" scroll-y wx:if="{{post}}">
-    <view class="brand-mark bm">AURELLE</view>
+    <image class="bm-logo" src="/assets/jetset-logo.png" mode="aspectFit" />
     <block wx:for="{{post.body}}" wx:key="ph">
       <view wx:if="{{item.kind === 'image'}}" class="img" style="aspect-ratio:{{item.ratio}};">
         <image wx:if="{{item.img}}" class="real" src="{{item.img}}" mode="aspectFill" />

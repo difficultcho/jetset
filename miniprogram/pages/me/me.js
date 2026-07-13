@@ -30,7 +30,7 @@ Page({
       this.setData({
         user: u,
         registered: !!u.name,
-        code: 'AURL' + String(100000 + (u.id || 0) * 37 % 900000).slice(0, 6)
+        code: 'JETS' + String(100000 + (u.id || 0) * 37 % 900000).slice(0, 6)
       });
     } catch (e) { /* 静默 */ }
   },

@@ -1,4 +1,4 @@
-// 后端数据 → AURELLE 视图模型。后端金额单位为「分」，展示用「元」（千分位）。
+// 后端数据 → JET SET 视图模型。后端金额单位为「分」，展示用「元」（千分位）。
 const { API_BASE } = require('./config.js');
 
 function yuan(cents) {

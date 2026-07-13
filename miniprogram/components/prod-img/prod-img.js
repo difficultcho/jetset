@@ -1,4 +1,4 @@
-// AURELLE 商品图：优先真实图；无图时用暖沙斜纹占位 + 等宽字体标签
+// JET SET 商品图：优先真实图；无图时用暖沙斜纹占位 + 等宽字体标签
 Component({
   properties: {
     prod: { type: Object, value: null },

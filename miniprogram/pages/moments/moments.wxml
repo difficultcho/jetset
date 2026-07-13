@@ -2,7 +2,7 @@
   <nav-bar title="A.MOMENTS" />
   <scroll-view class="body" scroll-y wx:if="{{post}}">
     <view class="head">
-      <view class="brand-mark bm">AURELLE</view>
+      <image class="bm-logo" src="/assets/jetset-logo.png" mode="aspectFit" />
       <view class="eyebrow ax">{{post.title}}</view>
       <view class="intro">{{post.subtitle}}</view>
     </view>

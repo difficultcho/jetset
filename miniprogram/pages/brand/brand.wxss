@@ -1,7 +1,7 @@
 .page { height: 100vh; display: flex; flex-direction: column; background: #fff; }
 .hdr { background: rgba(255,255,255,0.97); flex-shrink: 0; }
 .hdr-bar { height: 88rpx; display: flex; align-items: center; justify-content: center; }
-.hdr-brand { font-size: 40rpx; }
+.hdr-logo { width: 90rpx; height: 64rpx; }
 .body { flex: 1; height: 0; }
 
 .sec-title { text-align: center; padding: 52rpx 0 40rpx; }

@@ -1,7 +1,7 @@
 <template>
   <el-container class="layout">
     <el-aside width="200px" class="aside">
-      <div class="logo">AURELLE</div>
+      <div class="logo"><img class="logo-img" :src="logo" alt="JET SET" /></div>
       <el-menu :default-active="$route.path" router background-color="#211e1a" text-color="#b8b0a4" active-text-color="#d6be94">
         <el-menu-item index="/dashboard">概览</el-menu-item>
         <el-menu-item index="/products">商品管理</el-menu-item>
@@ -47,6 +47,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import http from '../api.js'
+import logo from '../assets/jetset-logo.png'
 
 const router = useRouter()
 const adminName = localStorage.getItem('admin_name') || 'admin'
@@ -72,13 +73,10 @@ function logout() {
 .aside { background: #211e1a; }
 .aside :deep(.el-menu) { border-right: none; }
 .logo {
-  color: #ece6dc;
-  font-weight: 900;
-  letter-spacing: 4px;
-  font-size: 18px;
-  padding: 20px;
+  padding: 18px 20px 14px;
   text-align: center;
 }
+.logo-img { height: 44px; }
 .header {
   background: #fff;
   border-bottom: 1px solid #eee;

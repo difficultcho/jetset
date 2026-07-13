@@ -2,7 +2,7 @@ Component({
   data: {
     selected: 0,
     list: [
-      { pagePath: '/pages/home/home', text: 'AURELLE', key: 'home' },
+      { pagePath: '/pages/home/home', text: 'JET SET', key: 'home' },
       { pagePath: '/pages/brand/brand', text: '关于品牌', key: 'brand' },
       { pagePath: '/pages/shop/shop', text: '商城', key: 'shop' },
       { pagePath: '/pages/me/me', text: '我的', key: 'me' },

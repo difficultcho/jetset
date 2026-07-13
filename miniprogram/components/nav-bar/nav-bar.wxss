@@ -35,11 +35,9 @@
   font-weight: 600;
   color: #111;
 }
-.title.brand-mark {
-  font-weight: 300;
-  font-size: 36rpx;
-  letter-spacing: 0.32em;
-  padding-left: 0.32em;
+.title-logo {
+  width: 84rpx;
+  height: 60rpx;
 }
 .right {
   position: absolute;

@@ -7,7 +7,7 @@
   background: linear-gradient(135deg, #b8b3ab, #8f8a82);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
-.mc-brand { font-size: 48rpx; color: #fff; }
+.mc-logo { width: 140rpx; height: 100rpx; }
 .mc-sub { font-size: 20rpx; color: rgba(255,255,255,0.8); letter-spacing: 0.3em; margin-top: 16rpx; }
 
 .form-card { background: #fff; border-radius: 16rpx; margin: 0 32rpx; padding: 12rpx 32rpx; }

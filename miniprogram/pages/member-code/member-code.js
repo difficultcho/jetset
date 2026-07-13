@@ -10,7 +10,7 @@ function bars() {
 }
 
 Page({
-  data: { name: '', code: 'AURL037946', bars: bars(), qr: [] },
+  data: { name: '', code: 'JETS037946', bars: bars(), qr: [] },
 
   onLoad() {
     // 生成 21×21 伪二维码点阵（演示）
@@ -26,6 +26,6 @@ Page({
       grid.push(row);
     }
     this.setData({ qr: grid });
-    api.me().then((u) => this.setData({ name: u.name || 'AURELLE', code: 'AURL' + String(37946 + (u.id || 0)).padStart(6, '0') })).catch(() => {});
+    api.me().then((u) => this.setData({ name: u.name || 'JET SET', code: 'JETS' + String(37946 + (u.id || 0)).padStart(6, '0') })).catch(() => {});
   }
 });

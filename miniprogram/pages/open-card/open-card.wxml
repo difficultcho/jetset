@@ -2,7 +2,7 @@
   <nav-bar title="加入我们" />
   <scroll-view class="body" scroll-y>
     <view class="member-card">
-      <view class="mc-brand brand-mark">AURELLE</view>
+      <image class="mc-logo" src="/assets/jetset-logo.png" mode="aspectFit" />
       <view class="mc-sub">MEMBERSHIP CARD</view>
     </view>
 

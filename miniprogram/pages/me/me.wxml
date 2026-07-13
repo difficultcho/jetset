@@ -3,7 +3,7 @@
     <!-- 未注册态 -->
     <block wx:if="{{!registered}}">
       <view class="welcome" style="padding-top:{{sbh + 90}}px;">
-        <view class="welcome-txt">加入 AURELLE，
+        <view class="welcome-txt">加入 JET SET，
 探索新品、享受独家优惠和个性化体验！</view>
         <view class="perks">
           <view class="perk"><view class="perk-ic ic-news" /><text class="perk-t">新品资讯</text></view>

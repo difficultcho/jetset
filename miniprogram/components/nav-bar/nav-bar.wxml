@@ -1,7 +1,8 @@
 <view class="nav {{border ? 'bordered' : ''}}" style="padding-top:{{sbh}}px;">
   <view class="nav-inner">
     <view wx:if="{{back}}" class="back-hit" bindtap="onBack"><view class="arrow" /></view>
-    <text class="title {{brand ? 'brand-mark' : ''}}">{{title}}</text>
+    <image wx:if="{{brand}}" class="title-logo" src="/assets/jetset-logo.png" mode="aspectFit" />
+    <text wx:else class="title">{{title}}</text>
     <view class="right"><slot name="right" /></view>
   </view>
 </view>

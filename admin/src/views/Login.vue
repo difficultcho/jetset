@@ -1,7 +1,7 @@
 <template>
   <div class="login-wrap">
     <el-card class="login-card">
-      <div class="brand">JETSET 管理后台</div>
+      <div class="brand"><img class="brand-logo" :src="logo" alt="JET SET" /><span>管理后台</span></div>
       <el-form @submit.prevent="submit">
         <el-form-item>
           <el-input v-model="form.username" placeholder="用户名" size="large" />
@@ -19,6 +19,7 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import http from '../api.js'
+import logo from '../assets/jetset-logo.png'
 
 const router = useRouter()
 const form = reactive({ username: '', password: '' })
@@ -48,10 +49,14 @@ async function submit() {
 }
 .login-card { width: 360px; padding: 12px 8px; }
 .brand {
-  text-align: center;
-  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: 4px;
   margin-bottom: 24px;
 }
+.brand-logo { height: 40px; }
 </style>
