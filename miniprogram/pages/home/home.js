@@ -28,9 +28,9 @@ Page({
         label: b.title || '', c1: '#e9dfce', c2: '#e2d5bf'
       }));
       if (banners.length) this.setData({ hero: banners, heroIdx: 0 });
-      // HIGH SUMMER 系列 id（供"探索HIGH SUMMER系列"跳转）
+      // STARS 系列 id（供"探索 STARS 星星系列"跳转）
       const series = await api.series();
-      const hs = series.find((s) => s.en === 'HIGH SUMMER') || series[0];
+      const hs = series.find((s) => s.en === 'STARS') || series[0];
       if (hs) this.setData({ hsId: hs.id, hsEn: hs.en });
     } catch (e) {
       console.error('[home] 取商品失败：', e && e.message);

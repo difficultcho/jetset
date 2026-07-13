@@ -42,6 +42,14 @@ class ProductIn(BaseModel):
     images: list[ImageIn] = []
 
 
+class CategoryIn(BaseModel):
+    name: str = Field(min_length=1, max_length=64)
+    en: str = Field(default="", max_length=64)
+    parent_id: int | None = None   # None=一级；仅支持两级
+    sort: int = 0
+    status: int = Field(default=1, ge=0, le=1)
+
+
 class SeriesIn(BaseModel):
     name: str = Field(min_length=1, max_length=64)
     en: str = Field(default="", max_length=64)

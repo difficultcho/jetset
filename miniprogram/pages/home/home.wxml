@@ -28,7 +28,7 @@
 
     <!-- 双链接行（左右分置） -->
     <view class="link-row">
-      <text class="ul-link" bindtap="goSeries">探索HIGH SUMMER系列</text>
+      <text class="ul-link" bindtap="goSeries">探索 STARS 星星系列</text>
       <text class="ul-link" bindtap="goCampaign">探索广告大片</text>
     </view>
 
@@ -52,25 +52,25 @@
     <view class="block block-video">
       <view class="block-img va-center" style="aspect-ratio:3/3.4;background:repeating-linear-gradient(135deg,#e9ddca 0 32rpx,#e2d3bc 32rpx 64rpx);" bindtap="goCampaign">
         <view class="play-btn"><view class="play-tri" /></view>
-        <text class="mono-label abs-bottom">campaign video · 泳池畔</text>
+        <text class="mono-label abs-bottom">campaign video · 雪山</text>
       </view>
-      <view class="block-link"><text class="ul-link" bindtap="goCampaign">2026夏日胶囊系列</text></view>
+      <view class="block-link"><text class="ul-link" bindtap="goCampaign">MID SEASON SALE</text></view>
     </view>
 
     <!-- 内容块 2：鞋履 -->
     <view class="block">
       <view class="block-img" style="aspect-ratio:3/3.2;background:repeating-linear-gradient(135deg,#ecd9c2 0 32rpx,#e6cfb2 32rpx 64rpx);" bindtap="goList">
-        <text class="mono-label abs-bottom">product still · 木底凉鞋</text>
+        <text class="mono-label abs-bottom">product still · 星标滑雪裤</text>
       </view>
-      <view class="block-link"><text class="ul-link" bindtap="goList">探索鞋履</text></view>
+      <view class="block-link"><text class="ul-link" bindtap="goList">探索滑雪裤</text></view>
     </view>
 
     <!-- 内容块 3：包袋 -->
     <view class="block">
       <view class="block-img" style="aspect-ratio:3/3.2;background:repeating-linear-gradient(135deg,#d9d4cc 0 32rpx,#cfc8bd 32rpx 64rpx);" bindtap="goList">
-        <text class="mono-label abs-bottom">product still · 编织手袋</text>
+        <text class="mono-label abs-bottom">product still · 绗缝滑雪夹克</text>
       </view>
-      <view class="block-link"><text class="ul-link" bindtap="goList">探索包袋</text></view>
+      <view class="block-link"><text class="ul-link" bindtap="goList">探索滑雪夹克</text></view>
     </view>
 
     <!-- 内容块 4：大片 -->

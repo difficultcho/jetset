@@ -5,10 +5,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.deps import DB
 from app.models.catalog import Category, Sku, Spu, SpuImage
 from app.models.series import Series
-from app.schemas.admin import ProductIn, StatusReq
+from app.schemas.admin import CategoryIn, ProductIn, StatusReq
 from app.schemas.common import Page, Resp
 
 router = APIRouter()
+
+
+async def _check_parent(session: AsyncSession, parent_id: int | None) -> None:
+    if parent_id is None:
+        return
+    parent = await session.get(Category, parent_id)
+    if parent is None:
+        raise HTTPException(status_code=400, detail="父级品类不存在")
+    if parent.parent_id is not None:
+        raise HTTPException(status_code=400, detail="品类最多两级")
 
 
 @router.get("/categories", response_model=Resp[list[dict]])
@@ -23,6 +33,37 @@ async def list_categories(session: DB):
         }
         for c in rows
     ])
+
+
+@router.post("/categories", response_model=Resp[dict])
+async def create_category(req: CategoryIn, session: DB):
+    await _check_parent(session, req.parent_id)
+    c = Category(**req.model_dump())
+    session.add(c)
+    await session.commit()
+    return Resp(data={"id": c.id, "name": c.name, "parent_id": c.parent_id})
+
+
+@router.put("/categories/{cat_id}", response_model=Resp[dict])
+async def update_category(cat_id: int, req: CategoryIn, session: DB):
+    c = await session.get(Category, cat_id)
+    if c is None:
+        raise HTTPException(status_code=404, detail="品类不存在")
+    if req.parent_id is not None:
+        if req.parent_id == cat_id:
+            raise HTTPException(status_code=400, detail="不能以自己为父级")
+        has_children = (
+            await session.execute(
+                select(func.count()).where(Category.parent_id == cat_id)
+            )
+        ).scalar_one()
+        if has_children:
+            raise HTTPException(status_code=400, detail="该品类下有子级，不能改为二级")
+    await _check_parent(session, req.parent_id)
+    for field, value in req.model_dump().items():
+        setattr(c, field, value)
+    await session.commit()
+    return Resp(data={"id": c.id, "name": c.name, "parent_id": c.parent_id, "status": c.status})
 
 
 def _sku_dict(s: Sku) -> dict:

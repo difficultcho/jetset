@@ -13,6 +13,39 @@ async def test_admin_categories_flat_tree(client):
     assert heels["parent_name"] == "鞋履"
 
 
+async def test_category_create_update(client):
+    h = await admin_login(client)
+    top = (await client.post("/api/admin/categories", headers=h, json={
+        "name": "滑雪服测试", "en": "SKI TEST", "sort": 90})).json()["data"]
+    child = (await client.post("/api/admin/categories", headers=h, json={
+        "name": "滑雪裤测试", "parent_id": top["id"]})).json()["data"]
+
+    # 只支持两级：三级被拒
+    resp = await client.post("/api/admin/categories", headers=h,
+                             json={"name": "x", "parent_id": child["id"]})
+    assert resp.status_code == 400
+
+    # C 端树立即可见（新一级带二级）
+    tops = (await client.get("/api/v1/categories")).json()["data"]
+    mine = next(t for t in tops if t["id"] == top["id"])
+    assert any(c["id"] == child["id"] for c in mine["children"])
+
+    # 自引用/有子级改二级 均被拒
+    resp = await client.put(f"/api/admin/categories/{top['id']}", headers=h, json={
+        "name": "滑雪服测试", "parent_id": top["id"]})
+    assert resp.status_code == 400
+    resp = await client.put(f"/api/admin/categories/{top['id']}", headers=h, json={
+        "name": "滑雪服测试", "parent_id": child["id"]})
+    assert resp.status_code == 400
+
+    # 收尾：隐藏该一级，C 端树恢复原状（不影响目录用例的精确断言）
+    resp = await client.put(f"/api/admin/categories/{top['id']}", headers=h, json={
+        "name": "滑雪服测试", "en": "SKI TEST", "sort": 90, "status": 0})
+    assert resp.status_code == 200
+    tops = (await client.get("/api/v1/categories")).json()["data"]
+    assert not any(t["id"] == top["id"] for t in tops)
+
+
 async def test_series_crud_and_c_end(client):
     h = await admin_login(client)
     created = (await client.post("/api/admin/series", headers=h, json={
