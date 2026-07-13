@@ -19,6 +19,7 @@
 .hero { position: relative; }
 .hero-swiper { width: 100%; height: 975rpx; }
 .hero-frame { width: 100%; height: 100%; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 56rpx; box-sizing: border-box; }
+.hero-real { width: 100%; height: 100%; display: block; }
 .hero-dots { position: absolute; bottom: 20rpx; left: 0; right: 0; display: flex; justify-content: center; gap: 10rpx; z-index: 2; }
 .hdot { width: 10rpx; height: 10rpx; border-radius: 50%; background: rgba(120, 120, 120, 0.4); }
 .hdot.on { background: #111; }

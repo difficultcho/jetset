@@ -5,6 +5,13 @@
     </div>
     <el-table :data="list" v-loading="loading">
       <el-table-column prop="sort" label="排序" width="70" />
+      <el-table-column label="图片" width="110">
+        <template #default="{ row }">
+          <el-image v-if="row.image" :src="imgUrl(row.image)" fit="cover" class="thumb"
+            :preview-src-list="[imgUrl(row.image)]" />
+          <span v-else class="sub">无图</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="title" label="主标题" min-width="180" />
       <el-table-column prop="sub_title" label="副标题" min-width="180" />
       <el-table-column label="启用" width="80">
@@ -23,8 +30,14 @@
 
   <el-dialog v-model="dialog" :title="form.id ? '编辑轮播' : '新增轮播'" width="480px">
     <el-form label-width="70px">
-      <el-form-item label="主标题"><el-input v-model="form.title" placeholder="如：山海无界  陪伴无休" /></el-form-item>
+      <el-form-item label="主标题"><el-input v-model="form.title" placeholder="如：MID SEASON SALE" /></el-form-item>
       <el-form-item label="副标题"><el-input v-model="form.sub_title" placeholder="如：EXPLORE WITHOUT LIMITS" /></el-form-item>
+      <el-form-item label="图片">
+        <div>
+          <ImgUpload v-model="form.image" />
+          <div class="sub" style="margin-top: 4px">首页 Hero 大图，建议 3:3.9 竖图</div>
+        </div>
+      </el-form-item>
       <el-form-item label="排序"><el-input-number v-model="form.sort" :min="0" /></el-form-item>
       <el-form-item label="启用"><el-switch v-model="form.on" /></el-form-item>
     </el-form>
@@ -38,12 +51,13 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import http from '../api.js'
+import http, { imgUrl } from '../api.js'
+import ImgUpload from '../components/ImgUpload.vue'
 
 const list = ref([])
 const loading = ref(false)
 const dialog = ref(false)
-const form = ref({ id: null, title: '', sub_title: '', sort: 0, on: true })
+const form = ref({ id: null, title: '', sub_title: '', image: '', sort: 0, on: true })
 
 async function fetch() {
   loading.value = true
@@ -55,18 +69,19 @@ async function fetch() {
 }
 
 function openCreate() {
-  form.value = { id: null, title: '', sub_title: '', sort: list.value.length, on: true }
+  form.value = { id: null, title: '', sub_title: '', image: '', sort: list.value.length, on: true }
   dialog.value = true
 }
 
 function openEdit(row) {
-  form.value = { id: row.id, title: row.title, sub_title: row.sub_title, sort: row.sort, on: row.status === 1 }
+  form.value = { id: row.id, title: row.title, sub_title: row.sub_title, image: row.image || '',
+                 sort: row.sort, on: row.status === 1 }
   dialog.value = true
 }
 
 function payload() {
   const f = form.value
-  return { title: f.title, sub_title: f.sub_title, image: '', link: '', sort: f.sort, status: f.on ? 1 : 0 }
+  return { title: f.title, sub_title: f.sub_title, image: f.image, link: '', sort: f.sort, status: f.on ? 1 : 0 }
 }
 
 async function save() {
@@ -98,4 +113,6 @@ onMounted(fetch)
 
 <style scoped>
 .toolbar { margin-bottom: 16px; }
+.thumb { width: 72px; height: 56px; border-radius: 6px; border: 1px solid #eee; }
+.sub { color: #999; font-size: 12px; }
 </style>

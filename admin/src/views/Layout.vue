@@ -1,13 +1,16 @@
 <template>
   <el-container class="layout">
     <el-aside width="200px" class="aside">
-      <div class="logo">JETSET</div>
+      <div class="logo">AURELLE</div>
       <el-menu :default-active="$route.path" router background-color="#211e1a" text-color="#b8b0a4" active-text-color="#d6be94">
         <el-menu-item index="/dashboard">概览</el-menu-item>
         <el-menu-item index="/products">商品管理</el-menu-item>
+        <el-menu-item index="/series">系列管理</el-menu-item>
         <el-menu-item index="/orders">订单管理</el-menu-item>
         <el-menu-item index="/wholesale">批发审核</el-menu-item>
         <el-menu-item index="/banners">首页轮播</el-menu-item>
+        <el-menu-item index="/stores">门店管理</el-menu-item>
+        <el-menu-item index="/brand">品牌内容</el-menu-item>
         <el-menu-item index="/coupons">优惠券</el-menu-item>
         <el-menu-item index="/users">用户</el-menu-item>
       </el-menu>

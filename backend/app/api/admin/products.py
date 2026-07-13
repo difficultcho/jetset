@@ -4,10 +4,25 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.deps import DB
 from app.models.catalog import Category, Sku, Spu, SpuImage
+from app.models.series import Series
 from app.schemas.admin import ProductIn, StatusReq
 from app.schemas.common import Page, Resp
 
 router = APIRouter()
+
+
+@router.get("/categories", response_model=Resp[list[dict]])
+async def list_categories(session: DB):
+    """全量品类（含父子关系），供商品表单级联选择。"""
+    rows = (await session.execute(select(Category).order_by(Category.sort, Category.id))).scalars().all()
+    name_of = {c.id: c.name for c in rows}
+    return Resp(data=[
+        {
+            "id": c.id, "name": c.name, "en": c.en, "parent_id": c.parent_id,
+            "parent_name": name_of.get(c.parent_id), "status": c.status,
+        }
+        for c in rows
+    ])
 
 
 def _sku_dict(s: Sku) -> dict:
@@ -67,7 +82,7 @@ async def list_products(
 ):
     stmt = select(Spu, Category.name).join(Category, Spu.category_id == Category.id)
     if q:
-        stmt = stmt.where(Spu.name.like(f"%{q}%") | Spu.en_model.like(f"%{q}%"))
+        stmt = stmt.where(Spu.name.like(f"%{q}%") | Spu.code.like(f"%{q}%"))
     if status is not None:
         stmt = stmt.where(Spu.status == status)
     total = (await session.execute(select(func.count()).select_from(stmt.subquery()))).scalar_one()
@@ -78,8 +93,9 @@ async def list_products(
     ).all()
     items = [
         {
-            "id": spu.id, "name": spu.name, "en_model": spu.en_model,
+            "id": spu.id, "name": spu.name, "sub": spu.sub, "code": spu.code,
             "category_id": spu.category_id, "category_name": cat_name,
+            "series_id": spu.series_id,
             "price": spu.price, "sales": spu.sales, "badge": spu.badge,
             "featured": spu.featured, "sort": spu.sort, "status": spu.status,
             "sku_count": len([s for s in spu.skus if s.status == 1]),
@@ -96,8 +112,11 @@ async def get_product(spu_id: int, session: DB):
     if spu is None:
         raise HTTPException(status_code=404, detail="商品不存在")
     return Resp(data={
-        "id": spu.id, "category_id": spu.category_id, "name": spu.name,
+        "id": spu.id, "category_id": spu.category_id, "series_id": spu.series_id,
+        "name": spu.name, "sub": spu.sub, "code": spu.code,
         "en_model": spu.en_model, "brief": spu.brief, "detail": spu.detail,
+        "bullets": spu.bullets or [], "has_video": spu.has_video,
+        "original_price": spu.original_price,
         "badge": spu.badge, "featured": spu.featured, "sort": spu.sort,
         "status": spu.status, "price": spu.price,
         "skus": [_sku_dict(s) for s in sorted(spu.skus, key=lambda x: (x.color_index, x.id))],
@@ -108,14 +127,22 @@ async def get_product(spu_id: int, session: DB):
     })
 
 
-@router.post("/products", response_model=Resp[dict])
-async def create_product(req: ProductIn, session: DB):
+async def _check_refs(session: AsyncSession, req: ProductIn) -> None:
     if await session.get(Category, req.category_id) is None:
         raise HTTPException(status_code=400, detail="分类不存在")
+    if req.series_id is not None and await session.get(Series, req.series_id) is None:
+        raise HTTPException(status_code=400, detail="系列不存在")
+
+
+@router.post("/products", response_model=Resp[dict])
+async def create_product(req: ProductIn, session: DB):
+    await _check_refs(session, req)
     spu = Spu(
-        category_id=req.category_id, name=req.name, en_model=req.en_model,
-        brief=req.brief, detail=req.detail, badge=req.badge,
-        featured=req.featured, sort=req.sort, status=req.status,
+        category_id=req.category_id, series_id=req.series_id,
+        name=req.name, sub=req.sub, en_model=req.en_model, code=req.code,
+        brief=req.brief, detail=req.detail, bullets=req.bullets or None,
+        badge=req.badge, featured=req.featured, has_video=req.has_video,
+        original_price=req.original_price, sort=req.sort, status=req.status,
     )
     session.add(spu)
     await session.flush()
@@ -133,10 +160,11 @@ async def update_product(spu_id: int, req: ProductIn, session: DB):
     spu = await session.get(Spu, spu_id)
     if spu is None:
         raise HTTPException(status_code=404, detail="商品不存在")
-    if await session.get(Category, req.category_id) is None:
-        raise HTTPException(status_code=400, detail="分类不存在")
-    spu.category_id, spu.name, spu.en_model = req.category_id, req.name, req.en_model
-    spu.brief, spu.detail, spu.badge = req.brief, req.detail, req.badge
+    await _check_refs(session, req)
+    spu.category_id, spu.series_id = req.category_id, req.series_id
+    spu.name, spu.sub, spu.en_model, spu.code = req.name, req.sub, req.en_model, req.code
+    spu.brief, spu.detail, spu.bullets = req.brief, req.detail, (req.bullets or None)
+    spu.badge, spu.has_video, spu.original_price = req.badge, req.has_video, req.original_price
     spu.featured, spu.sort, spu.status = req.featured, req.sort, req.status
     await _apply_skus(session, spu, req.skus, list(spu.skus))
     await _apply_images(session, spu.id, req.images)
