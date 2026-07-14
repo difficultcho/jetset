@@ -1,6 +1,7 @@
 const app = getApp();
 const api = require('../../utils/api.js');
 const { toCard, fullImg } = require('../../utils/mapper.js');
+const { watchVideos } = require('../../utils/video-autoplay.js');
 
 Page({
   data: { sbh: 20, heroH: 600, heroImg: '', bagCount: 0, prods: [], prodIdx: 0, scrollTop: 0 },
@@ -29,11 +30,19 @@ Page({
       // 首页视频位：广告大片首帖的第一个视频块（无则维持占位）
       const camp = await api.brandFirst('campaign');
       const v = camp && (camp.body || []).find((b) => b.kind === 'video' && b.src);
-      if (v) this.setData({ homeVideo: { src: fullImg(v.src), poster: v.poster ? fullImg(v.poster) : '' } });
+      if (v) {
+        this.setData({ homeVideo: { src: fullImg(v.src), poster: v.poster ? fullImg(v.poster) : '' } });
+        wx.nextTick(() => watchVideos(this, ['vhome']));
+      }
     } catch (e) {
       console.error('[home] 取商品失败：', e && e.message);
       wx.showToast({ title: '商品加载失败：' + ((e && e.message) || '网络错误'), icon: 'none', duration: 3000 });
     }
+  },
+
+  onHide() {
+    // 切走 tab 时暂停首页视频（回来后滑动进屏会自动续播）
+    if (this.data.homeVideo) wx.createVideoContext('vhome', this).pause();
   },
 
   onShow() {

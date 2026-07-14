@@ -47,8 +47,8 @@
 
     <!-- 内容块 1：品牌视频（取广告大片首帖的首个视频块；未配置则占位） -->
     <view class="block block-video">
-      <video wx:if="{{homeVideo}}" class="home-video" src="{{homeVideo.src}}" poster="{{homeVideo.poster}}"
-        controls object-fit="cover" style="aspect-ratio:3/3.4;" />
+      <video wx:if="{{homeVideo}}" id="vhome" class="home-video" src="{{homeVideo.src}}" poster="{{homeVideo.poster}}"
+        controls muted loop show-mute-btn object-fit="cover" style="aspect-ratio:3/3.4;" />
       <view wx:else class="block-img va-center" style="aspect-ratio:3/3.4;background:repeating-linear-gradient(135deg,#e9ddca 0 32rpx,#e2d3bc 32rpx 64rpx);" bindtap="goCampaign">
         <view class="play-btn"><view class="play-tri" /></view>
         <text class="mono-label abs-bottom">campaign video · 雪山</text>

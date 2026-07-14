@@ -12,7 +12,7 @@
         <view wx:else class="ph" style="background:{{item.tint}};"><text class="ph-label">{{item.ph}}</text></view>
       </view>
       <view wx:elif="{{item.kind === 'video'}}" class="cimg {{item.inset ? 'inset' : ''}}" style="aspect-ratio:{{item.ratio}};">
-        <video class="real" src="{{item.src}}" poster="{{item.poster}}" controls object-fit="cover" />
+        <video id="v{{index}}" class="real" src="{{item.src}}" poster="{{item.poster}}" controls muted loop show-mute-btn object-fit="cover" />
       </view>
       <view wx:elif="{{item.kind === 'quote'}}" class="quote">"{{item.text}}"</view>
       <view wx:elif="{{item.kind === 'text'}}" class="para">{{item.text}}</view>
