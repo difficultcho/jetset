@@ -4,25 +4,21 @@
     <view class="hdr-bar">
       <view class="hdr-left">
         <view class="ic-search" bindtap="goSearch" />
-        <view class="ic-bag" bindtap="goSearch" />
+        <view class="bag-wrap" bindtap="goBag">
+          <view class="ic-bag" />
+          <view wx:if="{{bagCount > 0}}" class="bag-badge">{{bagCount}}</view>
+        </view>
       </view>
-      <image class="hdr-logo" src="/assets/jetset-logo.png" mode="aspectFit" />
+      <text class="brand-mark hdr-brand">JET SET</text>
     </view>
   </view>
 
   <scroll-view class="body" scroll-y scroll-top="{{scrollTop}}">
-    <!-- Hero 走马灯 3:3.9（原生 swiper：自动播放 + 手势滑动 + 循环） -->
-    <view class="hero">
-      <swiper class="hero-swiper" autoplay circular interval="4000" duration="600" current="{{heroIdx}}" bindchange="heroChange">
-        <swiper-item wx:for="{{hero}}" wx:key="k" bindtap="goCampaign">
-          <image wx:if="{{item.img}}" class="hero-real" src="{{item.img}}" mode="aspectFill" />
-          <view wx:else class="hero-frame" style="background:repeating-linear-gradient(135deg,{{item.c1}} 0 32rpx,{{item.c2}} 32rpx 64rpx);">
-            <text class="mono-label">{{item.label}}</text>
-          </view>
-        </swiper-item>
-      </swiper>
-      <view class="hero-dots">
-        <view class="hdot {{heroIdx === index ? 'on' : ''}}" wx:for="{{hero}}" wx:key="k" data-i="{{index}}" catchtap="setHero" />
+    <!-- 首页首图：单张静态品牌大图，撑满首屏（头部以下），后台「首页首图」可配置 -->
+    <view class="hero" style="height:{{heroH}}px;" bindtap="goCampaign">
+      <image wx:if="{{heroImg}}" class="hero-real" src="{{heroImg}}" mode="aspectFill" />
+      <view wx:else class="hero-frame" style="background:repeating-linear-gradient(135deg,#e9dfce 0 32rpx,#e2d5bf 32rpx 64rpx);">
+        <text class="mono-label">brand hero · 首页首图</text>
       </view>
     </view>
 
@@ -34,7 +30,8 @@
 
     <!-- 单品走马灯：54% 居中 + SOLEIL + 副标题（原生 swiper） -->
     <view class="prod-carousel" wx:if="{{prods.length}}">
-      <swiper class="prod-swiper" autoplay circular interval="4000" duration="600" current="{{prodIdx}}" bindchange="prodChange">
+      <!-- 单向数据流：不绑 current，bindchange 只更新圆点，避免 autoplay 渲染回环 -->
+      <swiper class="prod-swiper" autoplay circular interval="4000" duration="600" bindchange="prodChange">
         <swiper-item wx:for="{{prods}}" wx:key="id" data-id="{{item.id}}" bindtap="goPdp">
           <view class="prod-frame">
             <view class="prod-img"><prod-img prod="{{item}}" /></view>
@@ -48,9 +45,11 @@
       </view>
     </view>
 
-    <!-- 内容块 1：视频封面 + 播放按钮 -->
+    <!-- 内容块 1：品牌视频（取广告大片首帖的首个视频块；未配置则占位） -->
     <view class="block block-video">
-      <view class="block-img va-center" style="aspect-ratio:3/3.4;background:repeating-linear-gradient(135deg,#e9ddca 0 32rpx,#e2d3bc 32rpx 64rpx);" bindtap="goCampaign">
+      <video wx:if="{{homeVideo}}" class="home-video" src="{{homeVideo.src}}" poster="{{homeVideo.poster}}"
+        controls object-fit="cover" style="aspect-ratio:3/3.4;" />
+      <view wx:else class="block-img va-center" style="aspect-ratio:3/3.4;background:repeating-linear-gradient(135deg,#e9ddca 0 32rpx,#e2d3bc 32rpx 64rpx);" bindtap="goCampaign">
         <view class="play-btn"><view class="play-tri" /></view>
         <text class="mono-label abs-bottom">campaign video · 雪山</text>
       </view>

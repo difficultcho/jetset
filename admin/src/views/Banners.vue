@@ -1,7 +1,7 @@
 <template>
   <el-card>
     <div class="toolbar">
-      <el-button type="primary" @click="openCreate">+ 新增轮播</el-button>
+      <el-button type="primary" @click="openCreate">+ 新增首图</el-button>
     </div>
     <el-table :data="list" v-loading="loading">
       <el-table-column prop="sort" label="排序" width="70" />
@@ -28,14 +28,14 @@
     </el-table>
   </el-card>
 
-  <el-dialog v-model="dialog" :title="form.id ? '编辑轮播' : '新增轮播'" width="480px">
+  <el-dialog v-model="dialog" :title="form.id ? '编辑首图' : '新增首图'" width="480px">
     <el-form label-width="70px">
       <el-form-item label="主标题"><el-input v-model="form.title" placeholder="如：MID SEASON SALE" /></el-form-item>
       <el-form-item label="副标题"><el-input v-model="form.sub_title" placeholder="如：EXPLORE WITHOUT LIMITS" /></el-form-item>
       <el-form-item label="图片">
         <div>
           <ImgUpload v-model="form.image" />
-          <div class="sub" style="margin-top: 4px">首页 Hero 大图，建议 3:3.9 竖图</div>
+          <div class="sub" style="margin-top: 4px">首页首图（撑满首屏）：只展示「排序最前的启用项」，可存多条按季节切换启用；建议竖版大图</div>
         </div>
       </el-form-item>
       <el-form-item label="排序"><el-input-number v-model="form.sort" :min="0" /></el-form-item>
@@ -102,7 +102,7 @@ async function toggle(row, on) {
 }
 
 async function del(row) {
-  await ElMessageBox.confirm(`删除轮播「${row.title}」？`, '确认', { type: 'warning' })
+  await ElMessageBox.confirm(`删除首图「${row.title}」？`, '确认', { type: 'warning' })
   await http.delete('/api/admin/banners/' + row.id)
   ElMessage.success('已删除')
   fetch()

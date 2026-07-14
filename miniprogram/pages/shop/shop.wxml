@@ -1,6 +1,6 @@
 <view class="page">
   <view class="hdr" style="padding-top:{{sbh}}px;">
-    <view class="hdr-bar"><image class="hdr-logo" src="/assets/jetset-logo.png" mode="aspectFit" /></view>
+    <view class="hdr-bar"><text class="brand-mark hdr-brand">JET SET</text></view>
     <view class="search-wrap">
       <view class="search-box">
         <view class="ic-search" />

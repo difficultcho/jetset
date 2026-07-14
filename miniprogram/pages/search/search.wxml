@@ -1,0 +1,43 @@
+<view class="page">
+  <nav-bar title="" brand />
+
+  <!-- 搜索输入行：放大镜 + 输入框 + 细分割线 -->
+  <view class="search-row">
+    <view class="s-ic" />
+    <input class="s-input" placeholder="搜索商品" placeholder-class="s-ph" focus confirm-type="search"
+      value="{{q}}" bindinput="onInput" bindconfirm="doSearch" />
+    <view wx:if="{{q}}" class="s-clear" bindtap="clearQ">×</view>
+  </view>
+  <view class="s-line" />
+
+  <scroll-view class="body" scroll-y>
+    <!-- 搜索结果模式 -->
+    <block wx:if="{{searched}}">
+      <view class="sec-t">搜索"{{qDone}}"</view>
+      <view class="grid" wx:if="{{results.length}}">
+        <product-card wx:for="{{results}}" wx:key="id" prod="{{item}}" wished="{{wished[item.id]}}"
+          bind:tap="goPdp" bind:star="onStar" bind:bag="onBag" />
+      </view>
+      <view wx:else class="empty">未找到相关商品</view>
+    </block>
+
+    <!-- 默认模式：品类快捷入口 + 热门推荐 -->
+    <block wx:else>
+      <view class="sec-t">热门品类</view>
+      <view class="chips">
+        <view class="chip" wx:for="{{cats}}" wx:key="id" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="goCat">
+          <image wx:if="{{item.img}}" class="chip-img" src="{{item.img}}" mode="aspectFill" />
+          <view wx:else class="chip-img chip-ph" />
+          <text class="chip-t">{{item.name}}</text>
+        </view>
+      </view>
+
+      <view class="sec-t">热门推荐</view>
+      <view class="grid">
+        <product-card wx:for="{{hot}}" wx:key="id" prod="{{item}}" wished="{{wished[item.id]}}"
+          bind:tap="goPdp" bind:star="onStar" bind:bag="onBag" />
+      </view>
+    </block>
+    <view class="body-space" />
+  </scroll-view>
+</view>

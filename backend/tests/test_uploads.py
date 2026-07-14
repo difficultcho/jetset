@@ -27,6 +27,21 @@ async def test_upload_requires_auth(client):
     assert resp.status_code == 401
 
 
+async def test_upload_video_mp4(client):
+    headers = await login(client, "upload-user3")
+    fake_mp4 = b"\x00\x00\x00\x18ftypmp42" + b"\x00" * 64
+    resp = await client.post(
+        "/api/v1/uploads", headers=headers,
+        files={"file": ("clip.mp4", fake_mp4, "video/mp4")},
+    )
+    assert resp.status_code == 200, resp.text
+    url = resp.json()["data"]["url"]
+    assert url.endswith(".mp4")
+    resp = await client.get(url)
+    assert resp.status_code == 200
+    assert resp.headers["content-type"].startswith("video/mp4")
+
+
 async def test_upload_rejects_non_image(client):
     headers = await login(client, "upload-user2")
     resp = await client.post(

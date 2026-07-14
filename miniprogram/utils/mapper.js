@@ -77,18 +77,25 @@ function toStore(s) {
   };
 }
 
-// 品牌内容
+// 品牌内容（详情含 series 关联与子项目卡片）
 function toBrand(p) {
   return {
     id: p.id, type: p.type, title: p.title, subtitle: p.subtitle,
     cover: fullImg(p.cover), tint: p.cover_tint || '#e6ddce', link: p.link,
+    series: p.series || null,
+    subPosts: (p.sub_posts || []).map((x) => ({
+      id: x.id, title: x.title, subtitle: x.subtitle,
+      cover: fullImg(x.cover), tint: x.cover_tint || '#e6ddce'
+    })),
     body: (p.body || []).map((b) => ({
       kind: b.kind,
       text: b.value || '',
       img: b.img ? fullImg(b.img) : '',
+      src: b.src ? fullImg(b.src) : '',
+      poster: b.poster ? fullImg(b.poster) : '',
       tint: b.tint || '#e6ddce',
       ph: b.ph || '',
-      ratio: b.ratio || '3/3.3',
+      ratio: b.ratio || (b.kind === 'video' ? '16/9' : '3/3.3'),
       inset: !!b.inset
     }))
   };

@@ -35,9 +35,9 @@
   font-weight: 600;
   color: #111;
 }
-.title-logo {
-  width: 84rpx;
-  height: 60rpx;
+.title.brand-mark {
+  font-weight: 300;
+  font-size: 36rpx;
 }
 .right {
   position: absolute;

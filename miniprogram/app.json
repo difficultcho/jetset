@@ -5,6 +5,7 @@
     "pages/shop/shop",
     "pages/me/me",
     "pages/stores/stores",
+    "pages/search/search",
     "pages/list/list",
     "pages/pdp/pdp",
     "pages/bag/bag",
@@ -29,6 +30,7 @@
     "pages/follow/follow",
     "pages/campaign/campaign",
     "pages/projects/projects",
+    "pages/post/post",
     "pages/moments/moments",
     "pages/story/story",
     "pages/store-intro/store-intro",
@@ -50,11 +52,26 @@
     "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
-      { "pagePath": "pages/home/home", "text": "首页" },
-      { "pagePath": "pages/brand/brand", "text": "关于品牌" },
-      { "pagePath": "pages/shop/shop", "text": "商城" },
-      { "pagePath": "pages/me/me", "text": "我的" },
-      { "pagePath": "pages/stores/stores", "text": "线下门店" }
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/brand/brand",
+        "text": "关于品牌"
+      },
+      {
+        "pagePath": "pages/shop/shop",
+        "text": "商城"
+      },
+      {
+        "pagePath": "pages/me/me",
+        "text": "我的"
+      },
+      {
+        "pagePath": "pages/stores/stores",
+        "text": "线下门店"
+      }
     ]
   },
   "style": "v2",

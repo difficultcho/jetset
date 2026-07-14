@@ -1,15 +1,14 @@
 const api = require('../../utils/api.js');
 const { toCard, toBrand } = require('../../utils/mapper.js');
 
+// 通用品牌帖详情：活动项目（含子项目）/系列专题/任意 brand_post
 Page({
   data: { post: null, prods: [], seriesEn: '' },
-  async onLoad() {
+  async onLoad(opts) {
     try {
-      const p = await api.brandFirst('campaign');
-      if (!p) return;
+      const p = await api.brandPost(opts.id);
       const post = toBrand(p);
       this.setData({ post });
-      // 关联了系列 → 尾部同系列单品导购条
       if (post.series) {
         const page = await api.products({ series: post.series.id, page_size: 6 });
         this.setData({
@@ -17,7 +16,10 @@ Page({
           seriesEn: post.series.en || post.series.name
         });
       }
-    } catch (e) { /* 静默 */ }
+    } catch (e) {
+      wx.showToast({ title: '内容加载失败', icon: 'none' });
+    }
   },
+  goSub(e) { wx.navigateTo({ url: '/pages/post/post?id=' + e.currentTarget.dataset.id }); },
   goPdp(e) { wx.navigateTo({ url: '/pages/pdp/pdp?id=' + e.currentTarget.dataset.id }); }
 });

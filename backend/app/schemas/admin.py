@@ -82,7 +82,9 @@ class BrandPostIn(BaseModel):
     subtitle: str = Field(default="", max_length=256)
     cover: str = Field(default="", max_length=512)
     cover_tint: str = Field(default="#e6ddce", max_length=16)
-    body: list[dict] = []   # [{kind: image|text|quote, ...}]
+    body: list[dict] = []   # [{kind: image|text|quote|video, ...}]
+    series_id: int | None = None   # 关联系列 → 详情页尾部导购条
+    parent_id: int | None = None   # 父活动项目（两级，仅 project）
     link: str = Field(default="", max_length=256)
     sort: int = 0
     status: int = Field(default=1, ge=0, le=1)

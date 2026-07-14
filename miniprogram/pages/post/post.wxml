@@ -1,12 +1,12 @@
-<view class="page">
+<view class="page" wx:if="{{post}}">
   <nav-bar title="" brand />
   <scroll-view class="body" scroll-y>
-    <view wx:if="{{post}}" class="title-sec">
+    <view class="title-sec">
       <view class="eyebrow">{{post.title}}</view>
-      <view class="t-cn">{{post.subtitle}}</view>
+      <view wx:if="{{post.subtitle}}" class="t-cn">{{post.subtitle}}</view>
     </view>
 
-    <block wx:if="{{post}}" wx:for="{{post.body}}" wx:key="ph">
+    <block wx:for="{{post.body}}" wx:key="ph">
       <view wx:if="{{item.kind === 'image'}}" class="cimg {{item.inset ? 'inset' : ''}}" style="aspect-ratio:{{item.ratio}};">
         <image wx:if="{{item.img}}" class="real" src="{{item.img}}" mode="aspectFill" />
         <view wx:else class="ph" style="background:{{item.tint}};"><text class="ph-label">{{item.ph}}</text></view>
@@ -14,10 +14,24 @@
       <view wx:elif="{{item.kind === 'video'}}" class="cimg {{item.inset ? 'inset' : ''}}" style="aspect-ratio:{{item.ratio}};">
         <video class="real" src="{{item.src}}" poster="{{item.poster}}" controls object-fit="cover" />
       </view>
+      <view wx:elif="{{item.kind === 'quote'}}" class="quote">"{{item.text}}"</view>
       <view wx:elif="{{item.kind === 'text'}}" class="para">{{item.text}}</view>
     </block>
 
-    <!-- 关联系列单品（帖子配置了「关联系列」才出现） -->
+    <!-- 子项目（活动项目的下级） -->
+    <block wx:if="{{post.subPosts.length}}">
+      <view class="strip-t eyebrow">相关活动</view>
+      <view class="sub-item" wx:for="{{post.subPosts}}" wx:key="id" data-id="{{item.id}}" bindtap="goSub">
+        <view class="sub-img">
+          <image wx:if="{{item.cover}}" class="real" src="{{item.cover}}" mode="aspectFill" />
+          <view wx:else class="ph" style="background:{{item.tint}};"><text class="ph-label">editorial · {{item.title}}</text></view>
+        </view>
+        <view class="sub-t">{{item.title}}</view>
+        <view class="sub-c">{{item.subtitle}}</view>
+      </view>
+    </block>
+
+    <!-- 关联系列单品 -->
     <block wx:if="{{prods.length}}">
       <view class="strip-t eyebrow">{{seriesEn}}</view>
       <view class="prod-strip">

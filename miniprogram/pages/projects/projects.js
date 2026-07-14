@@ -8,5 +8,6 @@ Page({
       const posts = await api.brandPosts('project');
       this.setData({ projects: posts.map(toBrand) });
     } catch (e) { /* 静默 */ }
-  }
+  },
+  goDetail(e) { wx.navigateTo({ url: '/pages/post/post?id=' + e.currentTarget.dataset.id }); }
 });

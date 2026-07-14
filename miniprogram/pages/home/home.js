@@ -2,18 +2,15 @@ const app = getApp();
 const api = require('../../utils/api.js');
 const { toCard, fullImg } = require('../../utils/mapper.js');
 
-// 与设计稿一致的 Hero 三帧（后台未配置轮播图时的占位）
-const HERO = [
-  { k: 'h0', c1: '#ecd9cb', c2: '#e5cebc', label: 'campaign · 崖畔印花套装' },
-  { k: 'h1', c1: '#e9dfce', c2: '#e2d5bf', label: 'campaign · 金纱帘光影' },
-  { k: 'h2', c1: '#dfe5e9', c2: '#d5dde3', label: 'campaign · 泳池假日' }
-];
-
 Page({
-  data: { sbh: 20, hero: HERO, heroIdx: 0, prods: [], prodIdx: 0, scrollTop: 0 },
+  data: { sbh: 20, heroH: 600, heroImg: '', bagCount: 0, prods: [], prodIdx: 0, scrollTop: 0 },
 
   onLoad() {
-    this.setData({ sbh: app.globalData.statusBarHeight });
+    const sbh = app.globalData.statusBarHeight;
+    // 首图撑满首屏：窗口高 −（状态栏 + 88rpx 头部）
+    const win = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
+    const heroH = win.windowHeight - sbh - Math.round((win.windowWidth * 88) / 750);
+    this.setData({ sbh, heroH });
     this.fetch();
   },
 
@@ -21,17 +18,18 @@ Page({
     try {
       const page = await api.products({ page_size: 6 });
       this.setData({ prods: page.items.slice(0, 3).map(toCard) });
-      // 后台配置的 Hero 轮播（有图用图，无图用占位帧）
+      // 首页首图：后台「首页首图」排序最前的启用项（无图时保留占位帧）
       const home = await api.home();
-      const banners = (home.banners || []).map((b, i) => ({
-        k: 'b' + i, img: fullImg(b.image),
-        label: b.title || '', c1: '#e9dfce', c2: '#e2d5bf'
-      }));
-      if (banners.length) this.setData({ hero: banners, heroIdx: 0 });
+      const first = (home.banners || [])[0];
+      if (first && first.image) this.setData({ heroImg: fullImg(first.image) });
       // STARS 系列 id（供"探索 STARS 星星系列"跳转）
       const series = await api.series();
       const hs = series.find((s) => s.en === 'STARS') || series[0];
       if (hs) this.setData({ hsId: hs.id, hsEn: hs.en });
+      // 首页视频位：广告大片首帖的第一个视频块（无则维持占位）
+      const camp = await api.brandFirst('campaign');
+      const v = camp && (camp.body || []).find((b) => b.kind === 'video' && b.src);
+      if (v) this.setData({ homeVideo: { src: fullImg(v.src), poster: v.poster ? fullImg(v.poster) : '' } });
     } catch (e) {
       console.error('[home] 取商品失败：', e && e.message);
       wx.showToast({ title: '商品加载失败：' + ((e && e.message) || '网络错误'), icon: 'none', duration: 3000 });
@@ -40,17 +38,16 @@ Page({
 
   onShow() {
     if (typeof this.getTabBar === 'function') this.getTabBar().refresh(0);
-    app.refreshCartCount();
+    app.refreshCartCount().then((c) => this.setData({ bagCount: c }));
     // 首次因登录时序失败时，回到首页补取一次
     if (!this.data.prods.length) this.fetch();
   },
 
-  // swiper 切换（含手势/自动播放）时同步自定义圆点
-  heroChange(e) { this.setData({ heroIdx: e.detail.current }); },
+  // swiper 切换（含手势/自动播放）时同步自定义圆点（单向，不回写 current）
   prodChange(e) { this.setData({ prodIdx: e.detail.current }); },
-  setHero(e) { this.setData({ heroIdx: e.currentTarget.dataset.i }); },
   scrollToTop() { this.setData({ scrollTop: this.data.scrollTop === 0 ? 1 : 0 }); },
 
+  goBag() { wx.navigateTo({ url: '/pages/bag/bag' }); },
   goCampaign() { wx.navigateTo({ url: '/pages/campaign/campaign' }); },
   goSeries() {
     const id = this.data.hsId || 1;
@@ -58,5 +55,5 @@ Page({
   },
   goList() { wx.navigateTo({ url: '/pages/list/list' }); },
   goPdp(e) { wx.navigateTo({ url: '/pages/pdp/pdp?id=' + e.currentTarget.dataset.id }); },
-  goSearch() { wx.navigateTo({ url: '/pages/list/list' }); }
+  goSearch() { wx.navigateTo({ url: '/pages/search/search' }); }
 });

@@ -21,7 +21,11 @@
       </el-table-column>
       <el-table-column label="标题" min-width="200">
         <template #default="{ row }">
-          <div>{{ row.title }}</div>
+          <div>
+            {{ row.title }}
+            <el-tag v-if="row.parent_id" size="small" type="info" effect="plain">子项目</el-tag>
+            <el-tag v-if="row.series_id" size="small" effect="plain">{{ seriesName(row.series_id) }}</el-tag>
+          </div>
           <div class="sub">{{ row.subtitle }}</div>
         </template>
       </el-table-column>
@@ -52,9 +56,25 @@
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :span="16"><el-form-item label="标题" required><el-input v-model="form.title" placeholder="如：N.04 CAPRI SUMMER" /></el-form-item></el-col>
+        <el-col :span="16"><el-form-item label="标题" required><el-input v-model="form.title" placeholder="如：MID SEASON SALE" /></el-form-item></el-col>
       </el-row>
       <el-form-item label="副标题"><el-input v-model="form.subtitle" /></el-form-item>
+      <el-row :gutter="12">
+        <el-col :span="12">
+          <el-form-item label="关联系列">
+            <el-select v-model="form.series_id" clearable placeholder="无（详情页尾部不出导购条）" style="width: 100%">
+              <el-option v-for="s in seriesList" :key="s.id" :label="s.en ? s.en + '｜' + s.name : s.name" :value="s.id" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12" v-if="form.type === 'project'">
+          <el-form-item label="父项目">
+            <el-select v-model="form.parent_id" clearable placeholder="无（本身是顶级项目）" style="width: 100%">
+              <el-option v-for="p in parentOptions" :key="p.id" :label="p.title" :value="p.id" />
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
       <el-row :gutter="12">
         <el-col :span="10">
           <el-form-item label="封面图"><ImgUpload v-model="form.cover" :size="80" /></el-form-item>
@@ -72,6 +92,7 @@
             <div class="block-head">
               <el-select v-model="b.kind" style="width: 100px" size="small">
                 <el-option label="图片" value="image" />
+                <el-option label="视频" value="video" />
                 <el-option label="正文" value="text" />
                 <el-option label="引言" value="quote" />
               </el-select>
@@ -89,6 +110,20 @@
                 <el-input v-model="b.ph" size="small" style="width: 200px" placeholder="占位标签（未传图时展示）" />
               </div>
             </div>
+            <div v-else-if="b.kind === 'video'" class="block-img">
+              <div>
+                <el-upload :show-file-list="false" :http-request="(o) => doVideo(o, b)" accept="video/mp4">
+                  <el-button size="small">{{ b.src ? '重新上传视频' : '上传视频（mp4 ≤50MB）' }}</el-button>
+                </el-upload>
+                <div v-if="vPct" class="v-hint">上传中 {{ vPct }}%</div>
+                <div v-else-if="b.src" class="v-hint">✓ {{ b.src }}</div>
+              </div>
+              <div class="block-opts">
+                <span>封面图 <ImgUpload v-model="b.poster" :size="72" /></span>
+                <span>宽高比 <el-input v-model="b.ratio" size="small" style="width: 80px" placeholder="16/9" /></span>
+                <span>两侧留白 <el-switch v-model="b.inset" size="small" /></span>
+              </div>
+            </div>
             <el-input v-else v-model="b.value" type="textarea" :rows="2"
               :placeholder="b.kind === 'quote' ? '引言（居中大字）' : '正文段落'" />
           </div>
@@ -104,9 +139,9 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import http, { imgUrl } from '../api.js'
+import http, { imgUrl, uploadImage } from '../api.js'
 import ImgUpload from '../components/ImgUpload.vue'
 
 const TYPES = { project: 'A.PROJECTS', moment: 'A.MOMENTS', campaign: '广告大片', story: '品牌故事' }
@@ -116,16 +151,36 @@ const type = ref('')
 const loading = ref(false)
 const dialog = ref(false)
 const form = ref(empty())
+const seriesList = ref([])
+const allPosts = ref([])
+const vPct = ref(0)
+
+// 父项目候选：顶级 project，排除自己
+const parentOptions = computed(() =>
+  allPosts.value.filter((p) => p.type === 'project' && !p.parent_id && p.id !== form.value.id))
 
 function empty() {
   return { id: null, type: 'project', title: '', subtitle: '', cover: '',
-           cover_tint: '#e6ddce', link: '', body: [], sort: 0, on: true }
+           cover_tint: '#e6ddce', link: '', body: [], series_id: null, parent_id: null,
+           sort: 0, on: true }
+}
+
+async function doVideo({ file }, b) {
+  vPct.value = 1
+  try {
+    const data = await uploadImage(file, (p) => { vPct.value = p })
+    b.src = data.url
+  } finally {
+    vPct.value = 0
+  }
 }
 
 async function fetch() {
   loading.value = true
   try {
     list.value = await http.get('/api/admin/brand/posts', { params: { type: type.value || undefined } })
+    if (!type.value) allPosts.value = list.value
+    else allPosts.value = await http.get('/api/admin/brand/posts')
   } finally {
     loading.value = false
   }
@@ -142,9 +197,11 @@ function openEdit(row) {
   form.value = {
     id: row.id, type: row.type, title: row.title, subtitle: row.subtitle,
     cover: row.cover, cover_tint: row.cover_tint, link: row.link || '',
+    series_id: row.series_id, parent_id: row.parent_id,
     sort: row.sort, on: row.status === 1,
     body: (row.body || []).map((b) => ({
       kind: b.kind || 'text', img: b.img || '', value: b.value || '',
+      src: b.src || '', poster: b.poster || '',
       ratio: b.ratio || '3/3.3', inset: !!b.inset, ph: b.ph || '', tint: b.tint || '#e6ddce'
     }))
   }
@@ -152,7 +209,8 @@ function openEdit(row) {
 }
 
 function addBlock() {
-  form.value.body.push({ kind: 'image', img: '', value: '', ratio: '3/3.3', inset: false, ph: '', tint: '#e6ddce' })
+  form.value.body.push({ kind: 'image', img: '', value: '', src: '', poster: '',
+                         ratio: '3/3.3', inset: false, ph: '', tint: '#e6ddce' })
 }
 
 function move(i, delta) {
@@ -161,11 +219,15 @@ function move(i, delta) {
   arr.splice(i + delta, 0, x)
 }
 
-// 图片块与文字块字段互斥，保存时只带各自需要的键（与小程序 toBrand 的契约一致）
+// 各类块只带各自需要的键（与小程序 toBrand 的契约一致）
 function blockOut(b) {
   if (b.kind === 'image') {
     return { kind: 'image', img: b.img, ratio: b.ratio || '3/3.3', inset: !!b.inset,
              ph: b.ph, tint: b.tint || '#e6ddce' }
+  }
+  if (b.kind === 'video') {
+    return { kind: 'video', src: b.src, poster: b.poster,
+             ratio: b.ratio || '16/9', inset: !!b.inset }
   }
   return { kind: b.kind, value: b.value }
 }
@@ -173,6 +235,8 @@ function blockOut(b) {
 function payload(f) {
   return { type: f.type, title: f.title, subtitle: f.subtitle, cover: f.cover,
            cover_tint: f.cover_tint || '#e6ddce', link: f.link,
+           series_id: f.series_id || null,
+           parent_id: f.type === 'project' ? (f.parent_id || null) : null,
            body: f.body.map(blockOut), sort: f.sort, status: f.on ? 1 : 0 }
 }
 
@@ -189,6 +253,7 @@ async function toggle(row, on) {
   await http.put('/api/admin/brand/posts/' + row.id, {
     type: row.type, title: row.title, subtitle: row.subtitle, cover: row.cover,
     cover_tint: row.cover_tint, link: row.link || '', body: row.body,
+    series_id: row.series_id, parent_id: row.parent_id,
     sort: row.sort, status: on ? 1 : 0
   })
   row.status = on ? 1 : 0
@@ -201,7 +266,15 @@ async function del(row) {
   fetch()
 }
 
-onMounted(fetch)
+function seriesName(id) {
+  const s = seriesList.value.find((x) => x.id === id)
+  return s ? (s.en || s.name) : '系列'
+}
+
+onMounted(async () => {
+  fetch()
+  seriesList.value = await http.get('/api/admin/series')
+})
 </script>
 
 <style scoped>
@@ -214,5 +287,6 @@ onMounted(fetch)
 .block-head { display: flex; align-items: center; gap: 4px; margin-bottom: 8px; }
 .grow { flex: 1; }
 .block-img { display: flex; gap: 16px; align-items: flex-start; }
+.v-hint { color: #67a23a; font-size: 12px; margin-top: 6px; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .block-opts { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; color: #666; font-size: 13px; }
 </style>

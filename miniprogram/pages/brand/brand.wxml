@@ -1,41 +1,80 @@
 <view class="page">
   <view class="hdr" style="padding-top:{{sbh}}px;">
-    <view class="hdr-bar"><image class="hdr-logo" src="/assets/jetset-logo.png" mode="aspectFit" /></view>
+    <view class="hdr-bar"><text class="brand-mark hdr-brand">JET SET</text></view>
   </view>
 
   <scroll-view class="body" scroll-y>
+    <!-- 区块 1：品牌故事 -->
     <view class="sec-title">
-      <view class="eyebrow">A.IMMERSE</view>
-      <view class="sec-sub">探索JET SET世界</view>
+      <view class="eyebrow">THE STORY</view>
+      <view class="sec-sub">品牌故事</view>
     </view>
-
-    <view class="block" wx:for="{{blocks}}" wx:key="ph">
-      <view class="block-img" bindtap="{{item.video ? 'togglePlay' : 'go'}}" data-go="{{item.go}}"
-        style="background:repeating-linear-gradient(135deg,{{item.c1}} 0 16rpx,{{item.c2}} 16rpx 32rpx);">
-        <block wx:if="{{item.video}}">
-          <view wx:if="{{!playing}}" class="play-btn"><view class="play-tri" /></view>
-          <block wx:else>
-            <view class="pause-btn"><view class="pause-bar" /><view class="pause-bar" /></view>
-            <view class="vid-progress"><view class="vid-fill" /></view>
-          </block>
-        </block>
-        <text class="ph-label">{{item.ph}}</text>
-        <text wx:if="{{item.time}}" class="time-tag">00:30</text>
+    <view class="block">
+      <view class="block-img" data-go="story" bindtap="go"
+        style="background:repeating-linear-gradient(135deg,#e5ddce 0 16rpx,#ddd3c0 16rpx 32rpx);">
+        <image wx:if="{{covers.story}}" class="block-real" src="{{covers.story}}" mode="aspectFill" />
+        <text wx:else class="ph-label">story · 品牌故事</text>
       </view>
-      <view class="block-cap"><text class="cap-link" data-go="{{item.go}}" bindtap="go">{{item.t}}</text></view>
+      <view class="block-cap"><text class="cap-link" data-go="story" bindtap="go">品牌故事 THE STORY</text></view>
     </view>
 
+    <!-- 区块 2：门店 -->
+    <view class="block">
+      <view class="block-img" data-go="storeIntro" bindtap="go"
+        style="background:repeating-linear-gradient(135deg,#e0dbd2 0 16rpx,#d8d2c6 16rpx 32rpx);">
+        <image wx:if="{{covers.store}}" class="block-real" src="{{covers.store}}" mode="aspectFill" />
+        <text wx:else class="ph-label">boutique · 走进精品店</text>
+      </view>
+      <view class="block-cap"><text class="cap-link" data-go="storeIntro" bindtap="go">走进精品店 BOUTIQUE</text></view>
+    </view>
+
+    <!-- 区块 3：系列（关联了系列的品牌帖，与商城上下架解耦） -->
+    <block wx:if="{{seriesPosts.length}}">
+      <view class="sec-title">
+        <view class="eyebrow">COLLECTIONS</view>
+        <view class="sec-sub">系列精选</view>
+      </view>
+      <scroll-view class="series-strip" scroll-x>
+        <view class="series-card" wx:for="{{seriesPosts}}" wx:key="id" data-id="{{item.id}}" bindtap="goPost">
+          <view class="series-img">
+            <image wx:if="{{item.cover}}" class="block-real" src="{{item.cover}}" mode="aspectFill" />
+            <view wx:else class="series-ph" style="background:{{item.tint}};" />
+          </view>
+          <view class="series-t">{{item.title}}</view>
+          <view class="series-c">{{item.subtitle}}</view>
+        </view>
+      </scroll-view>
+    </block>
+
+    <!-- 区块 4：活动 -->
     <view class="sec-title">
-      <view class="eyebrow">EXPLORE</view>
-      <view class="sec-sub">发现JET SET最新讯息和无穷巧思</view>
+      <view class="eyebrow">EVENTS</view>
+      <view class="sec-sub">品牌活动</view>
     </view>
-
-    <view class="block" wx:for="{{blocks2}}" wx:key="ph">
-      <view class="block-img" data-go="{{item.go}}" bindtap="go"
-        style="background:repeating-linear-gradient(135deg,{{item.c1}} 0 16rpx,{{item.c2}} 16rpx 32rpx);">
-        <text class="ph-label">{{item.ph}}</text>
+    <view class="block">
+      <view class="block-img" data-go="campaign" bindtap="go"
+        style="background:repeating-linear-gradient(135deg,#dcdfe0 0 16rpx,#d0d4d6 16rpx 32rpx);">
+        <image wx:if="{{covers.campaign}}" class="block-real" src="{{covers.campaign}}" mode="aspectFill" />
+        <view wx:if="{{!covers.campaign}}" class="play-btn"><view class="play-tri" /></view>
+        <text wx:if="{{!covers.campaign}}" class="ph-label">campaign · 当季大片</text>
       </view>
-      <view class="block-cap"><text class="cap-link" data-go="{{item.go}}" bindtap="go">{{item.t}}</text></view>
+      <view class="block-cap"><text class="cap-link" data-go="campaign" bindtap="go">{{campTitle}} 当季大片</text></view>
+    </view>
+    <view class="block">
+      <view class="block-img" data-go="projects" bindtap="go"
+        style="background:repeating-linear-gradient(135deg,#dde3ea 0 16rpx,#d3dbe4 16rpx 32rpx);">
+        <image wx:if="{{covers.project}}" class="block-real" src="{{covers.project}}" mode="aspectFill" />
+        <text wx:else class="ph-label">editorial · A.PROJECTS</text>
+      </view>
+      <view class="block-cap"><text class="cap-link" data-go="projects" bindtap="go">A.PROJECTS 活动项目</text></view>
+    </view>
+    <view class="block">
+      <view class="block-img" data-go="moments" bindtap="go"
+        style="background:repeating-linear-gradient(135deg,#e8dcc8 0 16rpx,#e0d2b9 16rpx 32rpx);">
+        <image wx:if="{{covers.moment}}" class="block-real" src="{{covers.moment}}" mode="aspectFill" />
+        <text wx:else class="ph-label">moments · 品牌活动</text>
+      </view>
+      <view class="block-cap"><text class="cap-link" data-go="moments" bindtap="go">A.MOMENTS 精彩瞬间</text></view>
     </view>
 
     <view class="tab-space" />

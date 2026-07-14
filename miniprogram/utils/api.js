@@ -24,6 +24,7 @@ const api = {
   brandPosts: (type) => request('GET', '/api/v1/brand/posts?type=' + type),
   brandPost: (id) => request('GET', '/api/v1/brand/posts/' + id),
   brandFirst: (type) => request('GET', '/api/v1/brand/first?type=' + type),
+  seriesPosts: () => request('GET', '/api/v1/brand/series-posts'),
 
   // 购物车
   cartList: () => request('GET', '/api/v1/cart'),

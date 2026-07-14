@@ -2,7 +2,7 @@
   <nav-bar title="A.MOMENTS" />
   <scroll-view class="body" scroll-y wx:if="{{post}}">
     <view class="head">
-      <image class="bm-logo" src="/assets/jetset-logo.png" mode="aspectFit" />
+      <view class="brand-mark bm">JET SET</view>
       <view class="eyebrow ax">{{post.title}}</view>
       <view class="intro">{{post.subtitle}}</view>
     </view>
@@ -10,6 +10,9 @@
       <view wx:if="{{item.kind === 'image'}}" class="img" style="aspect-ratio:{{item.ratio}};">
         <image wx:if="{{item.img}}" class="real" src="{{item.img}}" mode="aspectFill" />
         <view wx:else class="ph" style="background:{{item.tint}};"><text class="ph-label">{{item.ph}}</text></view>
+      </view>
+      <view wx:elif="{{item.kind === 'video'}}" class="img" style="aspect-ratio:{{item.ratio}};">
+        <video class="real" src="{{item.src}}" poster="{{item.poster}}" controls object-fit="cover" />
       </view>
       <view wx:elif="{{item.kind === 'text'}}" class="para">{{item.text}}</view>
     </block>

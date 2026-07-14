@@ -155,6 +155,48 @@ async def test_store_crud_and_c_end(client):
     assert resp.status_code == 200
 
 
+async def test_brand_post_structure(client):
+    """series_id 关联系列 + parent_id 两级活动项目。"""
+    h = await admin_login(client)
+    series = (await client.get("/api/admin/series", headers=h)).json()["data"][0]
+
+    parent = (await client.post("/api/admin/brand/posts", headers=h, json={
+        "type": "project", "title": "半年企划 SS26",
+        "series_id": series["id"], "sort": 98})).json()["data"]
+    child = (await client.post("/api/admin/brand/posts", headers=h, json={
+        "type": "project", "title": "发布酒会", "parent_id": parent["id"]})).json()["data"]
+
+    # 三级 / 自引用 / 系列不存在，均被拒
+    resp = await client.post("/api/admin/brand/posts", headers=h,
+                             json={"type": "project", "title": "x", "parent_id": child["id"]})
+    assert resp.status_code == 400
+    resp = await client.put(f"/api/admin/brand/posts/{parent['id']}", headers=h,
+                            json={"type": "project", "title": "半年企划 SS26",
+                                  "parent_id": parent["id"]})
+    assert resp.status_code == 400
+    resp = await client.post("/api/admin/brand/posts", headers=h,
+                             json={"type": "project", "title": "x", "series_id": 999999})
+    assert resp.status_code == 400
+
+    # C 端列表只出顶级；详情带子项目卡片 + 关联系列
+    cards = (await client.get("/api/v1/brand/posts", params={"type": "project"})).json()["data"]
+    ids = [c["id"] for c in cards]
+    assert parent["id"] in ids and child["id"] not in ids
+    detail = (await client.get(f"/api/v1/brand/posts/{parent['id']}")).json()["data"]
+    assert any(s["id"] == child["id"] for s in detail["sub_posts"])
+    assert detail["series"]["id"] == series["id"]
+
+    # 品牌 tab「系列」区块：关联了系列的顶级帖
+    sp = (await client.get("/api/v1/brand/series-posts")).json()["data"]
+    assert any(p["id"] == parent["id"] for p in sp)
+
+    # 有子项目的父项目禁止删除；先删子再删父
+    resp = await client.delete(f"/api/admin/brand/posts/{parent['id']}", headers=h)
+    assert resp.status_code == 400
+    assert (await client.delete(f"/api/admin/brand/posts/{child['id']}", headers=h)).status_code == 200
+    assert (await client.delete(f"/api/admin/brand/posts/{parent['id']}", headers=h)).status_code == 200
+
+
 async def test_brand_post_crud_and_c_end(client):
     h = await admin_login(client)
     created = (await client.post("/api/admin/brand/posts", headers=h, json={
