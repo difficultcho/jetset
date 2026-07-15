@@ -10,7 +10,7 @@ from app.utils import utcnow
 
 
 def uc_status(uc: UserCoupon) -> str:
-    """惰性判定：unused 且已过期 → expired。"""
+    """惰性判定：unused 且已过期 → expired"""
     if uc.status == "unused" and uc.expires_at < utcnow():
         return "expired"
     return uc.status

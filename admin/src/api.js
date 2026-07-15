@@ -31,7 +31,7 @@ http.interceptors.response.use(
   }
 )
 
-// 相对路径图片（/uploads/x.jpg）补全为可访问 URL
+// 相对路径图片（/uploads/x.jpg）补全为可访问的 URL
 export function imgUrl(path) {
   if (!path) return ''
   return path.startsWith('http') ? path : apiBase + path
