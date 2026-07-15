@@ -54,6 +54,7 @@ class ProductDetail(BaseModel):
     price: int
     original_price: int | None = None
     series: dict | None = None
+    category: str = ""
     colors: list[ColorOut]
     sizes: list[str]
     skus: list[SkuOut]

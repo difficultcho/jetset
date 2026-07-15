@@ -101,10 +101,15 @@ async def test_product_new_fields_roundtrip(client):
     assert d["series_id"] == series["id"] and d["has_video"] is True
     assert d["original_price"] == 1280000 and d["bullets"][2] == "鞋跟高度 8.5cm"
 
-    # C 端详情透出新字段
+    # C 端详情透出新字段（含品类名，详情页同品类推荐用）
     c = (await client.get(f"/api/v1/products/{spu_id}")).json()["data"]
     assert c["code"] == "AU999TEST01" and c["series"]["id"] == series["id"]
     assert c["original_price"] == 1280000 and len(c["bullets"]) == 3
+    assert c["category"] == leaf["name"]
+
+    # 精选筛选（首页走马灯/购物袋推荐的取材）
+    feat = (await client.get("/api/v1/products", params={"featured": 1})).json()["data"]
+    assert any(i["id"] == spu_id for i in feat["items"])
 
     # 更新：摘掉系列、清空划线价
     payload["series_id"] = None

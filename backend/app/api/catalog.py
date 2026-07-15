@@ -77,6 +77,7 @@ async def products(
     cat: str | None = None,
     series: int | None = None,
     q: str | None = None,
+    featured: bool = False,
     sort: str = "default",
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
@@ -91,6 +92,8 @@ async def products(
         stmt = stmt.where(Spu.series_id == series)
     if q:
         stmt = stmt.where(Spu.name.like(f"%{q}%"))
+    if featured:
+        stmt = stmt.where(Spu.featured.is_(True))
     total = (await session.execute(select(func.count()).select_from(stmt.subquery()))).scalar_one()
     stmt = stmt.order_by(*SORTS.get(sort, SORTS["default"]))
     stmt = stmt.offset((page - 1) * page_size).limit(page_size)
@@ -118,4 +121,5 @@ async def product_detail(spu_id: int, session: DB):
         s = await session.get(Series, spu.series_id)
         if s:
             series = {"id": s.id, "name": s.name, "en": s.en, "subtitle": s.subtitle}
-    return Resp(data=spu_to_detail(spu, series))
+    cat = await session.get(Category, spu.category_id)
+    return Resp(data=spu_to_detail(spu, series, cat.name if cat else ""))

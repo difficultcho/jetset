@@ -9,6 +9,7 @@ const routes = [
     children: [
       { path: 'dashboard', component: () => import('./views/Dashboard.vue'), meta: { title: '概览' } },
       { path: 'products', component: () => import('./views/Products.vue'), meta: { title: '商品管理' } },
+      { path: 'categories', component: () => import('./views/Categories.vue'), meta: { title: '品类管理' } },
       { path: 'series', component: () => import('./views/Series.vue'), meta: { title: '系列管理' } },
       { path: 'orders', component: () => import('./views/Orders.vue'), meta: { title: '订单管理' } },
       { path: 'wholesale', component: () => import('./views/Wholesale.vue'), meta: { title: '批发审核' } },

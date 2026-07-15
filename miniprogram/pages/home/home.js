@@ -17,8 +17,14 @@ Page({
 
   async fetch() {
     try {
-      const page = await api.products({ page_size: 6 });
-      this.setData({ prods: page.items.slice(0, 3).map(toCard) });
+      // 走马灯取材：精选商品优先（勾几个轮几帧）；无精选回退默认前 3
+      const feat = await api.products({ featured: 1, page_size: 10 });
+      if (feat.items.length) {
+        this.setData({ prods: feat.items.map(toCard) });
+      } else {
+        const page = await api.products({ page_size: 6 });
+        this.setData({ prods: page.items.slice(0, 3).map(toCard) });
+      }
       // 首页首图：后台「首页首图」排序最前的启用项（无图时保留占位帧）
       const home = await api.home();
       const first = (home.banners || [])[0];

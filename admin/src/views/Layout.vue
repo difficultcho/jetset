@@ -5,6 +5,7 @@
       <el-menu :default-active="$route.path" router background-color="#211e1a" text-color="#b8b0a4" active-text-color="#d6be94">
         <el-menu-item index="/dashboard">概览</el-menu-item>
         <el-menu-item index="/products">商品管理</el-menu-item>
+        <el-menu-item index="/categories">品类管理</el-menu-item>
         <el-menu-item index="/series">系列管理</el-menu-item>
         <el-menu-item index="/orders">订单管理</el-menu-item>
         <el-menu-item index="/wholesale">批发审核</el-menu-item>

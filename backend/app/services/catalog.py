@@ -28,7 +28,7 @@ def spu_to_list_item(spu: Spu, series_en: str = "") -> dict:
     }
 
 
-def spu_to_detail(spu: Spu, series: dict | None = None) -> dict:
+def spu_to_detail(spu: Spu, series: dict | None = None, category: str = "") -> dict:
     colors: dict[int, dict] = {}
     sizes: list[str] = []
     for sku in sorted(spu.skus, key=lambda s: s.id):
@@ -55,6 +55,7 @@ def spu_to_detail(spu: Spu, series: dict | None = None) -> dict:
         "price": spu.price,
         "original_price": spu.original_price,
         "series": series,
+        "category": category,   # 品类名（详情页同品类推荐用）
         "colors": [colors[i] for i in sorted(colors)],
         "sizes": sizes,
         "skus": [

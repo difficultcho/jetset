@@ -14,7 +14,9 @@ Page({
       const items = raw.map(toCartItem);
       const sel = items.map(() => true);
       this.setData({ items, sel }, () => this.calc());
-      const page = await api.products({ page_size: 12 });
+      // 推荐取材：精选优先，无精选回退销量榜；排除已在袋中的
+      let page = await api.products({ featured: 1, page_size: 12 });
+      if (!page.items.length) page = await api.products({ sort: 'sales', page_size: 12 });
       const inCart = {};
       raw.forEach((r) => { inCart[r.spu_id] = true; });
       this.setData({ recs: page.items.filter((p) => !inCart[p.id]).slice(0, 4).map(toCard) });

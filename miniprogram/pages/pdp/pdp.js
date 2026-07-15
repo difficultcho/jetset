@@ -26,8 +26,16 @@ Page({
         size: prod.sizes[0] || '',
         wished: app.isWished(opts.id)
       });
-      const page = await api.products({ page_size: 4 });
-      this.setData({ recs: page.items.filter((p) => p.id !== d.id).slice(0, 2).map(toCard) });
+      // 推荐取材：同品类按销量优先（看裤子推热卖的裤子），不足补精选
+      const page = await api.products({ cat: d.category, sort: 'sales', page_size: 6 });
+      let recs = page.items.filter((p) => p.id !== d.id);
+      if (recs.length < 2) {
+        const extra = await api.products({ featured: 1, sort: 'sales', page_size: 6 });
+        extra.items.forEach((p) => {
+          if (p.id !== d.id && !recs.some((r) => r.id === p.id)) recs.push(p);
+        });
+      }
+      this.setData({ recs: recs.slice(0, 2).map(toCard) });
     } catch (e) {
       wx.showToast({ title: '商品加载失败', icon: 'none' });
     }
