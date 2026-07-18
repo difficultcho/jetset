@@ -1,5 +1,5 @@
 // 后端数据 → JET SET 视图模型。后端金额单位为「分」，展示用「元」（千分位）。
-const { API_BASE } = require('./config.js');
+const { ASSET_BASE } = require('./config.js');
 
 function yuan(cents) {
   return (cents || 0) / 100;
@@ -16,7 +16,7 @@ function fmt(cents) {
 
 function fullImg(path) {
   if (!path) return '';
-  return path.indexOf('http') === 0 ? path : API_BASE + path;
+  return path.indexOf('http') === 0 ? path : ASSET_BASE + path;
 }
 
 // 商品卡（首页/商城/列表/心愿单/足迹/推荐）

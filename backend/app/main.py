@@ -4,7 +4,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
 from app.api import api_router
 from app.api.admin import admin_router
@@ -57,6 +57,10 @@ async def serve_upload(name: str):
         raise HTTPException(status_code=404, detail="Not Found")
     path = Path(settings.upload_dir) / name
     if not path.is_file():
+        # COS 切换过渡兜底：本地没有的文件（新上传已进 COS / 存量已迁走）跳转素材域名。
+        # 这让「后端切 COS、存量迁移、前端换 CDN 前缀」三步可以任意分步上线而不断图。
+        if settings.asset_base_url:
+            return RedirectResponse(f"{settings.asset_base_url}/uploads/{name}", status_code=302)
         raise HTTPException(status_code=404, detail="Not Found")
     # 文件名为 UUID、内容不可变，可放心长缓存（客户端/微信缓存后不再回源）
     return FileResponse(path, headers={"Cache-Control": "public, max-age=31536000, immutable"})

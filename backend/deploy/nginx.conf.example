@@ -3,14 +3,40 @@
 # ^~ 前缀匹配优先级高于普通前缀和正则，不会被 location / 抢走）。
 # 配套：/opt/jetset/.env 里设 ROOT_PATH=/jetset（让 /jetset/docs 文档页正常）
 
+# ★ 限流 zone 定义必须放在 http{} 块里（server 块之外），如 /etc/nginx/nginx.conf 的 http 段：
+#   limit_req_zone $binary_remote_addr zone=jetset_login:10m  rate=10r/m;   # 登录：每 IP 每分钟 10 次
+#   limit_req_zone $binary_remote_addr zone=jetset_upload:10m rate=30r/m;   # 上传：每 IP 每分钟 30 次
+
     # --- JETSET 购物小程序后端 ---
+
+    # 登录接口限流（防撞库/爆破；burst 允许短暂突发，超出直接 429）
+    location = /jetset/api/admin/auth/login {
+        limit_req zone=jetset_login burst=5 nodelay;
+        proxy_pass http://127.0.0.1:8010/api/admin/auth/login;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # 上传接口限流（匿名用户 token 即可调用，防脚本刷盘）
+    location = /jetset/api/v1/uploads {
+        limit_req zone=jetset_upload burst=10 nodelay;
+        client_max_body_size 60m;             # 视频上传（50MB 上限 + 余量）
+        proxy_pass http://127.0.0.1:8010/api/v1/uploads;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
     location ^~ /jetset/ {
         proxy_pass http://127.0.0.1:8010/;    # 结尾斜杠：转发时剥掉 /jetset 前缀
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        client_max_body_size 10m;             # 图片上传
+        client_max_body_size 60m;             # 图片/视频上传
     }
 
     # --- JETSET 管理后台（静态 SPA，CI scp 到 /var/www/jetset-admin）---

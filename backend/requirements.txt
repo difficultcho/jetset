@@ -12,6 +12,8 @@ python-multipart>=0.0.9
 alembic>=1.13
 # 上限 <45：本地老 macOS (x86_64) 没有更新版本的 wheel，避免源码编译；Linux/Docker 不受影响
 cryptography>=42,<45
+# S3 兼容对象存储 SDK（百度 BOS/腾讯 COS/阿里 OSS 通用；未配置 S3_* 环境变量时代码不会触碰它）
+boto3>=1.34
 
 # 测试（与运行依赖合并管理，单人项目从简）
 pytest>=8.0

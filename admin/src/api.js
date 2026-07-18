@@ -31,10 +31,14 @@ http.interceptors.response.use(
   }
 )
 
-// 相对路径图片（/uploads/x.jpg）补全为可访问的 URL
+// 素材 CDN 域名：COS 加速域名配好后填入（如 'https://cdn.kkmsee.com'）；
+// 留空则素材走 API 域名（由后端本地伺服或 302 到 CDN）
+const CDN_BASE = ''
+
+// 相对路径素材（/uploads/x.jpg）补全为可访问的 URL
 export function imgUrl(path) {
   if (!path) return ''
-  return path.startsWith('http') ? path : apiBase + path
+  return path.startsWith('http') ? path : (CDN_BASE || apiBase) + path
 }
 
 // 图片/视频上传：大文件 + 慢上行不适用全局 15s 超时，单独放宽并回报进度

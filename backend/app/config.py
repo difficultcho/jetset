@@ -37,6 +37,17 @@ class Settings(BaseSettings):
 
     upload_dir: str = "./uploads"
 
+    # S3 兼容对象存储（百度 BOS / 腾讯 COS / 阿里 OSS 通用；配齐后上传自动切对象存储，
+    # 否则回退本地磁盘，开发/测试零依赖）。百度 BOS 北京区 endpoint: https://s3.bj.bcebos.com
+    s3_endpoint: str = ""
+    s3_region: str = ""         # 如 bj
+    s3_access_key: str = ""
+    s3_secret_key: str = ""
+    s3_bucket: str = ""
+    # 素材公网域名（CDN 加速域名，如 https://cdn.kkmsee.com）。
+    # 配置后：本地不存在的 /uploads/x 由 API 302 跳转到该域名（迁移过渡期的兜底）
+    asset_base_url: str = ""
+
     # 管理后台初始账号（seed 时创建；生产务必改密码）
     admin_username: str = "admin"
     admin_password: str = "jetset-admin"

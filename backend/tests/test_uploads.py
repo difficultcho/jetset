@@ -54,3 +54,15 @@ async def test_upload_rejects_non_image(client):
 async def test_serve_upload_path_traversal_blocked(client):
     resp = await client.get("/uploads/..%2Fapp%2Fconfig.py")
     assert resp.status_code == 404
+
+
+async def test_missing_file_redirects_to_cdn_when_configured(client, monkeypatch):
+    """COS 迁移过渡兜底：本地没有的文件 302 到素材域名；未配置则维持 404。"""
+    resp = await client.get("/uploads/notexist.jpg")
+    assert resp.status_code == 404
+
+    from app.config import settings
+    monkeypatch.setattr(settings, "asset_base_url", "https://cdn.example.com")
+    resp = await client.get("/uploads/notexist.jpg")
+    assert resp.status_code == 302
+    assert resp.headers["location"] == "https://cdn.example.com/uploads/notexist.jpg"
