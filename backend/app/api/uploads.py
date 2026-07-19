@@ -62,7 +62,11 @@ async def upload(file: UploadFile):
         raise BizError("视频不能超过 50MB")
     name = f"{uuid.uuid4().hex}{ext}"
     if s3_enabled():
-        await run_in_threadpool(_put_s3, name, content, mime)
+        try:
+            await run_in_threadpool(_put_s3, name, content, mime)
+        except Exception as e:
+            # 配置/权限/网络问题给出可读原因（AK/SK 错、endpoint 不通、桶权限不足等），不裸 500
+            raise BizError(f"对象存储上传失败：{type(e).__name__}: {e}") from e
     else:
         dest = Path(settings.upload_dir)
         dest.mkdir(parents=True, exist_ok=True)
