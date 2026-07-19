@@ -1,10 +1,20 @@
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    # URL 类配置容错：自动补 https:// 前缀、去掉尾斜杠（漏写协议头已翻车两次）
+    @field_validator("s3_endpoint", "asset_base_url", check_fields=False)
+    @classmethod
+    def _normalize_url(cls, v: str) -> str:
+        v = (v or "").strip().rstrip("/")
+        if v and not v.startswith(("http://", "https://")):
+            v = "https://" + v
+        return v
 
     app_env: str = "dev"  # dev | test | prod
     # 反代路径前缀（如 nginx 挂在 /jetset/ 下则设为 /jetset），影响 /docs 等自引用 URL
