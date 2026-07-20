@@ -117,41 +117,18 @@
           </div>
         </div>
 
-        <!-- 跳转配置（视频块不支持） -->
-        <div v-if="b.kind !== 'video' && b.kind !== 'carousel'" class="opts link-row">
-          <span>点击跳转
-            <el-select v-model="b.lkind" size="small" style="width: 130px">
-              <el-option label="不跳转" value="none" />
-              <el-option label="内容页" value="post" />
-              <el-option label="广告大片" value="campaign" />
-              <el-option label="商品列表" value="list" />
-              <el-option label="商品详情" value="pdp" />
-            </el-select>
-          </span>
-          <span v-if="b.lkind === 'post'">内容帖
-            <el-select v-model="b.lpost" size="small" filterable style="width: 240px" placeholder="选择帖子">
-              <el-option v-for="p in postList" :key="p.id" :label="POST_TYPES[p.type] + '｜' + p.title" :value="p.id" />
-            </el-select>
-          </span>
-          <template v-if="b.lkind === 'list'">
-            <span>品类
-              <el-select v-model="b.lcat" size="small" clearable filterable style="width: 170px" placeholder="（可选）">
-                <el-option v-for="c in catList" :key="c.id" :label="catLabel(c)" :value="c.id" :disabled="c.status !== 1" />
-              </el-select>
-            </span>
-            <span>系列
-              <el-select v-model="b.lseries" size="small" clearable filterable style="width: 170px" placeholder="（可选）">
-                <el-option v-for="s in seriesList" :key="s.id" :label="s.en ? s.en + '｜' + s.name : s.name"
-                  :value="s.id" :disabled="s.status !== 1" />
-              </el-select>
-            </span>
-            <span class="sub">优先品类；都不选 = 全部商品</span>
-          </template>
-          <span v-if="b.lkind === 'pdp'">商品
-            <el-select v-model="b.lspu" size="small" filterable style="width: 240px" placeholder="选择商品">
-              <el-option v-for="p in prodList" :key="p.id" :label="prodLabel(p)" :value="p.id" :disabled="p.status !== 1" />
-            </el-select>
-          </span>
+        <!-- 链接行块：左右两栏，各自文字 + 跳转 -->
+        <div v-else-if="b.kind === 'linkrow'" class="block-body-col">
+          <div v-for="side in ['left', 'right']" :key="side" class="opts linkrow-side">
+            <el-tag size="small" type="info">{{ side === 'left' ? '左' : '右' }}</el-tag>
+            <el-input v-model="b[side].text" size="small" style="width: 200px" placeholder="链接文字（留空=该侧不显示）" />
+            <LinkTarget v-model="b[side].link" :posts="postList" :cats="catList" :series="seriesList" :prods="prodList" />
+          </div>
+        </div>
+
+        <!-- 跳转配置（图片/文本；视频不支持、走马灯与链接行自带） -->
+        <div v-if="b.kind === 'image' || b.kind === 'text'" class="opts link-row">
+          <LinkTarget v-model="b.link" :posts="postList" :cats="catList" :series="seriesList" :prods="prodList" />
         </div>
       </div>
 
@@ -159,6 +136,7 @@
         <el-button size="small" @click="add('image')">+ 图片</el-button>
         <el-button size="small" @click="add('video')">+ 视频</el-button>
         <el-button size="small" @click="add('text')">+ 文本</el-button>
+        <el-button size="small" @click="add('linkrow')">+ 链接行</el-button>
         <el-button size="small" @click="add('carousel')">+ 走马灯</el-button>
       </div>
     </div>
@@ -170,10 +148,10 @@ import { onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import http, { uploadImage } from '../api.js'
 import ImgUpload from '../components/ImgUpload.vue'
+import LinkTarget from '../components/LinkTarget.vue'
 
-const KINDS = { image: '图片', video: '视频', text: '文本', carousel: '走马灯' }
-const TAG = { image: '', video: 'warning', text: 'info', carousel: 'success' }
-const POST_TYPES = { project: '项目', moment: '瞬间', campaign: '大片', story: '故事' }
+const KINDS = { image: '图片', video: '视频', text: '文本', linkrow: '链接行', carousel: '走马灯' }
+const TAG = { image: '', video: 'warning', text: 'info', linkrow: 'info', carousel: 'success' }
 const RATIOS = ['3/3.9', '3/3.6', '3/3.4', '3/3.2', '1/1', '16/9']
 
 const loading = ref(false)
@@ -189,11 +167,13 @@ const catLabel = (c) => (c.parent_name ? c.parent_name + ' / ' : '') + c.name
 const prodLabel = (p) => p.name + (p.code ? '｜' + p.code : '')
 
 function blank(kind) {
-  return { _id: ++seq, _pct: 0, kind, img: '', src: '', poster: '',
-           ratio: kind === 'image' ? 'hero' : '3/3.4', inset: false,
-           preset: 'para', text: '', align: 'left',
-           source: 'featured', series_id: null, category_id: null, spu_ids: [], count: 6,
-           lkind: 'none', lpost: null, lcat: null, lseries: null, lspu: null }
+  const b = { _id: ++seq, _pct: 0, kind, img: '', src: '', poster: '',
+              ratio: kind === 'image' ? 'hero' : '3/3.4', inset: false,
+              preset: 'para', text: '', align: 'left',
+              source: 'featured', series_id: null, category_id: null, spu_ids: [], count: 6,
+              link: null }
+  if (kind === 'linkrow') { b.left = { text: '', link: null }; b.right = { text: '', link: null } }
+  return b
 }
 
 function add(kind) { blocks.value.push(blank(kind)) }
@@ -213,29 +193,28 @@ async function doVideo({ file }, b) {
   }
 }
 
-// 存储态 → 编辑态
+// 存储态 → 编辑态（link 结构直接沿用，交给 LinkTarget 组件维护）
 function toEdit(b) {
   const e = { ...blank(b.kind), ...b, _id: ++seq, _pct: 0 }
-  const l = b.link
-  e.lkind = (l && l.kind) || 'none'
-  e.lpost = (l && l.post_id) || null
-  e.lcat = (l && l.category_id) || null
-  e.lseries = (l && l.series_id) || null
-  e.lspu = (l && l.spu_id) || null
-  delete e.link
+  if (b.kind === 'linkrow') {
+    e.left = { text: (b.left && b.left.text) || '', link: (b.left && b.left.link) || null }
+    e.right = { text: (b.right && b.right.text) || '', link: (b.right && b.right.link) || null }
+  } else {
+    e.link = b.link || null
+  }
   return e
 }
 
 // 编辑态 → 存储态（各块只带自己的键）
 function toOut(b) {
-  let link = null
-  if (b.lkind === 'campaign') link = { kind: 'campaign' }
-  if (b.lkind === 'post' && b.lpost) link = { kind: 'post', post_id: b.lpost }
-  if (b.lkind === 'pdp' && b.lspu) link = { kind: 'pdp', spu_id: b.lspu }
-  if (b.lkind === 'list') link = { kind: 'list', category_id: b.lcat || null, series_id: b.lseries || null }
-  if (b.kind === 'image') return { kind: 'image', img: b.img, ratio: b.ratio, inset: !!b.inset, link }
+  if (b.kind === 'image') return { kind: 'image', img: b.img, ratio: b.ratio, inset: !!b.inset, link: b.link || null }
   if (b.kind === 'video') return { kind: 'video', src: b.src, poster: b.poster, ratio: b.ratio, inset: !!b.inset }
-  if (b.kind === 'text') return { kind: 'text', preset: b.preset, text: b.text, align: b.align, link }
+  if (b.kind === 'text') return { kind: 'text', preset: b.preset, text: b.text, align: b.align, link: b.link || null }
+  if (b.kind === 'linkrow') {
+    return { kind: 'linkrow',
+             left: { text: b.left.text, link: b.left.link || null },
+             right: { text: b.right.text, link: b.right.link || null } }
+  }
   return { kind: 'carousel', source: b.source, series_id: b.series_id, category_id: b.category_id,
            spu_ids: b.spu_ids, count: b.count }
 }
@@ -283,6 +262,7 @@ onMounted(load)
 .block-body-col { display: flex; flex-direction: column; gap: 8px; }
 .opts { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; font-size: 12px; color: #666; }
 .link-row { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #eee; }
+.linkrow-side { padding: 4px 0; }
 .picker-label { flex-shrink: 0; }
 .v-hint { margin-top: 6px; font-size: 12px; color: #67c23a; }
 .add-row { display: flex; gap: 8px; }

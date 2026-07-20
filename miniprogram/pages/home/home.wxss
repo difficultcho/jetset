@@ -65,3 +65,5 @@
 .gt-center { text-align: center; }
 .gt-right { text-align: right; }
 .gb-bottom { height: 40rpx; }
+.lr-slot { min-width: 0; }
+.lr-right { text-align: right; }

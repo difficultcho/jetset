@@ -25,10 +25,18 @@ async def test_page_home_configure_and_resolve(client):
         "blocks": [{"kind": "carousel", "source": "manual", "spu_ids": []}], "status": 1})
     assert resp.status_code == 400
 
-    # 保存一页四种块
+    # 链接行：左右至少一侧文字
+    resp = await client.put("/api/admin/pages/home", headers=h, json={
+        "blocks": [{"kind": "linkrow", "left": {"text": ""}, "right": {"text": ""}}], "status": 1})
+    assert resp.status_code == 400
+
+    # 保存一页各种块（含链接行：左跳系列列表、右跳大片）
     blocks = [
         {"kind": "image", "img": "/uploads/hero.jpg", "ratio": "hero", "inset": False,
          "link": {"kind": "list", "category_id": leaf["id"]}},
+        {"kind": "linkrow",
+         "left": {"text": "探索系列", "link": {"kind": "list", "category_id": leaf["id"]}},
+         "right": {"text": "探索广告大片", "link": {"kind": "campaign"}}},
         {"kind": "text", "preset": "link", "text": "探索广告大片", "align": "right",
          "link": {"kind": "campaign"}},
         {"kind": "carousel", "source": "manual", "spu_ids": manual_ids, "count": 6},
@@ -36,6 +44,7 @@ async def test_page_home_configure_and_resolve(client):
         {"kind": "text", "preset": "para", "text": "山巅之上。",
          "link": {"kind": "post", "post_id": post["id"]}},
         {"kind": "carousel", "source": "category", "category_id": leaf["id"], "count": 4},
+        {"kind": "linkrow", "left": {"text": "仅左链接", "link": None}, "right": {"text": ""}},
     ]
     resp = await client.put("/api/admin/pages/home", headers=h,
                             json={"blocks": blocks, "status": 1})
@@ -45,12 +54,16 @@ async def test_page_home_configure_and_resolve(client):
     data = (await client.get("/api/v1/pages/home")).json()["data"]
     b = data["blocks"]
     assert b[0]["link"] == {"kind": "list", "cat": leaf["name"], "title": leaf["name"]}
-    assert b[1]["link"] == {"kind": "campaign"}
-    assert [it["id"] for it in b[2]["items"]] == manual_ids
-    assert "image" in b[2]["items"][0] and "price" in b[2]["items"][0]
-    assert b[3]["link"] is None
-    assert b[4]["link"] == {"kind": "post", "post_id": post["id"]}
-    assert isinstance(b[5]["items"], list)
+    # 链接行左右各自解析；仅左块右侧为 None
+    assert b[1]["left"]["text"] == "探索系列" and b[1]["left"]["link"]["cat"] == leaf["name"]
+    assert b[1]["right"]["link"] == {"kind": "campaign"}
+    assert b[2]["link"] == {"kind": "campaign"}
+    assert [it["id"] for it in b[3]["items"]] == manual_ids
+    assert "image" in b[3]["items"][0] and "price" in b[3]["items"][0]
+    assert b[4]["link"] is None
+    assert b[5]["link"] == {"kind": "post", "post_id": post["id"]}
+    assert isinstance(b[6]["items"], list)
+    assert b[7]["left"]["text"] == "仅左链接" and b[7]["left"]["link"] is None and b[7]["right"] is None
 
     # 停用 → C 端回落（data 为 None）；收尾保持停用，避免影响其他用例
     resp = await client.put("/api/admin/pages/home", headers=h,

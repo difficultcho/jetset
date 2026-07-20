@@ -35,6 +35,15 @@
           data-i="{{index}}" bindtap="goBlockLink">
           <text class="{{item.preset === 'link' ? 'ul-link' : ''}}">{{item.text}}</text>
         </view>
+        <!-- 链接行块：左右两栏，各自可点、各自跳转（任一侧空则只显示另一侧） -->
+        <view wx:elif="{{item.kind === 'linkrow'}}" class="link-row">
+          <view class="lr-slot">
+            <text wx:if="{{item.left}}" class="ul-link" data-i="{{index}}" data-side="left" bindtap="goBlockLink">{{item.left.text}}</text>
+          </view>
+          <view class="lr-slot lr-right">
+            <text wx:if="{{item.right}}" class="ul-link" data-i="{{index}}" data-side="right" bindtap="goBlockLink">{{item.right.text}}</text>
+          </view>
+        </view>
         <!-- 走马灯块（单向圆点，不回绑 current） -->
         <view wx:elif="{{item.kind === 'carousel' && item.items.length}}" class="prod-carousel">
           <swiper class="prod-swiper" autoplay circular interval="4000" duration="600"

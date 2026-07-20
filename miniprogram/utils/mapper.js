@@ -53,6 +53,9 @@ function toPageBlocks(blocks) {
       o.preset = b.preset || 'para';
       o.text = b.text || '';
       o.align = b.align || 'left';
+    } else if (b.kind === 'linkrow') {
+      o.left = b.left ? { text: b.left.text, link: b.left.link || null } : null;
+      o.right = b.right ? { text: b.right.text, link: b.right.link || null } : null;
     } else if (b.kind === 'carousel') {
       o.items = (b.items || []).map(toCard);
       o.idx = 0;

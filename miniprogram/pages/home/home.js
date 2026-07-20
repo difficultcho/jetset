@@ -130,10 +130,12 @@ Page({
     if (!this.data.blocks.length && !this.data.prods.length) this.fetch();
   },
 
-  // 配置化块：类型化跳转（后端已把链接解析成导航参数）
+  // 配置化块：类型化跳转（后端已把链接解析成导航参数）；链接行按左右取各自 link
   goBlockLink(e) {
-    const b = this.data.blocks[e.currentTarget.dataset.i];
-    const l = b && b.link;
+    const { i, side } = e.currentTarget.dataset;
+    const b = this.data.blocks[i];
+    let l = b && b.link;
+    if (b && b.kind === 'linkrow') l = side === 'right' ? (b.right && b.right.link) : (b.left && b.left.link);
     if (!l) return;
     if (l.kind === 'post') return wx.navigateTo({ url: '/pages/post/post?id=' + l.post_id });
     if (l.kind === 'campaign') return wx.navigateTo({ url: '/pages/campaign/campaign' });

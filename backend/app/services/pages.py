@@ -20,7 +20,7 @@ from app.models.series import Series
 from app.services.catalog import spu_to_list_item
 
 PAGE_KEYS = {"home"}
-BLOCK_KINDS = {"image", "video", "text", "carousel"}
+BLOCK_KINDS = {"image", "video", "text", "carousel", "linkrow"}
 TEXT_PRESETS = {"para", "quote", "eyebrow", "link"}
 CAROUSEL_SOURCES = {"featured", "series", "category", "manual"}
 LINK_KINDS = {"post", "campaign", "list", "pdp"}
@@ -42,10 +42,19 @@ def validate_blocks(blocks: list) -> None:
                 raise BizError(f"第 {i} 块（走马灯）未选择品类")
             if b["source"] == "manual" and not b.get("spu_ids"):
                 raise BizError(f"第 {i} 块（走马灯）未选择商品")
-        link = b.get("link")
-        if link is not None and b["kind"] != "video":
-            if not isinstance(link, dict) or link.get("kind") not in LINK_KINDS:
-                raise BizError(f"第 {i} 块跳转配置无效")
+        if b["kind"] == "linkrow":
+            sides = [b.get("left") or {}, b.get("right") or {}]
+            if not any((s.get("text") or "").strip() for s in sides):
+                raise BizError(f"第 {i} 块（链接行）左右至少填一侧文字")
+            for s in sides:
+                _validate_link(s.get("link"), i)
+        elif b["kind"] != "video":
+            _validate_link(b.get("link"), i)
+
+
+def _validate_link(link, i: int) -> None:
+    if link is not None and (not isinstance(link, dict) or link.get("kind") not in LINK_KINDS):
+        raise BizError(f"第 {i} 块跳转配置无效")
 
 
 async def _carousel_items(session: AsyncSession, b: dict) -> list[dict]:
@@ -134,6 +143,18 @@ async def resolve_page(session: AsyncSession, key: str) -> dict | None:
             rb["items"] = await _carousel_items(session, rb)
             if not rb["items"]:
                 continue
+        if rb["kind"] == "linkrow":
+            # 左右两栏：空文字侧置 None，各自解析跳转；两侧全空则整块剔除
+            for side in ("left", "right"):
+                s = rb.get(side) or {}
+                if (s.get("text") or "").strip():
+                    rb[side] = {"text": s["text"], "link": await _resolve_link(session, s.get("link"))}
+                else:
+                    rb[side] = None
+            if not rb["left"] and not rb["right"]:
+                continue
+            blocks.append(rb)
+            continue
         rb["link"] = await _resolve_link(session, rb.get("link")) if rb["kind"] != "video" else None
         blocks.append(rb)
     return {"key": key, "blocks": blocks}
