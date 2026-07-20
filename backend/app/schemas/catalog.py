@@ -69,6 +69,8 @@ class HomeBanner(BaseModel):
 
 class HomeOut(BaseModel):
     banners: list[HomeBanner]
+    # 视频位：{src, poster, post_id, series_id, series_name, series_en}，未配置为 None
+    video: dict | None = None
     hot: list[ProductListItem]
     featured: ProductListItem | None
     grid: list[ProductListItem]

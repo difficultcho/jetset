@@ -45,7 +45,7 @@
       </view>
     </view>
 
-    <!-- 内容块 1：品牌视频（取广告大片首帖的首个视频块；未配置则占位）；文案跟随大片标题 -->
+    <!-- 内容块 1：视频位（后台「首页首图」配置系列 → 播该系列内容帖的第一个视频，链接跳系列页；未配置则占位、指向广告大片） -->
     <view class="block block-video">
       <video wx:if="{{homeVideo}}" id="vhome" class="home-video" src="{{homeVideo.src}}" poster="{{homeVideo.poster}}"
         controls muted loop show-mute-btn object-fit="cover" style="aspect-ratio:3/3.4;" />
@@ -53,7 +53,10 @@
         <view class="play-btn"><view class="play-tri" /></view>
         <text class="mono-label abs-bottom">campaign video</text>
       </view>
-      <view class="block-link"><text class="ul-link" bindtap="goCampaign">{{campTitle || '探索广告大片'}}</text></view>
+      <view class="block-link">
+        <text wx:if="{{homeVideo}}" class="ul-link" bindtap="goVideoPost">{{homeVideo.label}}</text>
+        <text wx:else class="ul-link" bindtap="goCampaign">{{campTitle || '探索广告大片'}}</text>
+      </view>
     </view>
 
     <!-- 内容块 2/3：品类导览（前两个叶子品类，图为该品类第一个商品图） -->

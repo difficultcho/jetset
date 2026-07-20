@@ -2,11 +2,41 @@ from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
 
 from app.deps import DB
+from app.errors import BizError
 from app.models.cms import Banner
-from app.schemas.admin import BannerIn
+from app.models.series import Series
+from app.schemas.admin import BannerIn, HomeVideoIn
 from app.schemas.common import Resp
+from app.services.cms import HOME_VIDEO_KEY, find_series_video, get_setting, set_setting
 
 router = APIRouter()
+
+
+async def _home_video_state(session) -> dict:
+    """当前配置 + 按配置能解析出的视频（video=None 表示配置了但未生效/未配置）。"""
+    raw = await get_setting(session, HOME_VIDEO_KEY)
+    sid = int(raw) if raw.isdigit() else 0
+    video = await find_series_video(session, sid) if sid else None
+    return {"series_id": sid, "video": video}
+
+
+@router.get("/home-video", response_model=Resp[dict])
+async def get_home_video(session: DB):
+    return Resp(data=await _home_video_state(session))
+
+
+@router.put("/home-video", response_model=Resp[dict])
+async def set_home_video(req: HomeVideoIn, session: DB):
+    """配置首页视频位关联的系列；该系列的内容帖中必须已有视频块。series_id=0 清除。"""
+    if req.series_id:
+        s = await session.get(Series, req.series_id)
+        if s is None:
+            raise HTTPException(status_code=404, detail="系列不存在")
+        if await find_series_video(session, req.series_id) is None:
+            raise BizError("该系列还没有视频内容：请先在「品牌内容」里给关联此系列的帖子添加视频块")
+    await set_setting(session, HOME_VIDEO_KEY, str(req.series_id or ""))
+    await session.commit()
+    return Resp(data=await _home_video_state(session))
 
 
 def _row(b: Banner) -> dict:

@@ -4,6 +4,15 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.db import Base, BigIntPK
 
 
+class Setting(Base):
+    """全站键值配置：如首页视频位关联的系列 id。"""
+
+    __tablename__ = "setting"
+
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    value: Mapped[str] = mapped_column(String(512), default="")
+
+
 class Banner(Base):
     __tablename__ = "banner"
 

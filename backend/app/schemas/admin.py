@@ -94,6 +94,10 @@ class StatusReq(BaseModel):
     status: int = Field(ge=0, le=1)
 
 
+class HomeVideoIn(BaseModel):
+    series_id: int = Field(default=0, ge=0)  # 0 = 清除配置
+
+
 class ShipReq(BaseModel):
     company: str = Field(min_length=1, max_length=32)
     tracking_no: str = Field(min_length=1, max_length=64)

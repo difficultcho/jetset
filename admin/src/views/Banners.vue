@@ -28,6 +28,24 @@
     </el-table>
   </el-card>
 
+  <el-card style="margin-top: 16px">
+    <template #header>首页视频位</template>
+    <div class="sub" style="margin-bottom: 12px">
+      选定一个系列后，首页视频区将播放该系列内容帖中的第一个视频，视频下方链接同步指向该系列页面。
+      要求该系列至少有一篇含视频块的内容帖（在「品牌内容」编辑并关联系列）；清空则视频位显示占位并指向广告大片。
+    </div>
+    <div class="vs-row">
+      <el-select v-model="vsSeriesId" clearable placeholder="不配置" style="width: 280px">
+        <el-option v-for="s in seriesList" :key="s.id" :value="s.id"
+          :label="s.name + (s.en ? ' · ' + s.en : '')" :disabled="s.status !== 1" />
+      </el-select>
+      <el-button type="primary" @click="saveVideoSlot">保存</el-button>
+      <el-tag v-if="vsState.series_id && vsState.video" type="success">已生效：{{ vsFile }}</el-tag>
+      <el-tag v-else-if="vsState.series_id" type="warning">未生效：该系列当前无视频内容</el-tag>
+      <el-tag v-else type="info">未配置</el-tag>
+    </div>
+  </el-card>
+
   <el-dialog v-model="dialog" :title="form.id ? '编辑首图' : '新增首图'" width="480px">
     <el-form label-width="70px">
       <el-form-item label="主标题"><el-input v-model="form.title" placeholder="如：MID SEASON SALE" /></el-form-item>
@@ -49,7 +67,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import http, { imgUrl } from '../api.js'
 import ImgUpload from '../components/ImgUpload.vue'
@@ -58,6 +76,29 @@ const list = ref([])
 const loading = ref(false)
 const dialog = ref(false)
 const form = ref({ id: null, title: '', sub_title: '', image: '', sort: 0, on: true })
+
+// 首页视频位
+const seriesList = ref([])
+const vsSeriesId = ref(null)
+const vsState = ref({ series_id: 0, video: null })
+const vsFile = computed(() => {
+  const src = vsState.value.video && vsState.value.video.src
+  return src ? src.split('/').pop() : ''
+})
+
+async function fetchVideoSlot() {
+  const [ss, st] = await Promise.all([http.get('/api/admin/series'), http.get('/api/admin/home-video')])
+  seriesList.value = ss
+  vsState.value = st
+  vsSeriesId.value = st.series_id || null
+}
+
+async function saveVideoSlot() {
+  try {
+    vsState.value = await http.put('/api/admin/home-video', { series_id: vsSeriesId.value || 0 })
+    ElMessage.success(vsState.value.series_id ? '已配置' : '已清除')
+  } catch (e) { /* 校验失败：拦截器已提示 */ }
+}
 
 async function fetch() {
   loading.value = true
@@ -108,11 +149,12 @@ async function del(row) {
   fetch()
 }
 
-onMounted(fetch)
+onMounted(() => { fetch(); fetchVideoSlot() })
 </script>
 
 <style scoped>
 .toolbar { margin-bottom: 16px; }
 .thumb { width: 72px; height: 56px; border-radius: 6px; border: 1px solid #eee; }
 .sub { color: #999; font-size: 12px; }
+.vs-row { display: flex; align-items: center; gap: 12px; }
 </style>

@@ -44,14 +44,19 @@ Page({
         });
       }
 
-      // 大片首帖：视频位（首个视频块）+ 视频位下方文案 + 大片内容块封面
+      // 视频位：后台「首页首图」页配置的系列 → 播该系列内容帖的第一个视频，链接指向该系列页
+      const v = home.video;
+      if (v && v.src) {
+        this.setData({ homeVideo: {
+          src: fullImg(v.src), poster: v.poster ? fullImg(v.poster) : '', postId: v.post_id,
+          label: '探索 ' + [v.series_en, v.series_name].filter(Boolean).join(' ')
+        } });
+        wx.nextTick(() => watchVideos(this, ['vhome']));
+      }
+
+      // 大片首帖：视频位占位跳转文案 + 大片内容块封面
       if (camp) {
         this.setData({ campTitle: camp.title || '', campCover: camp.cover ? fullImg(camp.cover) : '' });
-        const v = (camp.body || []).find((b) => b.kind === 'video' && b.src);
-        if (v) {
-          this.setData({ homeVideo: { src: fullImg(v.src), poster: v.poster ? fullImg(v.poster) : '' } });
-          wx.nextTick(() => watchVideos(this, ['vhome']));
-        }
       }
 
       // 品类导览块：前两个叶子品类，各取该品类第一个商品图
@@ -103,6 +108,11 @@ Page({
     wx.navigateTo({ url: '/pages/list/list?series=' + this.data.hsId + '&title=' + encodeURIComponent(this.data.hsEn || '系列') });
   },
   goCampaign() { wx.navigateTo({ url: '/pages/campaign/campaign' }); },
+  goVideoPost() {
+    const hv = this.data.homeVideo;
+    if (hv && hv.postId) wx.navigateTo({ url: '/pages/post/post?id=' + hv.postId });
+    else this.goCampaign();
+  },
   goList() { wx.navigateTo({ url: '/pages/list/list' }); },
   goPdp(e) { wx.navigateTo({ url: '/pages/pdp/pdp?id=' + e.currentTarget.dataset.id }); },
   goSearch() { wx.navigateTo({ url: '/pages/search/search' }); }
