@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.api import (
-    addresses, auth, brand, cart, catalog, coupons, home, me, orders, pages, payments,
+    addresses, auth, cart, catalog, coupons, home, me, orders, pages, payments,
     points, stores, uploads, wholesale,
 )
 
@@ -19,5 +19,4 @@ api_router.include_router(orders.router, tags=["订单"])
 api_router.include_router(payments.router, tags=["支付"])
 api_router.include_router(wholesale.router, tags=["批发合作"])
 api_router.include_router(stores.router, tags=["门店"])
-api_router.include_router(brand.router, tags=["品牌内容"])
 api_router.include_router(uploads.router, tags=["上传"])

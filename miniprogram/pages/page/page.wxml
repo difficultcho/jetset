@@ -1,0 +1,5 @@
+<view class="page">
+  <nav-bar brand="JET SET" />
+  <page-blocks id="blocks" blocks="{{blocks}}" heroH="{{heroH}}" />
+  <view class="foot" />
+</view>

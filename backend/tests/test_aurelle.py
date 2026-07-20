@@ -22,17 +22,8 @@ async def test_store_regions(client):
     assert "成都市" in data["cities"]["四川省"]
 
 
-async def test_brand_projects(client):
-    resp = await client.get("/api/v1/brand/posts", params={"type": "project"})
-    posts = resp.json()["data"]
-    assert len(posts) == 6
-    assert all(p["type"] == "project" for p in posts)
-
-
-async def test_brand_story_and_moment(client):
-    for t in ("story", "moment", "campaign"):
-        resp = await client.get("/api/v1/brand/first", params={"type": t})
-        assert resp.status_code == 200
-        d = resp.json()["data"]
-        assert d is not None
-        assert isinstance(d["body"], list) and len(d["body"]) > 0
+async def test_pages_public_seed(client):
+    """种子建了 home/brand 两个挂载页 + story 内容页；C 端可解析。"""
+    data = (await client.get("/api/v1/pages/story")).json()["data"]
+    assert data is not None and data["title"] == "品牌故事"
+    assert any(b["kind"] == "text" for b in data["blocks"])

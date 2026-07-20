@@ -1,5 +1,6 @@
 {
   "usingComponents": {
+    "page-blocks": "/components/page-blocks/page-blocks",
     "fab-stack": "/components/fab-stack/fab-stack"
   }
 }

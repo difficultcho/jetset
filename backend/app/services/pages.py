@@ -6,24 +6,23 @@
   text     {kind, preset('para'|'quote'|'eyebrow'|'link'), text, align, link}
   carousel {kind, source('featured'|'series'|'category'|'manual'),
             series_id, category_id, spu_ids, count}
-链接结构：{kind: 'post'|'campaign'|'list'|'pdp', post_id|series_id|category_id|spu_id}
+链接结构：{kind: 'page'|'list'|'pdp', key|series_id|category_id|spu_id}
 C 端解析后：carousel 块带 items（商品卡）；link 解析为可直接导航的参数（失效则为 None）。
 """
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.errors import BizError
-from app.models.brand import BrandPost
 from app.models.catalog import Category, Spu
 from app.models.cms import Page
 from app.models.series import Series
 from app.services.catalog import spu_to_list_item
 
-PAGE_KEYS = {"home"}
+FIXED_PAGES = {"home", "brand"}  # 固定挂载页（首页 / 关于品牌 tab），不可删除
 BLOCK_KINDS = {"image", "video", "text", "carousel", "linkrow"}
 TEXT_PRESETS = {"para", "quote", "eyebrow", "link"}
 CAROUSEL_SOURCES = {"featured", "series", "category", "manual"}
-LINK_KINDS = {"post", "campaign", "list", "pdp"}
+LINK_KINDS = {"page", "list", "pdp"}
 
 
 def validate_blocks(blocks: list) -> None:
@@ -97,11 +96,9 @@ async def _resolve_link(session: AsyncSession, link) -> dict | None:
     if not isinstance(link, dict) or link.get("kind") not in LINK_KINDS:
         return None
     kind = link["kind"]
-    if kind == "campaign":
-        return {"kind": "campaign"}
-    if kind == "post":
-        p = await session.get(BrandPost, link.get("post_id") or 0)
-        return {"kind": "post", "post_id": p.id} if p is not None and p.status == 1 else None
+    if kind == "page":
+        p = await session.get(Page, link.get("key") or "")
+        return {"kind": "page", "key": p.key, "title": p.title} if p is not None and p.status == 1 else None
     if kind == "pdp":
         s = await session.get(Spu, link.get("spu_id") or 0)
         return {"kind": "pdp", "spu_id": s.id} if s is not None and s.status == 1 else None
@@ -157,4 +154,4 @@ async def resolve_page(session: AsyncSession, key: str) -> dict | None:
             continue
         rb["link"] = await _resolve_link(session, rb.get("link")) if rb["kind"] != "video" else None
         blocks.append(rb)
-    return {"key": key, "blocks": blocks}
+    return {"key": key, "title": page.title, "cover": page.cover, "blocks": blocks}

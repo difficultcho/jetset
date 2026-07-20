@@ -2,54 +2,11 @@ from fastapi import APIRouter, HTTPException
 from sqlalchemy import select
 
 from app.deps import DB
-from app.errors import BizError
-from app.models.brand import BrandPost
 from app.models.cms import Banner
-from app.models.series import Series
-from app.schemas.admin import BannerIn, HomeVideoIn
+from app.schemas.admin import BannerIn
 from app.schemas.common import Resp
-from app.services.cms import HOME_VIDEO_KEY, find_series_video, get_setting, set_setting
 
 router = APIRouter()
-
-
-async def _home_video_state(session) -> dict:
-    """当前配置 + 按配置能解析出的视频（video=None 表示配置了但未生效/未配置）。"""
-    raw = await get_setting(session, HOME_VIDEO_KEY)
-    sid = int(raw) if raw.isdigit() else 0
-    video = await find_series_video(session, sid) if sid else None
-    return {"series_id": sid, "video": video}
-
-
-@router.get("/home-video", response_model=Resp[dict])
-async def get_home_video(session: DB):
-    return Resp(data=await _home_video_state(session))
-
-
-@router.put("/home-video", response_model=Resp[dict])
-async def set_home_video(req: HomeVideoIn, session: DB):
-    """配置首页视频位关联的系列；该系列的内容帖中必须已有视频块。series_id=0 清除。"""
-    if req.series_id:
-        s = await session.get(Series, req.series_id)
-        if s is None:
-            raise HTTPException(status_code=404, detail="系列不存在")
-        if await find_series_video(session, req.series_id) is None:
-            # 区分两类失败原因，便于在「品牌内容」里对症修改
-            linked = (
-                await session.execute(
-                    select(BrandPost.id)
-                    .where(BrandPost.series_id == req.series_id, BrandPost.status == 1,
-                           BrandPost.parent_id.is_(None)).limit(1)
-                )
-            ).scalar_one_or_none()
-            if linked is None:
-                raise BizError("该系列还没有关联的内容帖：请在「品牌内容」把含视频的帖子的「关联系列」"
-                               "设为此系列（须是启用的顶级帖，配置了父项目的子帖不计入）")
-            raise BizError("该系列关联的内容帖里没有可用的视频块：请确认帖内已添加视频块、"
-                           "视频文件上传成功（仅传封面不算）并已保存")
-    await set_setting(session, HOME_VIDEO_KEY, str(req.series_id or ""))
-    await session.commit()
-    return Resp(data=await _home_video_state(session))
 
 
 def _row(b: Banner) -> dict:

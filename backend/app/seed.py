@@ -11,8 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 from app.db import SessionFactory, create_all, engine
 from app.models.admin import AdminUser
-from app.models.brand import BrandPost
 from app.models.catalog import Category, Sku, Spu
+from app.models.cms import Page
 from app.models.series import Series
 from app.models.store import Store
 from app.security import hash_password
@@ -107,15 +107,6 @@ STORES = [
      "business_hours": "周一至周日 10:00-22:00", "lat": 30.6520, "lng": 104.0817},
 ]
 
-PROJECTS = [
-    ("A X S26 蓝之絮语", "探索2026春季成衣系列｜灵感笔记", "#dde3ea"),
-    ("A X F26 霞光瞬间", "探索2026秋季成衣系列的幕后", "#e8dcc8"),
-    ("A X 创作之旅", "探索2026春季成衣系列｜灵感艺游", "#ead9d2"),
-    ("A GALLERY", "与两位当代艺术家联名合作，共同探索色彩与印花的创造力量", "#d8d8d4"),
-    ("A X 曼谷", "探索2025年12月启幕的度假限时精品店", "#e5ddce"),
-    ("A X 布鲁塞尔", "探索2025年11月启幕的布鲁塞尔精品店", "#e0dbd2"),
-]
-
 DEFAULT_STOCK = 50
 
 
@@ -176,38 +167,34 @@ async def seed_stores(session: AsyncSession) -> None:
         session.add(Store(sort=i, images=[], **s))
 
 
-async def seed_brand(session: AsyncSession) -> None:
-    if (await session.execute(select(func.count()).select_from(BrandPost))).scalar_one() > 0:
+async def seed_pages(session: AsyncSession) -> None:
+    """配置化页面种子：首页 / 关于品牌两个 tab 挂载页 + 一个示例内容页（品牌故事）。
+    页面间用链接块互跳；真实排版由用户在管理端「页面管理」搭建。"""
+    if (await session.execute(select(func.count()).select_from(Page))).scalar_one() > 0:
         return
-    for i, (t, c, tint) in enumerate(PROJECTS):
-        session.add(BrandPost(type="project", title=t, subtitle=c, cover_tint=tint, sort=i))
-    session.add(BrandPost(
-        type="moment", title="A × MOMENTS", subtitle="记录 AURELLE 在世界各地的品牌活动与不期而遇的美好瞬间",
-        cover_tint="#e8dcc8",
-        body=[
-            {"kind": "image", "tint": "#e8dcc8", "ph": "moments · 品牌活动现场"},
-            {"kind": "text", "value": "2026 春夏系列发布酒会于上海南京西路精品店圆满举行，品牌挚友与媒体嘉宾共同见证 HIGH SUMMER 系列的璀璨启幕。"},
-            {"kind": "image", "tint": "#ead9d2", "ph": "moments · 嘉宾合影"},
-        ],
-    ))
-    session.add(BrandPost(
-        type="story", title="品牌故事", subtitle="AURELLE THE STORY", cover_tint="#e6ddce",
-        body=[
-            {"kind": "image", "tint": "#e6ddce", "ph": "story · 创始人肖像"},
-            {"kind": "quote", "value": "我希望 AURELLE 的每一件作品，都能承载阳光、海风与自由的气息，陪伴每一位女性从容优雅地生活。"},
-            {"kind": "text", "value": "AURELLE 于 2003 年创立于墨尔本，以地中海式的松弛美学为灵感，专注于打造轻盈、优雅而富有度假气息的成衣与配饰。"},
-            {"kind": "image", "tint": "#dfe4e8", "ph": "story · 早期工作室"},
-            {"kind": "text", "value": "二十余年间，品牌坚持以天然面料、考究工艺与克制的设计语言，诠释当代女性对美与自我的追求，如今已在全球开设多家精品店。"},
-        ],
-    ))
-    session.add(BrandPost(
-        type="campaign", title="HIGH SUMMER", subtitle="2026夏日胶囊系列", cover_tint="#e2d9cb",
-        body=[
-            {"kind": "image", "tint": "#e2d9cb", "ph": "campaign · 金纱帘光影", "ratio": "3/3.9"},
-            {"kind": "image", "tint": "#dfe4e8", "ph": "campaign · 泳池边小憩", "ratio": "3/3.6", "inset": True},
-            {"kind": "image", "tint": "#e9ddd0", "ph": "campaign · 藤影微光", "ratio": "3/2.6"},
-        ],
-    ))
+    # 内容页：品牌故事（被首页 / 关于品牌页链接引用）
+    session.add(Page(key="story", title="品牌故事", cover_tint="#e6ddce", sort=1, blocks=[
+        {"kind": "text", "preset": "eyebrow", "text": "THE STORY", "align": "center"},
+        {"kind": "text", "preset": "quote", "text": "为山巅与海岸而生。", "align": "center"},
+        {"kind": "text", "preset": "para",
+         "text": "JET SET 诞生于对极致户外体验的向往，以轻盈的科技面料与克制的设计语言，"
+                 "陪伴每一次向雪线与浪尖的出发。", "align": "left"},
+    ]))
+    # 首页 tab
+    session.add(Page(key="home", title="首页", blocks=[
+        {"kind": "carousel", "source": "featured", "count": 6},
+        {"kind": "linkrow",
+         "left": {"text": "探索品牌故事", "link": {"kind": "page", "key": "story"}},
+         "right": {"text": "全部商品", "link": {"kind": "list"}}},
+    ]))
+    # 关于品牌 tab
+    session.add(Page(key="brand", title="关于品牌", blocks=[
+        {"kind": "text", "preset": "eyebrow", "text": "THE STORY", "align": "center"},
+        {"kind": "linkrow",
+         "left": {"text": "品牌故事", "link": {"kind": "page", "key": "story"}},
+         "right": {"text": "全部商品", "link": {"kind": "list"}}},
+        {"kind": "carousel", "source": "featured", "count": 6},
+    ]))
 
 
 async def ensure_admin(session: AsyncSession) -> bool:
@@ -221,7 +208,7 @@ async def ensure_admin(session: AsyncSession) -> bool:
 async def seed_all(session: AsyncSession) -> bool:
     written = await seed_catalog(session)
     await seed_stores(session)
-    await seed_brand(session)
+    await seed_pages(session)
     return written
 
 

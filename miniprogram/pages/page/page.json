@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "nav-bar": "/components/nav-bar/nav-bar",
+    "page-blocks": "/components/page-blocks/page-blocks"
+  }
+}

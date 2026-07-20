@@ -76,30 +76,16 @@ class StoreIn(BaseModel):
     status: int = Field(default=1, ge=0, le=1)
 
 
-class BrandPostIn(BaseModel):
-    type: str = Field(pattern="^(project|moment|campaign|story)$")
-    title: str = Field(min_length=1, max_length=128)
-    subtitle: str = Field(default="", max_length=256)
-    cover: str = Field(default="", max_length=512)
-    cover_tint: str = Field(default="#e6ddce", max_length=16)
-    body: list[dict] = []   # [{kind: image|text|quote|video, ...}]
-    series_id: int | None = None   # 关联系列 → 详情页尾部导购条
-    parent_id: int | None = None   # 父活动项目（两级，仅 project）
-    link: str = Field(default="", max_length=256)
-    sort: int = 0
-    status: int = Field(default=1, ge=0, le=1)
-
-
 class StatusReq(BaseModel):
     status: int = Field(ge=0, le=1)
 
 
-class HomeVideoIn(BaseModel):
-    series_id: int = Field(default=0, ge=0)  # 0 = 清除配置
-
-
 class PageIn(BaseModel):
+    title: str = Field(default="", max_length=128)
+    cover: str = Field(default="", max_length=512)
+    cover_tint: str = Field(default="#e6ddce", max_length=16)
     blocks: list[dict] = []   # 结构校验见 services.pages.validate_blocks
+    sort: int = 0
     status: int = Field(default=1, ge=0, le=1)
 
 

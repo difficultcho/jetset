@@ -1,0 +1,41 @@
+/* 组件根节点：isolated 隔离下须显式声明块级，否则内部 width:100% 可能塌缩 */
+:host { display: block; width: 100%; }
+
+/* 段间距：每块顶部留白一致；首屏 hero 图顶到最上 */
+.gseg { margin-top: 56rpx; }
+.gseg-flush { margin-top: 0; }
+
+/* 图片 / 视频块 */
+.gb { position: relative; width: 100%; overflow: hidden; }
+.gb-inset { width: calc(100% - 56rpx); margin-left: 28rpx; }
+.gb-fill { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* 文本块 */
+.gt { padding: 0 28rpx; }
+.gt-para { font-size: 26rpx; line-height: 1.9; color: #333; }
+.gt-quote { font-size: 30rpx; letter-spacing: 0.12em; line-height: 1.8; color: #222; padding: 40rpx 48rpx 16rpx; }
+.gt-eyebrow { font-size: 22rpx; letter-spacing: 0.3em; color: #111; text-transform: uppercase; }
+.gt-left { text-align: left; }
+.gt-center { text-align: center; }
+.gt-right { text-align: right; }
+
+/* 下划线链接 */
+.ul-link { font-size: 24rpx; letter-spacing: 0.1em; color: #111; border-bottom: 1rpx solid #111; padding-bottom: 4rpx; }
+
+/* 链接行 */
+.glinkrow { display: flex; justify-content: space-between; padding: 0 28rpx; }
+.lr-slot { min-width: 0; }
+.lr-right { text-align: right; }
+
+/* 走马灯 */
+.gcarousel { padding: 0 0 16rpx; }
+.prod-swiper { width: 100%; height: 640rpx; }
+.prod-frame { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; }
+.prod-img { width: 54%; aspect-ratio: 3 / 3.6; overflow: hidden; }
+.prod-line { margin-top: 36rpx; font-size: 24rpx; letter-spacing: 0.24em; color: #3a3a3a; }
+.prod-sub { margin-top: 12rpx; font-size: 24rpx; color: #9a9a9a; letter-spacing: 0.05em; }
+.prod-dots { display: flex; justify-content: center; gap: 10rpx; margin-top: 32rpx; }
+.pdot { width: 8rpx; height: 8rpx; border-radius: 50%; background: rgba(120, 120, 120, 0.4); }
+.pdot.on { background: #111; }
+
+.gb-bottom { height: 40rpx; }

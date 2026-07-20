@@ -7,7 +7,6 @@ from app.models.cms import Banner
 from app.schemas.catalog import HomeOut
 from app.schemas.common import Resp
 from app.services.catalog import spu_to_list_item
-from app.services.cms import resolve_home_video
 
 router = APIRouter()
 
@@ -31,7 +30,6 @@ async def home(session: DB):
     featured = next((s for s in spus if s.featured), None)
     return Resp(data=HomeOut(
         banners=[{"title": b.title, "sub_title": b.sub_title, "image": b.image} for b in banners],
-        video=await resolve_home_video(session),
         hot=[spu_to_list_item(s) for s in spus[:5]],
         featured=spu_to_list_item(featured) if featured else None,
         grid=[spu_to_list_item(s) for s in spus[3:]],

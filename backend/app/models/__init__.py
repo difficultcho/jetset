@@ -1,6 +1,5 @@
 from app.models.address import Address
 from app.models.admin import AdminUser
-from app.models.brand import BrandPost
 from app.models.cart import CartItem
 from app.models.catalog import Category, Sku, Spu, SpuImage
 from app.models.cms import Banner
@@ -16,7 +15,6 @@ __all__ = [
     "Address",
     "AdminUser",
     "Banner",
-    "BrandPost",
     "CartItem",
     "Category",
     "Coupon",
