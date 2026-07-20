@@ -8,10 +8,11 @@
         <el-menu-item index="/categories">品类管理</el-menu-item>
         <el-menu-item index="/series">系列管理</el-menu-item>
         <el-menu-item index="/orders">订单管理</el-menu-item>
-        <el-menu-item index="/stores">门店管理</el-menu-item>
-        <el-menu-item index="/wholesale">门店审核</el-menu-item>
         <el-menu-item index="/brand">品牌内容</el-menu-item>
         <el-menu-item index="/homepage">首页编排</el-menu-item>
+        <div class="menu-sep"></div>
+        <el-menu-item index="/stores">门店管理</el-menu-item>
+        <el-menu-item index="/wholesale">门店审核</el-menu-item>
         <el-menu-item index="/coupons">优惠券</el-menu-item>
         <el-menu-item index="/users">用户</el-menu-item>
         <el-menu-item index="/banners">首页首图</el-menu-item>
@@ -74,6 +75,7 @@ function logout() {
 .layout { height: 100vh; }
 .aside { background: #211e1a; }
 .aside :deep(.el-menu) { border-right: none; }
+.menu-sep { height: 1px; margin: 12px 20px; background: rgba(214, 190, 148, 0.18); }
 .logo {
   padding: 18px 20px 14px;
   text-align: center;
