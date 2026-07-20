@@ -39,6 +39,28 @@ function toCard(p) {
   };
 }
 
+// 配置化页面块（/pages/{key} 返回的已解析块 → 渲染视图模型）
+function toPageBlocks(blocks) {
+  return (blocks || []).map((b, i) => {
+    const o = { bkey: i, kind: b.kind, ratio: b.ratio || '', inset: !!b.inset, link: b.link || null };
+    if (b.kind === 'image') {
+      o.img = fullImg(b.img);
+    } else if (b.kind === 'video') {
+      o.src = fullImg(b.src);
+      o.poster = b.poster ? fullImg(b.poster) : '';
+      o.vid = 'vb' + i;
+    } else if (b.kind === 'text') {
+      o.preset = b.preset || 'para';
+      o.text = b.text || '';
+      o.align = b.align || 'left';
+    } else if (b.kind === 'carousel') {
+      o.items = (b.items || []).map(toCard);
+      o.idx = 0;
+    }
+    return o;
+  });
+}
+
 // 商品详情
 function toDetail(d) {
   const imgs = d.colors.map((c) => fullImg(c.image));
@@ -179,6 +201,6 @@ function toCoupon(c) {
 }
 
 module.exports = {
-  yuan, fmt, fullImg, toCard, toDetail, toCartItem, toOrderLine, toOrder, toAddress, toCoupon,
-  toStore, toBrand
+  yuan, fmt, fullImg, toCard, toPageBlocks, toDetail, toCartItem, toOrderLine, toOrder,
+  toAddress, toCoupon, toStore, toBrand
 };

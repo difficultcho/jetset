@@ -1,11 +1,14 @@
 const app = getApp();
 const api = require('../../utils/api.js');
-const { toCard, fullImg } = require('../../utils/mapper.js');
+const { toCard, fullImg, toPageBlocks } = require('../../utils/mapper.js');
 const { watchVideos } = require('../../utils/video-autoplay.js');
+
+const PAGE_CACHE = 'page_home_blocks';
 
 Page({
   data: { sbh: 20, heroH: 600, heroImg: '', bagCount: 0, prods: [], prodIdx: 0, scrollTop: 0,
-          campTitle: '', campCover: '', catBlocks: [], seriesLabel: '', hsId: 0, hsEn: '' },
+          campTitle: '', campCover: '', catBlocks: [], seriesLabel: '', hsId: 0, hsEn: '',
+          blocks: [] },
 
   onLoad() {
     const sbh = app.globalData.statusBarHeight;
@@ -13,10 +16,36 @@ Page({
     const win = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
     const heroH = win.windowHeight - sbh - Math.round((win.windowWidth * 88) / 750);
     this.setData({ sbh, heroH });
+    // 上次的页面编排先渲染（秒开），后台再拉最新
+    const cached = wx.getStorageSync(PAGE_CACHE);
+    if (cached && cached.length) this.applyBlocks(cached);
     this.fetch();
   },
 
+  // 配置化页面：块序列 → 渲染 + 视频进屏自动播
+  applyBlocks(raw) {
+    const blocks = toPageBlocks(raw);
+    this.setData({ blocks });
+    const vids = blocks.filter((b) => b.kind === 'video').map((b) => b.vid);
+    if (vids.length) wx.nextTick(() => watchVideos(this, vids));
+  },
+
   async fetch() {
+    // 优先取「首页编排」；未配置/停用/接口异常时回落内置默认排版
+    try {
+      const page = await api.page('home');
+      if (page && page.blocks && page.blocks.length) {
+        this.applyBlocks(page.blocks);
+        wx.setStorageSync(PAGE_CACHE, page.blocks);
+        return;
+      }
+      wx.removeStorageSync(PAGE_CACHE);
+      if (this.data.blocks.length) this.setData({ blocks: [] });
+    } catch (e) { /* 拉编排失败：继续走默认排版 */ }
+    await this.fetchLegacy();
+  },
+
+  async fetchLegacy() {
     try {
       const [feat, home, series, camp, tree] = await Promise.all([
         api.products({ featured: 1, page_size: 10 }),
@@ -89,13 +118,36 @@ Page({
   onHide() {
     // 切走 tab 时暂停首页视频（回来后滑动进屏会自动续播）
     if (this.data.homeVideo) wx.createVideoContext('vhome', this).pause();
+    this.data.blocks.forEach((b) => {
+      if (b.kind === 'video') wx.createVideoContext(b.vid, this).pause();
+    });
   },
 
   onShow() {
     if (typeof this.getTabBar === 'function') this.getTabBar().refresh(0);
     app.refreshCartCount().then((c) => this.setData({ bagCount: c }));
     // 首次因登录时序失败时，回到首页补取一次
-    if (!this.data.prods.length) this.fetch();
+    if (!this.data.blocks.length && !this.data.prods.length) this.fetch();
+  },
+
+  // 配置化块：类型化跳转（后端已把链接解析成导航参数）
+  goBlockLink(e) {
+    const b = this.data.blocks[e.currentTarget.dataset.i];
+    const l = b && b.link;
+    if (!l) return;
+    if (l.kind === 'post') return wx.navigateTo({ url: '/pages/post/post?id=' + l.post_id });
+    if (l.kind === 'campaign') return wx.navigateTo({ url: '/pages/campaign/campaign' });
+    if (l.kind === 'pdp') return wx.navigateTo({ url: '/pages/pdp/pdp?id=' + l.spu_id });
+    if (l.kind === 'list') {
+      let url = '/pages/list/list?';
+      if (l.cat) url += 'cat=' + encodeURIComponent(l.cat) + '&';
+      if (l.series) url += 'series=' + l.series + '&';
+      wx.navigateTo({ url: url + 'title=' + encodeURIComponent(l.title || '全部商品') });
+    }
+  },
+  // 走马灯圆点同步（单向，不回写 current，避免 autoplay 渲染回环）
+  onBlockCarousel(e) {
+    this.setData({ ['blocks[' + e.currentTarget.dataset.i + '].idx']: e.detail.current });
   },
 
   // swiper 切换（含手势/自动播放）时同步自定义圆点（单向，不回写 current）

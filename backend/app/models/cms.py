@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Integer, SmallInteger, String
+from sqlalchemy import JSON, BigInteger, Integer, SmallInteger, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base, BigIntPK
@@ -11,6 +11,16 @@ class Setting(Base):
 
     key: Mapped[str] = mapped_column(String(64), primary_key=True)
     value: Mapped[str] = mapped_column(String(512), default="")
+
+
+class Page(Base):
+    """配置化页面（如首页）：块序列自由编排；status=0 或无块时 C 端回落默认写死排版。"""
+
+    __tablename__ = "page"
+
+    key: Mapped[str] = mapped_column(String(32), primary_key=True)
+    blocks: Mapped[list] = mapped_column(JSON, default=list)
+    status: Mapped[int] = mapped_column(SmallInteger, default=1)
 
 
 class Banner(Base):

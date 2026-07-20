@@ -3,6 +3,7 @@ from sqlalchemy import select
 
 from app.deps import DB
 from app.errors import BizError
+from app.models.brand import BrandPost
 from app.models.cms import Banner
 from app.models.series import Series
 from app.schemas.admin import BannerIn, HomeVideoIn
@@ -33,7 +34,19 @@ async def set_home_video(req: HomeVideoIn, session: DB):
         if s is None:
             raise HTTPException(status_code=404, detail="系列不存在")
         if await find_series_video(session, req.series_id) is None:
-            raise BizError("该系列还没有视频内容：请先在「品牌内容」里给关联此系列的帖子添加视频块")
+            # 区分两类失败原因，便于在「品牌内容」里对症修改
+            linked = (
+                await session.execute(
+                    select(BrandPost.id)
+                    .where(BrandPost.series_id == req.series_id, BrandPost.status == 1,
+                           BrandPost.parent_id.is_(None)).limit(1)
+                )
+            ).scalar_one_or_none()
+            if linked is None:
+                raise BizError("该系列还没有关联的内容帖：请在「品牌内容」把含视频的帖子的「关联系列」"
+                               "设为此系列（须是启用的顶级帖，配置了父项目的子帖不计入）")
+            raise BizError("该系列关联的内容帖里没有可用的视频块：请确认帖内已添加视频块、"
+                           "视频文件上传成功（仅传封面不算）并已保存")
     await set_setting(session, HOME_VIDEO_KEY, str(req.series_id or ""))
     await session.commit()
     return Resp(data=await _home_video_state(session))

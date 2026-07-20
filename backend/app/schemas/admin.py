@@ -98,6 +98,11 @@ class HomeVideoIn(BaseModel):
     series_id: int = Field(default=0, ge=0)  # 0 = 清除配置
 
 
+class PageIn(BaseModel):
+    blocks: list[dict] = []   # 结构校验见 services.pages.validate_blocks
+    status: int = Field(default=1, ge=0, le=1)
+
+
 class ShipReq(BaseModel):
     company: str = Field(min_length=1, max_length=32)
     tracking_no: str = Field(min_length=1, max_length=64)

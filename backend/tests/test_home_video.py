@@ -8,18 +8,24 @@ async def test_home_video_slot(client):
         "name": "视频位测试系列", "en": "VIDEO SLOT", "sort": 99})).json()["data"]
     sid = s["id"]
 
-    # 系列还没有视频内容 → 配置被拒
+    # 系列没有任何关联内容帖 → 配置被拒，报错指向「关联」
     resp = await client.put("/api/admin/home-video", headers=h, json={"series_id": sid})
     assert resp.status_code == 400
-    assert "视频" in resp.json()["message"]
+    assert "关联" in resp.json()["message"]
 
-    # 给系列挂一篇含视频块的内容帖（视频块在图片块之后，仍应被选中）
+    # 挂了帖但帖里没有视频块 → 配置被拒，报错指向「视频块」
     post = (await client.post("/api/admin/brand/posts", headers=h, json={
         "type": "campaign", "title": "VIDEO SLOT 大片", "series_id": sid,
-        "body": [{"kind": "image", "img": "/uploads/a.jpg"},
-                 {"kind": "video", "src": "/uploads/slot.mp4", "poster": "/uploads/p.jpg"}],
+        "body": [{"kind": "image", "img": "/uploads/a.jpg"}],
         "sort": 99})).json()["data"]
+    resp = await client.put("/api/admin/home-video", headers=h, json={"series_id": sid})
+    assert resp.status_code == 400
+    assert "视频块" in resp.json()["message"]
 
+    # 补上视频块（在图片块之后，仍应被选中）→ 配置成功
+    post["body"] = [{"kind": "image", "img": "/uploads/a.jpg"},
+                    {"kind": "video", "src": "/uploads/slot.mp4", "poster": "/uploads/p.jpg"}]
+    await client.put(f"/api/admin/brand/posts/{post['id']}", headers=h, json=post)
     resp = await client.put("/api/admin/home-video", headers=h, json={"series_id": sid})
     assert resp.status_code == 200
     state = resp.json()["data"]

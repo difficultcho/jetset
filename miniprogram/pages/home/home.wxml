@@ -14,6 +14,50 @@
   </view>
 
   <scroll-view class="body" scroll-y scroll-top="{{scrollTop}}">
+    <!-- 配置化排版（后台「首页编排」）：四种块自由编排；无配置时走下方默认排版 -->
+    <block wx:if="{{blocks.length}}">
+      <block wx:for="{{blocks}}" wx:key="bkey">
+        <!-- 图片块 -->
+        <view wx:if="{{item.kind === 'image'}}"
+          class="gb {{item.inset ? 'gb-inset' : ''}} {{item.ratio === 'hero' ? 'gb-hero' : ''}}"
+          style="{{item.ratio === 'hero' ? 'height:' + heroH + 'px;' : 'aspect-ratio:' + (item.ratio || '3/3.4') + ';'}}"
+          data-i="{{index}}" bindtap="goBlockLink">
+          <image class="gb-fill" src="{{item.img}}" mode="aspectFill" lazy-load />
+        </view>
+        <!-- 视频块（纯播放器，不跳转） -->
+        <view wx:elif="{{item.kind === 'video'}}" class="gb {{item.inset ? 'gb-inset' : ''}}"
+          style="aspect-ratio:{{item.ratio || '3/3.4'}};">
+          <video id="{{item.vid}}" class="gb-fill" src="{{item.src}}" poster="{{item.poster}}"
+            controls muted loop show-mute-btn object-fit="cover" />
+        </view>
+        <!-- 文本块 -->
+        <view wx:elif="{{item.kind === 'text'}}" class="gt gt-{{item.preset}} gt-{{item.align}}"
+          data-i="{{index}}" bindtap="goBlockLink">
+          <text class="{{item.preset === 'link' ? 'ul-link' : ''}}">{{item.text}}</text>
+        </view>
+        <!-- 走马灯块（单向圆点，不回绑 current） -->
+        <view wx:elif="{{item.kind === 'carousel' && item.items.length}}" class="prod-carousel">
+          <swiper class="prod-swiper" autoplay circular interval="4000" duration="600"
+            data-i="{{index}}" bindchange="onBlockCarousel">
+            <swiper-item wx:for="{{item.items}}" wx:for-item="p" wx:key="id" data-id="{{p.id}}" bindtap="goPdp">
+              <view class="prod-frame">
+                <view class="prod-img"><prod-img prod="{{p}}" /></view>
+                <view class="prod-line">{{p.en}}</view>
+                <view class="prod-sub">{{p.name}}</view>
+              </view>
+            </swiper-item>
+          </swiper>
+          <view class="prod-dots">
+            <view class="pdot {{item.idx === di ? 'on' : ''}}" wx:for="{{item.items}}"
+              wx:for-item="d" wx:for-index="di" wx:key="id" />
+          </view>
+        </view>
+      </block>
+      <view class="gb-bottom" />
+    </block>
+
+    <!-- 默认排版（未配置「首页编排」时） -->
+    <block wx:else>
     <!-- 首页首图：单张静态品牌大图，撑满首屏；点击与左下 link 同目标 → 当季主推系列（排序最前） -->
     <view class="hero" style="height:{{heroH}}px;" bindtap="goSeries">
       <image wx:if="{{heroImg}}" class="hero-real" src="{{heroImg}}" mode="aspectFill" />
@@ -76,6 +120,7 @@
       </view>
       <view class="block-link"><text class="ul-link" bindtap="goCampaign">探索广告大片</text></view>
     </view>
+    </block>
 
     <view class="tab-space" />
   </scroll-view>
