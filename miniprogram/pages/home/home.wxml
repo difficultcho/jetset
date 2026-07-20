@@ -16,10 +16,11 @@
   <scroll-view class="body" scroll-y scroll-top="{{scrollTop}}">
     <!-- 配置化排版（后台「首页编排」）：四种块自由编排；无配置时走下方默认排版 -->
     <block wx:if="{{blocks.length}}">
-      <block wx:for="{{blocks}}" wx:key="bkey">
+      <view wx:for="{{blocks}}" wx:key="bkey"
+        class="gseg {{item.kind === 'image' && item.ratio === 'hero' ? 'gseg-flush' : ''}}">
         <!-- 图片块 -->
         <view wx:if="{{item.kind === 'image'}}"
-          class="gb {{item.inset ? 'gb-inset' : ''}} {{item.ratio === 'hero' ? 'gb-hero' : ''}}"
+          class="gb {{item.inset ? 'gb-inset' : ''}}"
           style="{{item.ratio === 'hero' ? 'height:' + heroH + 'px;' : 'aspect-ratio:' + (item.ratio || '3/3.4') + ';'}}"
           data-i="{{index}}" bindtap="goBlockLink">
           <image class="gb-fill" src="{{item.img}}" mode="aspectFill" lazy-load />
@@ -36,7 +37,7 @@
           <text class="{{item.preset === 'link' ? 'ul-link' : ''}}">{{item.text}}</text>
         </view>
         <!-- 链接行块：左右两栏，各自可点、各自跳转（任一侧空则只显示另一侧） -->
-        <view wx:elif="{{item.kind === 'linkrow'}}" class="link-row">
+        <view wx:elif="{{item.kind === 'linkrow'}}" class="glinkrow">
           <view class="lr-slot">
             <text wx:if="{{item.left}}" class="ul-link" data-i="{{index}}" data-side="left" bindtap="goBlockLink">{{item.left.text}}</text>
           </view>
@@ -45,7 +46,7 @@
           </view>
         </view>
         <!-- 走马灯块（单向圆点，不回绑 current） -->
-        <view wx:elif="{{item.kind === 'carousel' && item.items.length}}" class="prod-carousel">
+        <view wx:elif="{{item.kind === 'carousel' && item.items.length}}" class="gcarousel">
           <swiper class="prod-swiper" autoplay circular interval="4000" duration="600"
             data-i="{{index}}" bindchange="onBlockCarousel">
             <swiper-item wx:for="{{item.items}}" wx:for-item="p" wx:key="id" data-id="{{p.id}}" bindtap="goPdp">
@@ -61,7 +62,7 @@
               wx:for-item="d" wx:for-index="di" wx:key="id" />
           </view>
         </view>
-      </block>
+      </view>
       <view class="gb-bottom" />
     </block>
 

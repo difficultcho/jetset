@@ -53,11 +53,13 @@
 .tab-space { height: calc(180rpx + env(safe-area-inset-bottom)); }
 
 /* 配置化排版块（后台「首页编排」） */
-.gb { position: relative; width: 100%; overflow: hidden; margin-top: 48rpx; }
-.gb-hero { margin-top: 0; }
+/* 统一段间距：每个块顶部留白一致；首屏 hero 图顶到最上 */
+.gseg { margin-top: 56rpx; }
+.gseg-flush { margin-top: 0; }
+.gb { position: relative; width: 100%; overflow: hidden; }
 .gb-inset { width: calc(100% - 56rpx); margin-left: 28rpx; }
 .gb-fill { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.gt { padding: 24rpx 28rpx 0; }
+.gt { padding: 0 28rpx; }
 .gt-para { font-size: 26rpx; line-height: 1.9; color: #333; }
 .gt-quote { font-size: 30rpx; letter-spacing: 0.12em; line-height: 1.8; color: #222; padding: 40rpx 48rpx 16rpx; }
 .gt-eyebrow { font-size: 22rpx; letter-spacing: 0.3em; color: #111; text-transform: uppercase; }
@@ -67,3 +69,5 @@
 .gb-bottom { height: 40rpx; }
 .lr-slot { min-width: 0; }
 .lr-right { text-align: right; }
+.glinkrow { display: flex; justify-content: space-between; padding: 0 28rpx; }
+.gcarousel { padding: 0 0 16rpx; }
