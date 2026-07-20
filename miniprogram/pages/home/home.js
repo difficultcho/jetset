@@ -4,7 +4,8 @@ const { toCard, fullImg } = require('../../utils/mapper.js');
 const { watchVideos } = require('../../utils/video-autoplay.js');
 
 Page({
-  data: { sbh: 20, heroH: 600, heroImg: '', bagCount: 0, prods: [], prodIdx: 0, scrollTop: 0 },
+  data: { sbh: 20, heroH: 600, heroImg: '', bagCount: 0, prods: [], prodIdx: 0, scrollTop: 0,
+          campTitle: '', campCover: '', catBlocks: [], seriesLabel: '', hsId: 0, hsEn: '' },
 
   onLoad() {
     const sbh = app.globalData.statusBarHeight;
@@ -17,33 +18,67 @@ Page({
 
   async fetch() {
     try {
+      const [feat, home, series, camp, tree] = await Promise.all([
+        api.products({ featured: 1, page_size: 10 }),
+        api.home(), api.series(), api.brandFirst('campaign'), api.categories()
+      ]);
+
       // 走马灯取材：精选商品优先（勾几个轮几帧）；无精选回退默认前 3
-      const feat = await api.products({ featured: 1, page_size: 10 });
       if (feat.items.length) {
         this.setData({ prods: feat.items.map(toCard) });
       } else {
         const page = await api.products({ page_size: 6 });
         this.setData({ prods: page.items.slice(0, 3).map(toCard) });
       }
+
       // 首页首图：后台「首页首图」排序最前的启用项（无图时保留占位帧）
-      const home = await api.home();
       const first = (home.banners || [])[0];
       if (first && first.image) this.setData({ heroImg: fullImg(first.image) });
-      // STARS 系列 id（供"探索 STARS 星星系列"跳转）
-      const series = await api.series();
-      const hs = series.find((s) => s.en === 'STARS') || series[0];
-      if (hs) this.setData({ hsId: hs.id, hsEn: hs.en });
-      // 首页视频位：广告大片首帖的第一个视频块（无则维持占位）
-      const camp = await api.brandFirst('campaign');
-      const v = camp && (camp.body || []).find((b) => b.kind === 'video' && b.src);
-      if (v) {
-        this.setData({ homeVideo: { src: fullImg(v.src), poster: v.poster ? fullImg(v.poster) : '' } });
-        wx.nextTick(() => watchVideos(this, ['vhome']));
+
+      // 当季主推系列 = 排序最前的启用系列（首图点击 + 左下 link 同一目标，后台调排序即切换）
+      const hs = series[0];
+      if (hs) {
+        this.setData({
+          hsId: hs.id, hsEn: hs.en,
+          seriesLabel: '探索 ' + [hs.en, hs.name].filter(Boolean).join(' ')
+        });
       }
+
+      // 大片首帖：视频位（首个视频块）+ 视频位下方文案 + 大片内容块封面
+      if (camp) {
+        this.setData({ campTitle: camp.title || '', campCover: camp.cover ? fullImg(camp.cover) : '' });
+        const v = (camp.body || []).find((b) => b.kind === 'video' && b.src);
+        if (v) {
+          this.setData({ homeVideo: { src: fullImg(v.src), poster: v.poster ? fullImg(v.poster) : '' } });
+          wx.nextTick(() => watchVideos(this, ['vhome']));
+        }
+      }
+
+      // 品类导览块：前两个叶子品类，各取该品类第一个商品图
+      const leaves = [];
+      tree.forEach((t) => (t.children.length ? t.children : [t]).forEach((c) => leaves.push(c.name)));
+      const two = leaves.slice(0, 2);
+      const BGS = [
+        'repeating-linear-gradient(135deg,#ecd9c2 0 32rpx,#e6cfb2 32rpx 64rpx)',
+        'repeating-linear-gradient(135deg,#d9d4cc 0 32rpx,#cfc8bd 32rpx 64rpx)'
+      ];
+      const thumbs = await Promise.all(two.map((n) => api.products({ cat: n, page_size: 1 }).catch(() => null)));
+      this.setData({
+        catBlocks: two.map((n, i) => ({
+          name: n, bg: BGS[i % 2],
+          img: (thumbs[i] && thumbs[i].items[0] && thumbs[i].items[0].image)
+            ? fullImg(thumbs[i].items[0].image) : ''
+        }))
+      });
     } catch (e) {
-      console.error('[home] 取商品失败：', e && e.message);
-      wx.showToast({ title: '商品加载失败：' + ((e && e.message) || '网络错误'), icon: 'none', duration: 3000 });
+      console.error('[home] 取数失败：', e && e.message);
+      wx.showToast({ title: '加载失败：' + ((e && e.message) || '网络错误'), icon: 'none', duration: 3000 });
     }
+  },
+
+  goCat(e) {
+    const name = e.currentTarget.dataset.name;
+    wx.navigateTo({ url: '/pages/list/list?cat=' + encodeURIComponent(name) + '&title=' + encodeURIComponent(name) });
   },
 
   onHide() {
@@ -63,11 +98,11 @@ Page({
   scrollToTop() { this.setData({ scrollTop: this.data.scrollTop === 0 ? 1 : 0 }); },
 
   goBag() { wx.navigateTo({ url: '/pages/bag/bag' }); },
-  goCampaign() { wx.navigateTo({ url: '/pages/campaign/campaign' }); },
   goSeries() {
-    const id = this.data.hsId || 1;
-    wx.navigateTo({ url: '/pages/list/list?series=' + id + '&title=' + encodeURIComponent(this.data.hsEn) });
+    if (!this.data.hsId) return this.goList();
+    wx.navigateTo({ url: '/pages/list/list?series=' + this.data.hsId + '&title=' + encodeURIComponent(this.data.hsEn || '系列') });
   },
+  goCampaign() { wx.navigateTo({ url: '/pages/campaign/campaign' }); },
   goList() { wx.navigateTo({ url: '/pages/list/list' }); },
   goPdp(e) { wx.navigateTo({ url: '/pages/pdp/pdp?id=' + e.currentTarget.dataset.id }); },
   goSearch() { wx.navigateTo({ url: '/pages/search/search' }); }

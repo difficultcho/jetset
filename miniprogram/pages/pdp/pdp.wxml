@@ -3,8 +3,9 @@
   <view class="back-hit" style="top:{{sbh}}px;" catchtap="goBack"><view class="arrow" /></view>
 
   <scroll-view class="body" scroll-y>
-    <!-- 主图：当前颜色的多图轮播（无真图时回退占位组件） -->
-    <view class="hero">
+    <!-- 主图：当前颜色的多图轮播（无真图时回退占位组件）。
+         catch 阻断触摸冒泡：图上横滑只归轮播管，不触发页面级右滑返回 -->
+    <view class="hero" catchtouchstart="noop" catchtouchend="noop">
       <block wx:if="{{prod.imgsList[ci] && prod.imgsList[ci].length}}">
         <swiper class="hero-swiper" current="{{heroIdx}}" duration="300" bindchange="onHeroChange">
           <swiper-item wx:for="{{prod.imgsList[ci]}}" wx:key="*this">

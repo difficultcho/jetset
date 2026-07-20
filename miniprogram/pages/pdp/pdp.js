@@ -48,6 +48,7 @@ Page({
   },
 
   // 右滑返回
+  noop() { /* 主图区域触摸终点：阻断冒泡用 */ },
   onTS(e) { this.t = { x: e.touches[0].clientX, y: e.touches[0].clientY }; },
   onTE(e) {
     if (!this.t) return;

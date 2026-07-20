@@ -14,8 +14,8 @@
   </view>
 
   <scroll-view class="body" scroll-y scroll-top="{{scrollTop}}">
-    <!-- 首页首图：单张静态品牌大图，撑满首屏（头部以下），后台「首页首图」可配置 -->
-    <view class="hero" style="height:{{heroH}}px;" bindtap="goCampaign">
+    <!-- 首页首图：单张静态品牌大图，撑满首屏；点击与左下 link 同目标 → 当季主推系列（排序最前） -->
+    <view class="hero" style="height:{{heroH}}px;" bindtap="goSeries">
       <image wx:if="{{heroImg}}" class="hero-real" src="{{heroImg}}" mode="aspectFill" />
       <view wx:else class="hero-frame" style="background:repeating-linear-gradient(135deg,#e9dfce 0 32rpx,#e2d5bf 32rpx 64rpx);">
         <text class="mono-label">brand hero · 首页首图</text>
@@ -24,7 +24,7 @@
 
     <!-- 双链接行（左右分置） -->
     <view class="link-row">
-      <text class="ul-link" bindtap="goSeries">探索 STARS 星星系列</text>
+      <text class="ul-link" bindtap="goSeries">{{seriesLabel || '探索全部商品'}}</text>
       <text class="ul-link" bindtap="goCampaign">探索广告大片</text>
     </view>
 
@@ -45,37 +45,31 @@
       </view>
     </view>
 
-    <!-- 内容块 1：品牌视频（取广告大片首帖的首个视频块；未配置则占位） -->
+    <!-- 内容块 1：品牌视频（取广告大片首帖的首个视频块；未配置则占位）；文案跟随大片标题 -->
     <view class="block block-video">
       <video wx:if="{{homeVideo}}" id="vhome" class="home-video" src="{{homeVideo.src}}" poster="{{homeVideo.poster}}"
         controls muted loop show-mute-btn object-fit="cover" style="aspect-ratio:3/3.4;" />
       <view wx:else class="block-img va-center" style="aspect-ratio:3/3.4;background:repeating-linear-gradient(135deg,#e9ddca 0 32rpx,#e2d3bc 32rpx 64rpx);" bindtap="goCampaign">
         <view class="play-btn"><view class="play-tri" /></view>
-        <text class="mono-label abs-bottom">campaign video · 雪山</text>
+        <text class="mono-label abs-bottom">campaign video</text>
       </view>
-      <view class="block-link"><text class="ul-link" bindtap="goCampaign">MID SEASON SALE</text></view>
+      <view class="block-link"><text class="ul-link" bindtap="goCampaign">{{campTitle || '探索广告大片'}}</text></view>
     </view>
 
-    <!-- 内容块 2：鞋履 -->
-    <view class="block">
-      <view class="block-img" style="aspect-ratio:3/3.2;background:repeating-linear-gradient(135deg,#ecd9c2 0 32rpx,#e6cfb2 32rpx 64rpx);" bindtap="goList">
-        <text class="mono-label abs-bottom">product still · 星标滑雪裤</text>
+    <!-- 内容块 2/3：品类导览（前两个叶子品类，图为该品类第一个商品图） -->
+    <view class="block" wx:for="{{catBlocks}}" wx:key="name">
+      <view class="block-img" style="aspect-ratio:3/3.2;{{item.img ? '' : 'background:' + item.bg + ';'}}" data-name="{{item.name}}" bindtap="goCat">
+        <image wx:if="{{item.img}}" class="block-real" src="{{item.img}}" mode="aspectFill" />
+        <text wx:else class="mono-label abs-bottom">product still · {{item.name}}</text>
       </view>
-      <view class="block-link"><text class="ul-link" bindtap="goList">探索滑雪裤</text></view>
+      <view class="block-link"><text class="ul-link" data-name="{{item.name}}" bindtap="goCat">探索{{item.name}}</text></view>
     </view>
 
-    <!-- 内容块 3：包袋 -->
-    <view class="block">
-      <view class="block-img" style="aspect-ratio:3/3.2;background:repeating-linear-gradient(135deg,#d9d4cc 0 32rpx,#cfc8bd 32rpx 64rpx);" bindtap="goList">
-        <text class="mono-label abs-bottom">product still · 绗缝滑雪夹克</text>
-      </view>
-      <view class="block-link"><text class="ul-link" bindtap="goList">探索滑雪夹克</text></view>
-    </view>
-
-    <!-- 内容块 4：大片 -->
+    <!-- 内容块 4：大片（封面取大片首帖 cover） -->
     <view class="block block-last">
-      <view class="block-img" style="aspect-ratio:3/3.6;background:repeating-linear-gradient(135deg,#dfe6ea 0 32rpx,#d5dee4 32rpx 64rpx);" bindtap="goCampaign">
-        <text class="mono-label abs-bottom">campaign · 泳池边小憩</text>
+      <view class="block-img" style="aspect-ratio:3/3.6;{{campCover ? '' : 'background:repeating-linear-gradient(135deg,#dfe6ea 0 32rpx,#d5dee4 32rpx 64rpx);'}}" bindtap="goCampaign">
+        <image wx:if="{{campCover}}" class="block-real" src="{{campCover}}" mode="aspectFill" />
+        <text wx:else class="mono-label abs-bottom">campaign · 当季大片</text>
       </view>
       <view class="block-link"><text class="ul-link" bindtap="goCampaign">探索广告大片</text></view>
     </view>

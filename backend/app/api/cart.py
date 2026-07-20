@@ -25,7 +25,7 @@ async def _cart_out(session, user_id: int) -> list[CartItemOut]:
     return [
         CartItemOut(
             id=ci.id, sku_id=sku.id, spu_id=sku.spu_id, qty=ci.qty,
-            name=sku.spu.name, en_model=sku.spu.en_model,
+            name=sku.spu.name, en_model=sku.spu.code or sku.spu.en_model,
             color_name=sku.color_name, color_hex=sku.color_hex, size=sku.size,
             price=sku.price, stock=sku.stock, image=_color_image(sku) or None,
         )

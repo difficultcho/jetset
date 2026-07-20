@@ -50,7 +50,7 @@ def _build_line(sku: Sku, qty: int) -> dict:
         "sku_id": sku.id,
         "spu_id": sku.spu_id,
         "name": sku.spu.name,
-        "en_model": sku.spu.en_model,
+        "en_model": sku.spu.code or sku.spu.en_model,  # 小字标：款号优先（表单建的商品 en_model 为空）
         "color_name": sku.color_name,
         "color_hex": sku.color_hex,
         "size": sku.size,
