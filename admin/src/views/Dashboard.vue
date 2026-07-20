@@ -22,7 +22,7 @@ const cards = computed(() => {
     { label: '近24h 订单数', value: s.orders_24h },
     { label: '近24h 支付额（元）', value: (s.gmv_24h / 100).toFixed(2) },
     { label: '待发货订单', value: s.pending_shipment },
-    { label: '待审核批发申请', value: s.pending_wholesale },
+    { label: '待审核门店申请', value: s.pending_wholesale },
     { label: '注册用户', value: s.users },
     { label: '在售商品', value: s.products_on }
   ]
