@@ -29,15 +29,22 @@ def spu_to_list_item(spu: Spu, series_en: str = "") -> dict:
 
 
 def spu_to_detail(spu: Spu, series: dict | None = None, category: str = "") -> dict:
+    # 按色序聚合全部图（sort 排序），供详情页同色多图轮播
+    images_by_color: dict[int, list[str]] = {}
+    for img in sorted(spu.images, key=lambda i: (i.sort, i.id)):
+        images_by_color.setdefault(img.color_index, []).append(img.url)
+
     colors: dict[int, dict] = {}
     sizes: list[str] = []
     for sku in sorted(spu.skus, key=lambda s: s.id):
         if sku.color_index not in colors:
+            imgs = images_by_color.get(sku.color_index, [])
             colors[sku.color_index] = {
                 "index": sku.color_index,
                 "name": sku.color_name,
                 "hex": sku.color_hex,
-                "image": _first_image(spu, sku.color_index),
+                "image": imgs[0] if imgs else _first_image(spu, sku.color_index),
+                "images": imgs,
             }
         if sku.size not in sizes:
             sizes.append(sku.size)

@@ -42,6 +42,11 @@ function toCard(p) {
 // 商品详情
 function toDetail(d) {
   const imgs = d.colors.map((c) => fullImg(c.image));
+  // 每色全部图（多图轮播）；无 images 时回退单图
+  const imgsList = d.colors.map((c) => {
+    const list = (c.images && c.images.length ? c.images : (c.image ? [c.image] : []));
+    return list.map(fullImg);
+  });
   const hasSale = !!d.original_price && d.original_price > d.price;
   return {
     id: d.id,
@@ -61,6 +66,7 @@ function toDetail(d) {
     colors: d.colors.map((c) => c.name),
     sw: d.colors.map((c) => c.hex),
     imgs,
+    imgsList,
     img: imgs.find((u) => u) || '',
     sizes: d.sizes,
     skus: d.skus

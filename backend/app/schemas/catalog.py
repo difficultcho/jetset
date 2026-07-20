@@ -27,7 +27,8 @@ class ColorOut(BaseModel):
     index: int
     name: str
     hex: str
-    image: str | None
+    image: str | None          # 首图（兼容保留）
+    images: list[str] = []     # 该色全部图（详情页多图轮播）
 
 
 class SkuOut(BaseModel):

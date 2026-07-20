@@ -3,9 +3,19 @@
   <view class="back-hit" style="top:{{sbh}}px;" catchtap="goBack"><view class="arrow" /></view>
 
   <scroll-view class="body" scroll-y>
-    <!-- 主图 -->
+    <!-- 主图：当前颜色的多图轮播（无真图时回退占位组件） -->
     <view class="hero">
-      <prod-img prod="{{prod}}" ci="{{ci}}" />
+      <block wx:if="{{prod.imgsList[ci] && prod.imgsList[ci].length}}">
+        <swiper class="hero-swiper" current="{{heroIdx}}" duration="300" bindchange="onHeroChange">
+          <swiper-item wx:for="{{prod.imgsList[ci]}}" wx:key="*this">
+            <image class="hero-img" src="{{item}}" mode="aspectFill" data-url="{{item}}" bindtap="previewImg" />
+          </swiper-item>
+        </swiper>
+        <view wx:if="{{prod.imgsList[ci].length > 1}}" class="hero-dots">
+          <view class="hdot {{heroIdx === index ? 'on' : ''}}" wx:for="{{prod.imgsList[ci]}}" wx:key="*this" />
+        </view>
+      </block>
+      <prod-img wx:else prod="{{prod}}" ci="{{ci}}" />
     </view>
 
     <view class="info">

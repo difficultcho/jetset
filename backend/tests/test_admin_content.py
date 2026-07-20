@@ -91,7 +91,8 @@ async def test_product_new_fields_roundtrip(client):
         "original_price": 1280000, "sort": 88, "status": 1,
         "skus": [{"color_index": 0, "color_name": "象牙白", "color_hex": "#f4ede2",
                   "size": "37", "price": 640000, "stock": 3}],
-        "images": [{"color_index": 0, "url": "/uploads/heel.jpg", "sort": 0}],
+        "images": [{"color_index": 0, "url": "/uploads/heel.jpg", "sort": 0},
+                   {"color_index": 0, "url": "/uploads/heel-side.jpg", "sort": 1}],
     }
     spu_id = (await client.post("/api/admin/products", headers=h, json=payload)).json()["data"]["id"]
 
@@ -106,6 +107,9 @@ async def test_product_new_fields_roundtrip(client):
     assert c["code"] == "AU999TEST01" and c["series"]["id"] == series["id"]
     assert c["original_price"] == 1280000 and len(c["bullets"]) == 3
     assert c["category"] == leaf["name"]
+    # 同色多图：详情每色返回全部图（按 sort），首图字段兼容保留
+    assert c["colors"][0]["images"] == ["/uploads/heel.jpg", "/uploads/heel-side.jpg"]
+    assert c["colors"][0]["image"] == "/uploads/heel.jpg"
 
     # 精选筛选（首页走马灯/购物袋推荐的取材）
     feat = (await client.get("/api/v1/products", params={"featured": 1})).json()["data"]

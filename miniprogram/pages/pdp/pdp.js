@@ -7,6 +7,7 @@ Page({
     sbh: 20,
     prod: null,
     ci: 0,
+    heroIdx: 0,
     size: '',
     acc: { d: true, s: false, c: false },
     wished: false,
@@ -61,7 +62,11 @@ Page({
     else wx.switchTab({ url: '/pages/shop/shop' });
   },
 
-  pickColor(e) { this.setData({ ci: e.currentTarget.dataset.i }); },
+  pickColor(e) { this.setData({ ci: e.currentTarget.dataset.i, heroIdx: 0 }); },
+  onHeroChange(e) { this.setData({ heroIdx: e.detail.current }); },
+  previewImg(e) {
+    wx.previewImage({ current: e.currentTarget.dataset.url, urls: this.data.prod.imgsList[this.data.ci] });
+  },
   pickSize(e) { this.setData({ size: e.currentTarget.dataset.s }); },
   toggleAcc(e) {
     const k = e.currentTarget.dataset.k;
