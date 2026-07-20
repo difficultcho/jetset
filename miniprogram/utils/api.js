@@ -21,11 +21,6 @@ const api = {
   storeRegions: () => request('GET', '/api/v1/stores/regions'),
   storeDetail: (id) => request('GET', '/api/v1/stores/' + id),
 
-  // 品牌内容
-  brandPosts: (type) => request('GET', '/api/v1/brand/posts?type=' + type),
-  brandPost: (id) => request('GET', '/api/v1/brand/posts/' + id),
-  brandFirst: (type) => request('GET', '/api/v1/brand/first?type=' + type),
-  seriesPosts: () => request('GET', '/api/v1/brand/series-posts'),
 
   // 购物车
   cartList: () => request('GET', '/api/v1/cart'),

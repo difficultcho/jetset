@@ -1,6 +1,6 @@
 {
   "usingComponents": {
-    "prod-img": "/components/prod-img/prod-img",
+    "page-blocks": "/components/page-blocks/page-blocks",
     "fab-stack": "/components/fab-stack/fab-stack"
   }
 }
