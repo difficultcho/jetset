@@ -3,16 +3,16 @@
     <span>点击跳转
       <el-select :model-value="kind" size="small" style="width: 120px" @change="onKind">
         <el-option label="不跳转" value="none" />
-        <el-option label="内容页" value="post" />
-        <el-option label="广告大片" value="campaign" />
+        <el-option label="内容页" value="page" />
         <el-option label="商品列表" value="list" />
         <el-option label="商品详情" value="pdp" />
       </el-select>
     </span>
-    <span v-if="kind === 'post'">内容帖
-      <el-select :model-value="v.post_id" size="small" filterable style="width: 220px" placeholder="选择帖子"
-        @change="(x) => set({ post_id: x })">
-        <el-option v-for="p in posts" :key="p.id" :label="POST_TYPES[p.type] + '｜' + p.title" :value="p.id" />
+    <span v-if="kind === 'page'">页面
+      <el-select :model-value="v.key" size="small" filterable style="width: 220px" placeholder="选择页面"
+        @change="(x) => set({ key: x })">
+        <el-option v-for="p in pages" :key="p.key" :label="pageLabel(p)" :value="p.key"
+          :disabled="p.status !== 1" />
       </el-select>
     </span>
     <template v-else-if="kind === 'list'">
@@ -45,24 +45,23 @@ import { computed } from 'vue'
 
 const props = defineProps({
   modelValue: { type: Object, default: null },
-  posts: { type: Array, default: () => [] },
+  pages: { type: Array, default: () => [] },
   cats: { type: Array, default: () => [] },
   series: { type: Array, default: () => [] },
   prods: { type: Array, default: () => [] }
 })
 const emit = defineEmits(['update:modelValue'])
 
-const POST_TYPES = { project: '项目', moment: '瞬间', campaign: '大片', story: '故事' }
+const pageLabel = (p) => (p.title || '（未命名）') + (p.fixed ? '｜固定挂载' : '')
 const catLabel = (c) => (c.parent_name ? c.parent_name + ' / ' : '') + c.name
 const prodLabel = (p) => p.name + (p.code ? '｜' + p.code : '')
 
 const v = computed(() => props.modelValue || {})
 const kind = computed(() => v.value.kind || 'none')
 
-// 切换目标类型：none→清空；campaign 无需再选；其余先落 kind，等选具体对象补 id
+// 切换目标类型：none→清空；其余先落 kind，等选具体对象补 key/id
 function onKind(k) {
   if (k === 'none') emit('update:modelValue', null)
-  else if (k === 'campaign') emit('update:modelValue', { kind: 'campaign' })
   else emit('update:modelValue', { kind: k })
 }
 function set(patch) {
