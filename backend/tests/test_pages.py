@@ -1,5 +1,23 @@
 """配置化页面：块校验、走马灯数据源解析、链接解析、停用回退。"""
+from app.db import SessionFactory
+from app.models.cms import Page
 from tests.test_admin import admin_login
+
+
+async def test_fixed_page_title_falls_back(client):
+    """历史数据里固定页 title 可能是空串（早期版本写入），读取侧须回退到默认标题。"""
+    h = await admin_login(client)
+    await client.put("/api/admin/pages/home", headers=h, json={"blocks": [], "status": 1})
+
+    async with SessionFactory() as s:          # 直接把库改成脏状态
+        p = await s.get(Page, "home")
+        p.title = ""
+        await s.commit()
+
+    rows = (await client.get("/api/admin/pages", headers=h)).json()["data"]
+    home = next(r for r in rows if r["key"] == "home")
+    assert home["title"] == "首页" and home["fixed"] is True
+    assert (await client.get("/api/admin/pages/home", headers=h)).json()["data"]["title"] == "首页"
 
 
 async def test_page_home_configure_and_resolve(client):

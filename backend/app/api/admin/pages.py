@@ -16,7 +16,9 @@ FIXED_TITLES = {"home": "首页", "brand": "关于品牌"}
 
 
 def _meta(p: Page) -> dict:
-    return {"key": p.key, "title": p.title, "cover": p.cover, "cover_tint": p.cover_tint,
+    # 固定页标题兜底：历史数据里可能是空串，读取侧统一回退，避免显示成「未命名」
+    title = p.title or FIXED_TITLES.get(p.key, "")
+    return {"key": p.key, "title": title, "cover": p.cover, "cover_tint": p.cover_tint,
             "sort": p.sort, "status": p.status, "fixed": p.key in FIXED_PAGES}
 
 
