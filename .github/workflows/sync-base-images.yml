@@ -1,0 +1,31 @@
+# 基础镜像同步：服务器访问不了 Docker Hub，把依赖的公共镜像转存到自己的 TCR。
+#
+# 原本挂在 backend.yml 里，每次 push 都 pull + push 一遍 redis —— 镜像几乎不变，纯浪费。
+# 改成手动触发：升级 redis 版本、或换新服务器需要重新拉基础镜像时，来这里跑一次。
+#
+# 触发方式：GitHub 仓库 → Actions → sync base images → Run workflow
+
+name: sync base images
+
+on:
+  workflow_dispatch:
+
+env:
+  REGISTRY: ccr.ccs.tencentyun.com
+  NAMESPACE: mz_personal_namespace
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: docker/login-action@v3
+        with:
+          registry: ccr.ccs.tencentyun.com
+          username: ${{ secrets.TCR_USERNAME }}
+          password: ${{ secrets.TCR_PASSWORD }}
+      - name: Sync redis
+        run: |
+          set -e
+          docker pull redis:7-alpine
+          docker tag redis:7-alpine $REGISTRY/$NAMESPACE/redis:7-alpine
+          docker push $REGISTRY/$NAMESPACE/redis:7-alpine

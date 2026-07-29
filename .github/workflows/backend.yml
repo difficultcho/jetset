@@ -41,6 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # buildx 的 container driver 才支持导出层缓存，默认 docker driver 不行
+      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           registry: ccr.ccs.tencentyun.com
@@ -56,13 +58,11 @@ jobs:
           # GitHub Runner 在海外，走官方源比国内镜像快
           build-args: |
             PIP_INDEX_URL=https://pypi.org/simple
-
-      # 服务器访问不了 Docker Hub，把基础镜像同步到自己的 TCR（幂等）
-      - name: Sync base images to TCR
-        run: |
-          docker pull redis:7-alpine
-          docker tag redis:7-alpine ccr.ccs.tencentyun.com/mz_personal_namespace/redis:7-alpine
-          docker push ccr.ccs.tencentyun.com/mz_personal_namespace/redis:7-alpine
+          # Runner 是一次性 VM，本地层缓存每次都空。缓存存到 GitHub 侧（而非 TCR）：
+          # runner 在海外，回国内registry 拉缓存反而更慢。
+          # 只改代码不动 requirements.txt 时，pip install 那层直接命中。
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   deploy:
     if: github.event_name == 'push'
