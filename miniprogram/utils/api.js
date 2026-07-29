@@ -12,6 +12,7 @@ const api = {
       .join('&');
     return request('GET', '/api/v1/products' + (q ? '?' + q : ''));
   },
+  productFilters: () => request('GET', '/api/v1/products/filters'),
   productDetail: (id) => request('GET', '/api/v1/products/' + id),
   series: () => request('GET', '/api/v1/series'),
 

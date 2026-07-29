@@ -18,9 +18,12 @@
 
 .content { flex: 1; height: 100%; padding: 32rpx 32rpx 0 36rpx; box-sizing: border-box; }
 
-/* 上部：图片跳链（固定尺寸，等宽等高依次罗列） */
-.bn { margin-bottom: 24rpx; }
-.bn-img { width: 100%; aspect-ratio: 16 / 10; display: block; background: #f6f6f6; }
+/* 上部：图片跳链（固定画幅，等宽等高依次罗列）
+   画幅由外层 view 撑开、image 绝对定位填满 —— 与 page-blocks 的 .gb/.gb-fill 同一套。
+   不可把 aspect-ratio 直接写在 image 上：image 自带 320px 默认宽，会撑破右侧内容区。 */
+.bn { position: relative; width: 100%; aspect-ratio: 16 / 10; overflow: hidden;
+      margin-bottom: 24rpx; background: #f6f6f6; }
+.bn-img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
 /* 下部：下钻入口 */
 .ent { display: flex; align-items: center; justify-content: space-between; padding: 30rpx 4rpx; border-bottom: 1rpx solid #f0f0f0; }

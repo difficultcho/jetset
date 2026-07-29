@@ -2,14 +2,6 @@ const app = getApp();
 const api = require('../../utils/api.js');
 const { toCard } = require('../../utils/mapper.js');
 
-const FILTERS = [
-  { t: '推荐系列', opts: ['SOLEIL', 'CALLA', 'RIVA', 'LUMEN'] },
-  { t: '颜色', opts: ['黑色', '蓝色', '米白', '棕色', '拼色印花'] },
-  { t: '尺码', opts: ['XS', 'S', 'M', 'L', 'XL'] },
-  { t: '材质', opts: ['绢丝', '棉', '亚麻', '皮革'] },
-  { t: '衣长', opts: ['短款', '中长款', '长款'] }
-];
-
 Page({
   data: {
     title: '全部商品',
@@ -20,9 +12,11 @@ Page({
     list: [],
     wished: {},
     filterOpen: false,
-    filterExp: -1,
-    filters: FILTERS,
-    picked: {}
+    filterExp: 0,     // 组少，进来直接展开第一组
+    filters: [],     // 筛选项来自接口：尺码由库里实际值派生，价格为固定档位
+    picked: {},      // 抽屉内草稿：{'size:S': true, 'price:0-199999': true}
+    applied: {},     // 已生效的筛选，fetch 只认它
+    pickedCount: 0
   },
 
   onLoad(opts) {
@@ -31,6 +25,7 @@ Page({
     const title = opts.title ? decodeURIComponent(opts.title) : (cat || (seriesId ? '系列' : '全部商品'));
     this.setData({ cat, seriesId, title });
     this.fetch();
+    this.loadFilters();
   },
 
   onShow() {
@@ -46,9 +41,39 @@ Page({
     this.setData({ wished: map });
   },
 
+  async loadFilters() {
+    try {
+      const data = await api.productFilters();
+      this.setData({ filters: data.groups || [] });
+    } catch (e) { /* 静默：拿不到筛选项则抽屉为空 */ }
+  },
+
+  // 已生效筛选 → 请求参数
+  _filterParams() {
+    const sizes = [];
+    let price = '';
+    Object.keys(this.data.applied).forEach((k) => {
+      const i = k.indexOf(':');
+      const g = k.slice(0, i);
+      const v = k.slice(i + 1);
+      if (g === 'size') sizes.push(v);
+      else if (g === 'price') price = v;
+    });
+    const p = {};
+    if (sizes.length) p.size = sizes.join(',');
+    if (price) {
+      const seg = price.split('-');
+      p.price_min = seg[0];
+      p.price_max = seg[1];
+    }
+    return p;
+  },
+
   async fetch() {
     try {
-      const params = { page_size: 50, sort: this.data.sort };
+      const params = Object.assign(
+        { page_size: 50, sort: this.data.sort }, this._filterParams()
+      );
       if (this.data.cat) params.cat = this.data.cat;
       if (this.data.seriesId) params.series = this.data.seriesId;
       if (this.data.q) params.q = this.data.q;
@@ -79,22 +104,29 @@ Page({
     wx.navigateTo({ url: '/pages/pdp/pdp?id=' + e.detail.id });
   },
 
-  openFilter() { this.setData({ filterOpen: true }); },
+  // 打开时草稿同步成已生效状态，避免上次选了没点应用的残留
+  openFilter() {
+    this.setData({ picked: Object.assign({}, this.data.applied), filterOpen: true });
+  },
   closeFilter() { this.setData({ filterOpen: false }); },
   toggleExp(e) {
     const i = e.currentTarget.dataset.i;
     this.setData({ filterExp: this.data.filterExp === i ? -1 : i });
   },
   pickOpt(e) {
-    const { g, o } = e.currentTarget.dataset;
-    const key = g + ':' + o;
+    const { g, v, multi } = e.currentTarget.dataset;
+    const key = g + ':' + v;
     const picked = Object.assign({}, this.data.picked);
-    if (picked[key]) delete picked[key]; else picked[key] = true;
+    const on = !!picked[key];
+    // 单选组：先清掉同组其它选项
+    if (!multi) Object.keys(picked).forEach((k) => { if (k.indexOf(g + ':') === 0) delete picked[k]; });
+    if (on) delete picked[key]; else picked[key] = true;
     this.setData({ picked });
   },
   resetFilter() { this.setData({ picked: {} }); },
   applyFilter() {
-    this.setData({ filterOpen: false });
-    wx.showToast({ title: '筛选已应用', icon: 'none' });
+    const applied = Object.assign({}, this.data.picked);
+    this.setData({ applied, pickedCount: Object.keys(applied).length, filterOpen: false });
+    this.fetch();
   }
 });

@@ -6,6 +6,7 @@
 .ph { color: #b0b0b0; }
 .filter-row { display: flex; align-items: center; justify-content: space-between; padding: 22rpx 0 20rpx; }
 .filter-btn { display: flex; align-items: center; gap: 12rpx; font-size: 26rpx; color: #333; }
+.filter-btn.on { color: #111; font-weight: 500; }   /* 有生效筛选时点亮 */
 .ic-slider { width: 30rpx; height: 30rpx; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='15' height='15' fill='none' stroke='%23333' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M3 7 H21 M3 12 H21 M3 17 H21'/%3E%3Ccircle cx='8' cy='7' r='2' fill='%23fff'/%3E%3Ccircle cx='16' cy='12' r='2' fill='%23fff'/%3E%3Ccircle cx='7' cy='17' r='2' fill='%23fff'/%3E%3C/svg%3E") no-repeat center / contain; }
 .sort { display: flex; gap: 30rpx; }
 .sort-item { font-size: 26rpx; color: #9a9a9a; }

@@ -2,13 +2,24 @@ from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import func, select
 
 from app.deps import DB
-from app.models.catalog import Category, Spu
+from app.models.catalog import Category, Sku, Spu
 from app.models.series import Series
 from app.schemas.catalog import ProductDetail, ProductListItem
 from app.schemas.common import Page, Resp
 from app.services.catalog import spu_to_detail, spu_to_list_item
 
 router = APIRouter()
+
+# 尺码展示序（库里是自由文本，按服装惯例排；未知值排在最后）
+SIZE_ORDER = ["均码", "XS", "S", "M", "L", "XL", "XXL", "XXXL"]
+
+# 价格档位（分）。写死在这里而不是查库：档位是运营口径，不该随数据漂移
+PRICE_RANGES = [
+    (0, 199999, "¥2,000 以下"),
+    (200000, 499999, "¥2,000 - 5,000"),
+    (500000, 999999, "¥5,000 - 10,000"),
+    (1000000, 99999999, "¥10,000 以上"),
+]
 
 SORTS = {
     "default": (Spu.sort.asc(), Spu.id.asc()),
@@ -71,6 +82,23 @@ async def _category_ids(session, cat: str) -> list[int]:
     return ids
 
 
+@router.get("/products/filters", response_model=Resp[dict])
+async def product_filters(session: DB):
+    """筛选项。与当前结果集无关（不做 faceting），一次全局查询即可，分页/上拉不受影响。
+    代价是可能筛出空列表——正常电商行为，比每页扫全集划算。"""
+    sizes = (
+        await session.execute(select(Sku.size).where(Sku.status == 1, Sku.size != "").distinct())
+    ).scalars().all()
+    ordered = sorted(sizes, key=lambda s: (SIZE_ORDER.index(s) if s in SIZE_ORDER else 99, s))
+    groups = []
+    if ordered:
+        groups.append({"key": "size", "t": "尺码", "multi": True,
+                       "opts": [{"v": s, "label": s} for s in ordered]})
+    groups.append({"key": "price", "t": "价格", "multi": False,
+                   "opts": [{"v": f"{lo}-{hi}", "label": label} for lo, hi, label in PRICE_RANGES]})
+    return Resp(data={"groups": groups})
+
+
 @router.get("/products", response_model=Resp[Page[ProductListItem]])
 async def products(
     session: DB,
@@ -78,6 +106,9 @@ async def products(
     series: int | None = None,
     q: str | None = None,
     featured: bool = False,
+    size: str | None = None,        # 多选，逗号分隔
+    price_min: int | None = None,   # 分
+    price_max: int | None = None,
     sort: str = "default",
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
@@ -94,6 +125,18 @@ async def products(
         stmt = stmt.where(Spu.name.like(f"%{q}%"))
     if featured:
         stmt = stmt.where(Spu.featured.is_(True))
+    if size:
+        wanted = [s for s in (x.strip() for x in size.split(",")) if s]
+        if wanted:
+            stmt = stmt.where(
+                select(Sku.id)
+                .where(Sku.spu_id == Spu.id, Sku.status == 1, Sku.size.in_(wanted))
+                .exists()
+            )
+    if price_min is not None:
+        stmt = stmt.where(Spu.price >= price_min)
+    if price_max is not None:
+        stmt = stmt.where(Spu.price <= price_max)
     total = (await session.execute(select(func.count()).select_from(stmt.subquery()))).scalar_one()
     stmt = stmt.order_by(*SORTS.get(sort, SORTS["default"]))
     stmt = stmt.offset((page - 1) * page_size).limit(page_size)
