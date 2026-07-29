@@ -139,23 +139,6 @@ async def test_wholesale_review(client):
     assert mine[0]["status"] == "approved"
 
 
-async def test_banner_crud_and_home(client):
-    h = await admin_login(client)
-    created = (await client.post("/api/admin/banners", headers=h, json={
-        "title": "测试轮播", "sub_title": "TEST", "sort": 9})).json()["data"]
-
-    home = (await client.get("/api/v1/home")).json()["data"]
-    assert any(b["title"] == "测试轮播" for b in home["banners"])
-
-    await client.put(f"/api/admin/banners/{created['id']}", headers=h, json={
-        "title": "测试轮播", "sub_title": "TEST", "sort": 9, "status": 0})
-    home = (await client.get("/api/v1/home")).json()["data"]
-    assert not any(b["title"] == "测试轮播" for b in home["banners"])
-
-    resp = await client.delete(f"/api/admin/banners/{created['id']}", headers=h)
-    assert resp.status_code == 200
-
-
 async def test_change_password(client):
     h = await admin_login(client)
     # 原密码错误被拒

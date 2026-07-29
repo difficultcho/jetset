@@ -1,12 +1,3 @@
-async def test_home(client):
-    resp = await client.get("/api/v1/home")
-    assert resp.status_code == 200
-    data = resp.json()["data"]
-    assert len(data["hot"]) == 5          # 13 商品，hot 取前 5
-    assert len(data["grid"]) == 10        # grid 从第 4 个开始
-    assert data["featured"] is not None   # 前 3 个 featured
-
-
 async def test_categories_tree(client):
     resp = await client.get("/api/v1/categories")
     assert resp.status_code == 200

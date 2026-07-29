@@ -59,16 +59,3 @@ class ProductDetail(BaseModel):
     colors: list[ColorOut]
     sizes: list[str]
     skus: list[SkuOut]
-
-
-class HomeBanner(BaseModel):
-    title: str
-    sub_title: str
-    image: str
-
-
-class HomeOut(BaseModel):
-    banners: list[HomeBanner]
-    hot: list[ProductListItem]
-    featured: ProductListItem | None
-    grid: list[ProductListItem]

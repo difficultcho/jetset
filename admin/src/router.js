@@ -17,8 +17,7 @@ const routes = [
       { path: 'stores', component: () => import('./views/Stores.vue'), meta: { title: '门店管理' } },
       { path: 'wholesale', component: () => import('./views/Wholesale.vue'), meta: { title: '门店审核' } },
       { path: 'coupons', component: () => import('./views/Coupons.vue'), meta: { title: '优惠券' } },
-      { path: 'users', component: () => import('./views/Users.vue'), meta: { title: '用户' } },
-      { path: 'banners', component: () => import('./views/Banners.vue'), meta: { title: '首页首图' } }
+      { path: 'users', component: () => import('./views/Users.vue'), meta: { title: '用户' } }
     ]
   }
 ]

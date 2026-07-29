@@ -97,12 +97,3 @@ class ShipReq(BaseModel):
 class ReviewReq(BaseModel):
     action: str = Field(pattern="^(approve|reject)$")
     note: str = Field(default="", max_length=256)
-
-
-class BannerIn(BaseModel):
-    title: str = Field(min_length=1, max_length=128)
-    sub_title: str = Field(default="", max_length=128)
-    image: str = Field(default="", max_length=512)
-    link: str = Field(default="", max_length=256)
-    sort: int = 0
-    status: int = Field(default=1, ge=0, le=1)

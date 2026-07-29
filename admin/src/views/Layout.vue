@@ -14,7 +14,6 @@
         <el-menu-item index="/wholesale">门店审核</el-menu-item>
         <el-menu-item index="/coupons">优惠券</el-menu-item>
         <el-menu-item index="/users">用户</el-menu-item>
-        <el-menu-item index="/banners">首页首图</el-menu-item>
       </el-menu>
     </el-aside>
     <el-container>
