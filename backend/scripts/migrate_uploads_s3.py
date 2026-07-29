@@ -9,8 +9,11 @@ import mimetypes
 import sys
 from pathlib import Path
 
-from app.api.uploads import CACHE_CONTROL, s3_client, s3_enabled
-from app.config import settings
+# 直接 `python scripts/xxx.py` 时 sys.path[0] 是 scripts/ 而非项目根，import app 会失败
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from app.api.uploads import CACHE_CONTROL, s3_client, s3_enabled  # noqa: E402
+from app.config import settings  # noqa: E402
 
 
 def main() -> None:
