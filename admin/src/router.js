@@ -11,6 +11,7 @@ const routes = [
       { path: 'products', component: () => import('./views/Products.vue'), meta: { title: '商品管理' } },
       { path: 'categories', component: () => import('./views/Categories.vue'), meta: { title: '品类管理' } },
       { path: 'series', component: () => import('./views/Series.vue'), meta: { title: '系列管理' } },
+      { path: 'shop', component: () => import('./views/Shop.vue'), meta: { title: '商城配置' } },
       { path: 'orders', component: () => import('./views/Orders.vue'), meta: { title: '订单管理' } },
       { path: 'pages', component: () => import('./views/Pages.vue'), meta: { title: '页面管理' } },
       { path: 'pages/:key', component: () => import('./views/PageEditor.vue'), meta: { title: '页面编辑' } },

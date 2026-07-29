@@ -1,3 +1,5 @@
+const nav = require('../../utils/nav.js');
+
 // 配置化页面块渲染器：接收已解析的块序列，负责跳转 / 走马灯圆点 / 视频进屏自动播。
 Component({
   properties: {
@@ -45,15 +47,7 @@ Component({
       const b = this.data.blocks[i];
       let l = b && b.link;
       if (b && b.kind === 'linkrow') l = side === 'right' ? (b.right && b.right.link) : (b.left && b.left.link);
-      if (!l) return;
-      if (l.kind === 'page') return wx.navigateTo({ url: '/pages/page/page?key=' + l.key });
-      if (l.kind === 'pdp') return wx.navigateTo({ url: '/pages/pdp/pdp?id=' + l.spu_id });
-      if (l.kind === 'list') {
-        let url = '/pages/list/list?';
-        if (l.cat) url += 'cat=' + encodeURIComponent(l.cat) + '&';
-        if (l.series) url += 'series=' + l.series + '&';
-        wx.navigateTo({ url: url + 'title=' + encodeURIComponent(l.title || '全部商品') });
-      }
+      nav.go(l);
     }
   }
 });

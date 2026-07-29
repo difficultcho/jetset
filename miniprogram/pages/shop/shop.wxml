@@ -11,40 +11,34 @@
 
   <view class="body">
     <scroll-view class="rail" scroll-y>
-      <view class="rail-item {{curKey === item.kind + '-' + item.id ? 'on' : ''}}" wx:for="{{rail}}" wx:key="cn" data-i="{{index}}" bindtap="pick">
+      <view class="rail-item {{curKey === item.key ? 'on' : ''}}" wx:for="{{menus}}" wx:key="key" data-i="{{index}}" bindtap="pick">
         <text class="rail-en">{{item.en}}</text>
-        <text class="rail-cn">{{item.cn}}</text>
+        <text class="rail-cn">{{item.title}}</text>
       </view>
     </scroll-view>
 
     <scroll-view class="content" scroll-y>
-      <!-- 系列大卡 -->
-      <view wx:if="{{card}}" class="big-card" bindtap="goCard">
-        <view class="big-img" style="background:repeating-linear-gradient(135deg,{{card.tint}} 0 28rpx,{{card.tint}} 28rpx 56rpx);">
-          <text class="ph-label">series · {{card.en}}</text>
+      <!-- 上部：图片跳链，等宽等高依次罗列 -->
+      <view class="bn" wx:for="{{banners}}" wx:key="index" data-i="{{index}}" bindtap="goBanner">
+        <image class="bn-img" src="{{item.img}}" mode="aspectFill" />
+      </view>
+
+      <!-- 下部：下钻入口，每项通向一个商品列表 -->
+      <block wx:if="{{cur}}">
+        <view class="ent" bindtap="goAll">
+          <view class="ent-txt"><text class="ent-cn">全部{{cur.title}}</text></view>
+          <view class="ent-arrow" />
         </view>
-        <view class="big-en">{{card.en}}</view>
-        <view class="big-cn">{{card.name}}</view>
-      </view>
-
-      <!-- 品类二级 chips -->
-      <view wx:if="{{subs.length}}" class="subs">
-        <view class="sub-chip {{subCur === '' ? 'on' : ''}}" data-name="" bindtap="pickSub">全部</view>
-        <view class="sub-chip {{subCur === item.name ? 'on' : ''}}" wx:for="{{subs}}" wx:key="id" data-name="{{item.name}}" bindtap="pickSub">{{item.name}}</view>
-      </view>
-
-      <view class="tiles">
-        <view class="tile" wx:for="{{tiles}}" wx:key="id" data-id="{{item.id}}" bindtap="goPdp">
-          <view class="tile-img"><prod-img prod="{{item}}" /></view>
-          <view class="tile-en">{{item.en}}</view>
-          <view class="tile-cn clamp2">{{item.sub}}</view>
-          <view class="tile-price">
-            <text wx:if="{{item.sale}}" class="tp-old">¥{{item.saleText}}</text>
-            <text class="{{item.sale ? 'tp-sale' : 'tp-now'}}">¥{{item.priceText}}</text>
+        <view class="ent" wx:for="{{entries}}" wx:key="title" data-i="{{index}}" bindtap="goEntry">
+          <view class="ent-txt">
+            <text class="ent-cn">{{item.title}}</text>
+            <text wx:if="{{item.en}}" class="ent-en">{{item.en}}</text>
           </view>
+          <view class="ent-arrow" />
         </view>
-      </view>
-      <view wx:if="{{tiles.length === 0}}" class="empty">该类目即将上架，敬请期待</view>
+      </block>
+
+      <view wx:if="{{!menus.length}}" class="empty">内容即将上架，敬请期待</view>
       <view class="content-space" />
     </scroll-view>
   </view>

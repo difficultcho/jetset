@@ -2,6 +2,7 @@ const { request } = require('./request.js');
 
 const api = {
   // 商品浏览
+  shop: () => request('GET', '/api/v1/shop'),
   page: (key) => request('GET', '/api/v1/pages/' + key),
   categories: () => request('GET', '/api/v1/categories'),
   products: (params) => {

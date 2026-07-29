@@ -1,27 +1,26 @@
 const app = getApp();
 const api = require('../../utils/api.js');
-const { toCard } = require('../../utils/mapper.js');
+const nav = require('../../utils/nav.js');
+const { toShopMenus } = require('../../utils/mapper.js');
 
 Page({
   data: {
     sbh: 20,
-    rail: [],        // [{kind:'series'|'cat', id, en, cn, subs?}]
-    curKey: '',      // 'series-1' / 'cat-3'
-    card: null,      // 系列大卡
-    subs: [],        // 品类二级 chips
-    subCur: '',
-    tiles: []
+    menus: [],       // 左菜单：上部自定义项（系列）+ 下部一级类目
+    curKey: '',
+    cur: null,       // 当前菜单项（含自身 filter，供「全部」入口用）
+    banners: [],     // 右侧上部：图片跳链
+    entries: []      // 右侧下部：下钻入口，每项就是一个商品列表过滤条件
   },
 
   async onLoad() {
     this.setData({ sbh: app.globalData.statusBarHeight });
     try {
-      const [series, cats] = await Promise.all([api.series(), api.categories()]);
-      const rail = series.map((s) => ({ kind: 'series', id: s.id, en: s.en, cn: s.name, tint: s.cover_tint, subtitle: s.subtitle }))
-        .concat(cats.map((c) => ({ kind: 'cat', id: c.id, en: c.en, cn: c.name, subs: c.children || [] })));
-      this.setData({ rail });
-      if (rail.length) this.pick({ currentTarget: { dataset: { i: 0 } } });
-    } catch (e) { /* 静默 */ }
+      const data = await api.shop();
+      const menus = toShopMenus(data.menus);
+      this.setData({ menus });
+      if (menus.length) this._select(menus[0]);
+    } catch (e) { /* 静默：菜单为空时页面自然留白 */ }
   },
 
   onShow() {
@@ -31,47 +30,34 @@ Page({
     if (f) f.refresh();
   },
 
-  async pick(e) {
-    const item = this.data.rail[e.currentTarget.dataset.i];
-    this.setData({ curKey: item.kind + '-' + item.id });
-    if (item.kind === 'series') {
-      this.setData({
-        card: { name: item.cn, en: item.en, subtitle: item.subtitle, tint: item.tint || '#e8dcc8', seriesId: item.id },
-        subs: [], subCur: ''
-      });
-      await this._load({ series: item.id });
-    } else {
-      this.setData({
-        card: null,
-        subs: item.subs,
-        subCur: ''
-      });
-      await this._load({ cat: item.cn });
-    }
+  pick(e) {
+    const m = this.data.menus[e.currentTarget.dataset.i];
+    if (m) this._select(m);
   },
 
-  async pickSub(e) {
-    const name = e.currentTarget.dataset.name;
-    this.setData({ subCur: name });
-    await this._load({ cat: name || this._curCatName() });
+  _select(m) {
+    this.setData({
+      curKey: m.key, cur: m,
+      banners: m.banners || [],
+      entries: m.entries || []
+    });
   },
 
-  _curCatName() {
-    const item = this.data.rail.find((r) => r.kind + '-' + r.id === this.data.curKey);
-    return item ? item.cn : '';
+  goBanner(e) {
+    const b = this.data.banners[e.currentTarget.dataset.i];
+    if (b) nav.go(b.link);
   },
 
-  async _load(params) {
-    try {
-      const page = await api.products(Object.assign({ page_size: 30 }, params));
-      this.setData({ tiles: page.items.map(toCard) });
-    } catch (e) { this.setData({ tiles: [] }); }
+  // 下钻入口 / 当前项全部商品 —— 都落到同一个商品列表页
+  goEntry(e) {
+    const it = this.data.entries[e.currentTarget.dataset.i];
+    if (it) nav.goList(Object.assign({}, it.filter, { title: it.title }));
   },
 
-  goCard() {
-    const c = this.data.card;
-    if (c) wx.navigateTo({ url: '/pages/list/list?series=' + c.seriesId + '&title=' + encodeURIComponent(c.en) });
+  goAll() {
+    const m = this.data.cur;
+    if (m) nav.goList(Object.assign({}, m.filter, { title: m.title }));
   },
-  goPdp(e) { wx.navigateTo({ url: '/pages/pdp/pdp?id=' + e.currentTarget.dataset.id }); },
+
   goSearch() { wx.navigateTo({ url: '/pages/list/list' }); }
 });

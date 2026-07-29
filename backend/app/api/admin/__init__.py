@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from app.api.admin import (
-    auth, coupons, orders, pages, products, series, stats, stores, users,
+    auth, coupons, shop, orders, pages, products, series, stats, stores, users,
     wholesale,
 )
 from app.deps import get_current_admin
@@ -11,6 +11,7 @@ admin_router.include_router(auth.router, tags=["管理-认证"])
 
 protected = APIRouter(dependencies=[Depends(get_current_admin)])
 protected.include_router(products.router, tags=["管理-商品"])
+protected.include_router(shop.router, tags=["管理-商城配置"])
 protected.include_router(series.router, tags=["管理-系列"])
 protected.include_router(orders.router, tags=["管理-订单"])
 protected.include_router(wholesale.router, tags=["管理-批发审核"])

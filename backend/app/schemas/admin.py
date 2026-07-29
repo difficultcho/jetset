@@ -97,3 +97,13 @@ class ShipReq(BaseModel):
 class ReviewReq(BaseModel):
     action: str = Field(pattern="^(approve|reject)$")
     note: str = Field(default="", max_length=256)
+
+
+class ShopMenuIn(BaseModel):
+    kind: str = Field(default="series", pattern="^(series|category)$")
+    ref_id: int
+    title: str = Field(default="", max_length=64)   # 空=取实体名
+    en: str = Field(default="", max_length=64)
+    banners: list = Field(default_factory=list)     # [{img, link}]
+    sort: int = 0
+    status: int = Field(default=1, ge=0, le=1)

@@ -64,6 +64,13 @@ function toPageBlocks(blocks) {
   });
 }
 
+// 商城左菜单：图片补全域名，其余（filter/link）后端已解析好，直接透传
+function toShopMenus(menus) {
+  return (menus || []).map((m) => Object.assign({}, m, {
+    banners: (m.banners || []).map((b) => ({ img: fullImg(b.img), link: b.link || null }))
+  }));
+}
+
 // 商品详情
 function toDetail(d) {
   const imgs = d.colors.map((c) => fullImg(c.image));
@@ -182,6 +189,6 @@ function toCoupon(c) {
 }
 
 module.exports = {
-  yuan, fmt, fullImg, toCard, toPageBlocks, toDetail, toCartItem, toOrderLine, toOrder,
+  yuan, fmt, fullImg, toCard, toPageBlocks, toShopMenus, toDetail, toCartItem, toOrderLine, toOrder,
   toAddress, toCoupon, toStore
 };

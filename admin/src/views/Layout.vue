@@ -7,6 +7,7 @@
         <el-menu-item index="/products">商品管理</el-menu-item>
         <el-menu-item index="/categories">品类管理</el-menu-item>
         <el-menu-item index="/series">系列管理</el-menu-item>
+        <el-menu-item index="/shop">商城配置</el-menu-item>
         <el-menu-item index="/orders">订单管理</el-menu-item>
         <el-menu-item index="/pages">页面管理</el-menu-item>
         <div class="menu-sep"></div>

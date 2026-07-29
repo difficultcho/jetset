@@ -17,24 +17,17 @@
 .rail-item.on .rail-en, .rail-item.on .rail-cn { color: #111; font-weight: 500; }
 
 .content { flex: 1; height: 100%; padding: 32rpx 32rpx 0 36rpx; box-sizing: border-box; }
-.big-card { margin-bottom: 44rpx; }
-.big-img { width: 100%; aspect-ratio: 16 / 12; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 24rpx; }
-.ph-label { font-family: monospace; font-size: 19rpx; letter-spacing: 0.16em; color: rgba(80,60,45,0.5); }
-.big-en { margin-top: 22rpx; font-size: 26rpx; letter-spacing: 0.16em; color: #222; }
-.big-cn { margin-top: 8rpx; font-size: 27rpx; color: #333; }
 
-.subs { display: flex; flex-wrap: wrap; gap: 16rpx; margin-bottom: 36rpx; }
-.sub-chip { border: 1rpx solid #ddd; border-radius: 6rpx; padding: 10rpx 24rpx; font-size: 23rpx; color: #666; }
-.sub-chip.on { border-color: #111; color: #111; }
+/* 上部：图片跳链（固定尺寸，等宽等高依次罗列） */
+.bn { margin-bottom: 24rpx; }
+.bn-img { width: 100%; aspect-ratio: 16 / 10; display: block; background: #f6f6f6; }
 
-.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 56rpx 36rpx; }
-.tile { text-align: center; }
-.tile-img { width: 100%; aspect-ratio: 3 / 3.6; overflow: hidden; background: #f6f6f6; }
-.tile-en { margin-top: 20rpx; font-size: 22rpx; letter-spacing: 0.14em; color: #999; }
-.tile-cn { margin-top: 6rpx; font-size: 25rpx; color: #333; min-height: 68rpx; }
-.tile-price { margin-top: 4rpx; display: flex; gap: 10rpx; justify-content: center; align-items: baseline; }
-.tp-now { font-size: 25rpx; color: #111; }
-.tp-old { font-size: 21rpx; color: #b0b0b0; text-decoration: line-through; }
-.tp-sale { font-size: 25rpx; color: #d0342c; }
+/* 下部：下钻入口 */
+.ent { display: flex; align-items: center; justify-content: space-between; padding: 30rpx 4rpx; border-bottom: 1rpx solid #f0f0f0; }
+.ent-txt { display: flex; align-items: baseline; gap: 14rpx; min-width: 0; }
+.ent-cn { font-size: 27rpx; color: #222; }
+.ent-en { font-size: 21rpx; letter-spacing: 0.12em; color: #b0b0b0; }
+.ent-arrow { width: 16rpx; height: 16rpx; flex-shrink: 0; border-top: 2rpx solid #bbb; border-right: 2rpx solid #bbb; transform: rotate(45deg); }
+
 .empty { text-align: center; color: #b0b0b0; font-size: 26rpx; padding: 60rpx 0; }
 .content-space { height: 200rpx; }
