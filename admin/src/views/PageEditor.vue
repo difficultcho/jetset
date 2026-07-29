@@ -155,6 +155,7 @@ import LinkTarget from '../components/LinkTarget.vue'
 const KINDS = { image: '图片', video: '视频', text: '文本', linkrow: '链接行', carousel: '走马灯' }
 const TAG = { image: '', video: 'warning', text: 'info', linkrow: 'info', carousel: 'success' }
 const RATIOS = ['3/3.9', '3/3.6', '3/3.4', '3/3.2', '1/1', '16/9']
+const LINK_KINDS = ['page', 'list', 'pdp']   // 与后端 services/pages.py 保持一致
 
 const route = useRoute()
 const router = useRouter()
@@ -204,14 +205,24 @@ async function doVideo({ file }, b) {
   }
 }
 
+// 旧模型（post/campaign）留下的跳转在新规则下非法，载入时降级为「不跳转」，
+// 否则原样回传会被后端拒绝，而 LinkTarget 又渲染成空白框、看不出问题在哪
+let stale = 0
+function cleanLink(l) {
+  if (!l) return null
+  if (LINK_KINDS.includes(l.kind)) return l
+  stale++
+  return null
+}
+
 // 存储态 → 编辑态（link 结构直接沿用，交给 LinkTarget 组件维护）
 function toEdit(b) {
   const e = { ...blank(b.kind), ...b, _id: ++seq, _pct: 0 }
   if (b.kind === 'linkrow') {
-    e.left = { text: (b.left && b.left.text) || '', link: (b.left && b.left.link) || null }
-    e.right = { text: (b.right && b.right.text) || '', link: (b.right && b.right.link) || null }
+    e.left = { text: (b.left && b.left.text) || '', link: cleanLink(b.left && b.left.link) }
+    e.right = { text: (b.right && b.right.text) || '', link: cleanLink(b.right && b.right.link) }
   } else {
-    e.link = b.link || null
+    e.link = cleanLink(b.link)
   }
   return e
 }
@@ -246,7 +257,9 @@ async function load() {
     sort.value = page.sort
     on.value = page.status === 1
     fixed.value = page.fixed
+    stale = 0
     blocks.value = (page.blocks || []).map(toEdit)
+    if (stale) ElMessage.warning(`${stale} 处旧版跳转配置已失效，已重置为「不跳转」，请重新选择目标后保存`)
     pages.value = allPages.filter((p) => p.key !== pageKey)  // 排除自身，避免自引用
     seriesList.value = ss
     catList.value = cs.filter((c) => c.parent_id !== null)  // 商品挂叶子品类
