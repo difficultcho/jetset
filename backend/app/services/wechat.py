@@ -18,10 +18,10 @@ _token_cache = {"value": "", "expires": 0.0}
 async def code2session(code: str) -> dict:
     """wx.login 的 code 换 openid/unionid。
 
-    WECHAT_MOCK=true 时不请求微信服务器，code 直接映射为固定 openid，
+    MOCK_MODE=true 时不请求微信服务器，code 直接映射为固定 openid，
     便于本地开发与自动化测试。
     """
-    if settings.wechat_mock:
+    if settings.mock_mode:
         return {"openid": f"mock-{code}", "unionid": None}
 
     async with httpx.AsyncClient(timeout=10) as client:
@@ -70,7 +70,7 @@ async def msg_sec_check(openid: str, content: str) -> str:
 
     mock 模式或检测服务不可用时降级放行（记日志），不阻塞业务功能。
     """
-    if settings.wechat_mock or not content.strip():
+    if settings.mock_mode or not content.strip():
         return "pass"
     token = await _access_token()
     if token is None:

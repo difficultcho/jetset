@@ -29,9 +29,12 @@ class Settings(BaseSettings):
 
     wechat_appid: str = ""
     wechat_secret: str = ""
-    wechat_mock: bool = True
 
-    payment_provider: str = "mock"  # mock | wechat
+    # 开发期脚手架总开关，管三件事：假登录（code 直接映射 openid）、假支付、
+    # 跳过内容安全检测。这三者必须同时开关——拆成多个开关只会上线时漏掉某一个。
+    # 置 false 时启动会强校验真实凭据是否齐全（见 config_problems），缺什么直接报错。
+    mock_mode: bool = True
+
     wxpay_mchid: str = ""
     wxpay_cert_serial: str = ""
     wxpay_private_key_path: str = ""
@@ -68,18 +71,52 @@ def get_settings() -> Settings:
     return Settings()
 
 
+# 关掉 mock 就必须有的真实凭据。缺任何一项，真实登录或真实支付都跑不起来，
+# 与其等用户下单时报 503，不如启动就拒绝。
+REAL_MODE_REQUIRED = (
+    ("WECHAT_APPID", "wechat_appid"),
+    ("WECHAT_SECRET", "wechat_secret"),
+    ("WXPAY_MCHID", "wxpay_mchid"),
+    ("WXPAY_CERT_SERIAL", "wxpay_cert_serial"),
+    ("WXPAY_PRIVATE_KEY_PATH", "wxpay_private_key_path"),
+    ("WXPAY_APIV3_KEY", "wxpay_apiv3_key"),
+    ("WXPAY_NOTIFY_URL", "wxpay_notify_url"),
+)
+
+
+def config_problems(s: Settings) -> tuple[list[str], list[str]]:
+    """配置体检，返回 (致命, 警告)。一次列全，避免改一个报一个。"""
+    fatal: list[str] = []
+    warn: list[str] = []
+
+    if s.app_env == "prod" and s.database_url.startswith("sqlite"):
+        fatal.append("APP_ENV=prod 但 DATABASE_URL 仍是 sqlite 默认值："
+                     "数据存在容器内、重建即丢失，生产必须配 MySQL")
+
+    if not s.mock_mode:
+        miss = [env for env, field in REAL_MODE_REQUIRED if not str(getattr(s, field, "")).strip()]
+        if miss:
+            fatal.append("MOCK_MODE=false 走真实登录与真实支付，以下凭据未配置："
+                         + "、".join(miss))
+
+    if s.app_env == "prod":
+        if s.mock_mode:
+            warn.append("生产环境 MOCK_MODE=true：登录可伪造、支付是假的、"
+                        "内容安全检测被跳过。提审前必须置 false")
+        if s.jwt_secret.startswith("dev-secret"):
+            warn.append("JWT_SECRET 仍是默认值，生产必须更换（openssl rand -hex 32）")
+        if s.admin_password == "jetset-admin":
+            warn.append("ADMIN_PASSWORD 仍是默认值，生产必须更换")
+    return fatal, warn
+
+
 settings = get_settings()
 
-# 生产环境防线：关键配置缺失必须在启动时报错，而不是静默用默认值拖到运行期
-if settings.app_env == "prod":
+_fatal, _warn = config_problems(settings)
+if _warn:
     import sys
 
-    if settings.database_url.startswith("sqlite"):
-        raise RuntimeError(
-            "APP_ENV=prod 但 DATABASE_URL 未配置（当前为 sqlite 默认值）。"
-            "sqlite 数据存在容器内、重建即丢失，生产必须配置 MySQL。"
-        )
-    if settings.wechat_mock:
-        print("[config] 警告：生产环境 WECHAT_MOCK=true，任何人可伪造登录", file=sys.stderr)
-    if settings.jwt_secret.startswith("dev-secret") or settings.admin_password == "jetset-admin":
-        print("[config] 警告：JWT_SECRET/ADMIN_PASSWORD 仍为默认值，生产必须更换", file=sys.stderr)
+    for _w in _warn:
+        print(f"[config] 警告：{_w}", file=sys.stderr)
+if _fatal:
+    raise RuntimeError("配置检查未通过：\n  - " + "\n  - ".join(_fatal))

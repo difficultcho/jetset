@@ -44,5 +44,5 @@ async def test_risky_order_note_rejected(client, monkeypatch):
 
 
 async def test_mock_mode_skips_check(client):
-    # 测试环境 WECHAT_MOCK=true：真实实现直接放行，不请求微信
+    # 测试环境 MOCK_MODE=true：真实实现直接放行，不请求微信
     assert await wechat.msg_sec_check("any-openid", "任何内容") == "pass"

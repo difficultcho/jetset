@@ -43,6 +43,5 @@ class WechatPayProvider:
 
 
 def get_provider():
-    if settings.payment_provider == "wechat":
-        return WechatPayProvider()
-    return MockProvider()
+    """渠道由 MOCK_MODE 单一决定，不再有独立的 PAYMENT_PROVIDER 开关。"""
+    return MockProvider() if settings.mock_mode else WechatPayProvider()

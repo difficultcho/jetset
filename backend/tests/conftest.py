@@ -6,8 +6,7 @@ import tempfile
 _tmp = tempfile.mkdtemp(prefix="jetset-test-")
 os.environ["DATABASE_URL"] = f"sqlite+aiosqlite:///{_tmp}/test.db"
 os.environ["AUTO_CREATE_TABLES"] = "false"
-os.environ["WECHAT_MOCK"] = "true"
-os.environ["PAYMENT_PROVIDER"] = "mock"
+os.environ["MOCK_MODE"] = "true"
 os.environ["JWT_SECRET"] = "test-secret-0123456789abcdef0123456789abcdef"
 os.environ["UPLOAD_DIR"] = f"{_tmp}/uploads"
 os.environ["FREIGHT_CENTS"] = "0"
