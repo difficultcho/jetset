@@ -138,15 +138,30 @@ DROP TABLE banner;
 
 ## C. 脏配置数据：模型变更留下的旧值
 
-### C1 🔍 找出还带旧版跳转的页面
+### C1 🔍 找出还带旧版跳转的配置
 
-配置模型重构时 `post` / `campaign` 两种链接类型被合并成了 `page`，旧页面里可能还存着。
+配置模型重构时 `post` / `campaign` 两种链接类型被合并成了 `page`，旧数据可能还存着。
 
-```sql
-SELECT `key`, title FROM page
-WHERE JSON_SEARCH(blocks, 'one', 'post')     IS NOT NULL
-   OR JSON_SEARCH(blocks, 'one', 'campaign') IS NOT NULL;
+```bash
+docker compose exec api python -m scripts.check_page_links
 ```
+
+它按当前的 `LINK_KINDS` 规则逐块检查**页面块**和**商城图片跳链**，精确报到块级：
+
+```
+  页面「品牌故事」（key=a1b2c3d4）
+    ✗ 第 6 块（image）kind='post'
+    ✗ 第 9 块（链接行·右）kind='campaign'
+```
+
+顺带列出「指向已删对象」的跳转（页面/商品/类目被删）——那些标 △，仅供参考，见 C3。
+
+> 也可以用纯 SQL，但不推荐：
+> ```sql
+> SELECT `key`, title FROM page WHERE JSON_SEARCH(blocks, 'one', 'post') IS NOT NULL;
+> ```
+> `JSON_SEARCH` 匹配 JSON 里**任何位置**的字符串 `post`——某个文本块正文里写了 "post" 就误报，
+> 而且只告诉你哪个页面有问题，不告诉你第几块。
 
 ### C2 ⚠️ 处理方式：管理端点一遍，别手改 SQL
 
