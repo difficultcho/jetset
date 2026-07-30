@@ -55,15 +55,31 @@ docker compose exec api python scripts/migrate_uploads_s3.py
 >
 > 或者重新部署一次，脚本已加了 `sys.path` 引导，两种跑法都能用。
 
-### A4 🔍 抽查
+### A4 🔍 核对完整性（比随便 curl 一个文件靠谱）
 
 ```bash
-curl -I https://<素材域名>/uploads/<A3 输出里的任一文件名>
+docker compose exec api python -m scripts.check_assets
 ```
 
-期望 `200` 且带 `Cache-Control`。再到小程序里翻几个老商品/老页面，图能出来即可。
+它把**库里所有引用到的素材路径**收齐（商品图 / 系列封面 / 页面块 / 商城图片跳链 / 门店图），
+逐个到对象存储确认存在，按来源分类报告。只读，不传不删不改库。
 
-### A5 ⚠️ 清本地（可选，建议观察一两周再做）
+期望末尾是 `✓ 库里引用的素材在对象存储中全部存在`。
+
+若报缺失，脚本会标出每个缺失项是哪种情况：
+- `← 本地还有，重跑迁移即可` → 回 A3 再跑一次
+- `← 本地也没有，源文件已丢` → 该素材真丢了，需要在管理端重新上传
+
+### A5 🔍 抽查线上可访问
+
+```bash
+docker compose exec api python -c "from app.config import settings; print(settings.asset_base_url)"
+curl -I <上面输出的域名>/uploads/<任一文件名>
+```
+
+期望 `200` 且带 `Cache-Control`。再到小程序里翻几个老商品、老页面，图能出来即可。
+
+### A6 ⚠️ 清本地（可选，建议观察一两周再做）
 
 确认线上素材都从对象存储走之后，再删容器里的本地文件。不急——留着不影响任何东西。
 
