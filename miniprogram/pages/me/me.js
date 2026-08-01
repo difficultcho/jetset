@@ -15,13 +15,16 @@ const MENU = [
 Page({
   data: { sbh: 20, registered: false, user: null, menu: MENU, code: '' },
 
-  onLoad() { this.setData({ sbh: app.globalData.statusBarHeight }); },
+  onLoad() { this.setData({ sbh: app.refreshMetrics().sbh }); },
 
   onShow() {
     if (typeof this.getTabBar === 'function') this.getTabBar().refresh(3);
     app.refreshCartCount();
     this.fetch();
   },
+
+  // 折叠屏展开/收起、分屏会改变窗口尺寸，状态栏高度需重算
+  onResize() { this.setData({ sbh: app.refreshMetrics().sbh }); },
 
   async fetch() {
     try {

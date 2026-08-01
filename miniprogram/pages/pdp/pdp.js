@@ -14,8 +14,11 @@ Page({
     recs: []
   },
 
+  // 折叠屏展开/收起、分屏会改变窗口尺寸，状态栏高度需重算
+  onResize() { this.setData({ sbh: app.refreshMetrics().sbh }); },
+
   async onLoad(opts) {
-    this.setData({ sbh: app.globalData.statusBarHeight });
+    this.setData({ sbh: app.refreshMetrics().sbh });
     this.pid = opts.id;
     app.pushFootprint(opts.id);
     try {

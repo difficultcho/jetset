@@ -9,13 +9,14 @@ Page({
   data: { sbh: 20, heroH: 600, blocks: [] },
 
   onLoad() {
-    const sbh = app.globalData.statusBarHeight;
-    const win = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
-    this.setData({ sbh, heroH: win.windowHeight - sbh - Math.round((win.windowWidth * 88) / 750) });
+    this.setData(app.refreshMetrics());
+    // 先用上次的块秒开，取数交给 onShow（它在 onLoad 之后必然触发，不必在此重复请求）
     const cached = wx.getStorageSync(PAGE_CACHE);
     if (cached && cached.length) this.setData({ blocks: toPageBlocks(cached) });
-    this.fetch();
   },
+
+  // 折叠屏展开/收起、分屏会改变窗口尺寸，几何需重算（内容取数不受影响）
+  onResize() { this.setData(app.refreshMetrics()); },
 
   async fetch() {
     try {
@@ -35,5 +36,7 @@ Page({
   onShow() {
     if (typeof this.getTabBar === 'function') this.getTabBar().refresh(1);
     app.refreshCartCount();
+    // tab 页 onLoad 只跑一次，取数必须放 onShow，否则后台改了配置要杀应用才能看到
+    this.fetch();
   }
 });

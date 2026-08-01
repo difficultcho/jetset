@@ -11,6 +11,17 @@ App({
   },
 
   onLaunch() {
+    this.refreshMetrics();
+    // 折叠屏展开/收起、分屏都会改变窗口尺寸。这里刷新 globalData，
+    // 保证之后新打开的页面拿到的是当前几何；已打开的页面各自在 onResize 里重算。
+    if (wx.onWindowResize) wx.onWindowResize(() => this.refreshMetrics());
+    ensureLogin()
+      .then(() => this.refreshCartCount())
+      .catch(() => {});
+  },
+
+  // 首屏几何。幂等且极轻，可随时重算——onResize 里直接调即可，不依赖回调顺序。
+  refreshMetrics() {
     const win = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
     this.globalData.statusBarHeight = win.statusBarHeight || 20;
     // 胶囊按钮位置推导导航栏高度
@@ -20,9 +31,12 @@ App({
     } catch (e) {
       this.globalData.navBarHeight = 44;
     }
-    ensureLogin()
-      .then(() => this.refreshCartCount())
-      .catch(() => {});
+    return {
+      sbh: this.globalData.statusBarHeight,
+      // 首屏可用高 = 窗口高 − 状态栏 − 导航栏（88rpx 按当前窗宽折算）
+      heroH: win.windowHeight - this.globalData.statusBarHeight
+             - Math.round((win.windowWidth * 88) / 750)
+    };
   },
 
   cartCount() {

@@ -7,13 +7,13 @@ Page({
   data: { blocks: [], heroH: 600 },
 
   onLoad(opts) {
-    const sbh = app.globalData.statusBarHeight;
-    const win = wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync();
-    // 撑满首屏图：窗口高 −（状态栏 + 88rpx 导航栏）
-    this.setData({ heroH: win.windowHeight - sbh - Math.round((win.windowWidth * 88) / 750) });
+    this.setData({ heroH: app.refreshMetrics().heroH });
     this.key = opts.key || '';
     this.fetch();
   },
+
+  // 折叠屏展开/收起、分屏会改变窗口尺寸，撑满首屏图的高度需重算
+  onResize() { this.setData({ heroH: app.refreshMetrics().heroH }); },
 
   async fetch() {
     try {

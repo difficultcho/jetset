@@ -13,21 +13,32 @@ Page({
     entries: []      // 右侧下部：下钻入口，每项就是一个商品列表过滤条件
   },
 
-  async onLoad() {
-    this.setData({ sbh: app.globalData.statusBarHeight });
-    try {
-      const data = await api.shop();
-      const menus = toShopMenus(data.menus);
-      this.setData({ menus });
-      if (menus.length) this._select(menus[0]);
-    } catch (e) { /* 静默：菜单为空时页面自然留白 */ }
+  onLoad() {
+    this.setData({ sbh: app.refreshMetrics().sbh });
   },
+
+  // 折叠屏展开/收起、分屏会改变窗口尺寸，状态栏高度需重算
+  onResize() { this.setData({ sbh: app.refreshMetrics().sbh }); },
 
   onShow() {
     if (typeof this.getTabBar === 'function') this.getTabBar().refresh(2);
     app.refreshCartCount();
     const f = this.selectComponent('#fab');
     if (f) f.refresh();
+    // tab 页 onLoad 只跑一次，取数必须放 onShow，否则后台改了配置要杀应用才能看到
+    this.fetch();
+  },
+
+  async fetch() {
+    try {
+      const data = (await api.shop()) || {};
+      const menus = toShopMenus(data.menus);
+      this.setData({ menus });
+      // 重新取数不该把用户选中的项弹回第一个；该项被删了才回落
+      const keep = menus.filter((m) => m.key === this.data.curKey)[0];
+      if (keep) this._select(keep);
+      else if (menus.length) this._select(menus[0]);
+    } catch (e) { /* 静默：菜单为空时页面自然留白 */ }
   },
 
   pick(e) {
