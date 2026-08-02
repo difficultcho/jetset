@@ -115,7 +115,8 @@
             </template>
           </el-table-column>
         </el-table>
-        <el-button size="small" style="margin-top: 8px" @click="addSku">+ 加一行</el-button>
+        <el-button size="small" style="margin-top: 8px" @click="addSku()">+ 加尺码（同颜色）</el-button>
+        <el-button size="small" style="margin-top: 8px" @click="addSku(true)">+ 加颜色</el-button>
       </el-form-item>
 
       <el-form-item label="图片">
@@ -192,13 +193,43 @@ async function fetch() {
   }
 }
 
-function addSku() {
-  form.value.skus.push({ color_index: 0, color_name: '', color_hex: '#1a1a1a', size: '均码', priceYuan: 0, stock: 0, on: true })
+// 新行沿用上一行的颜色（加尺码是常态）；要加新颜色时改「色序」即可。
+// 不能一律给 0：色序 + 尺码 是 SKU 唯一键，两个颜色都占 0 会撞库。
+function addSku(newColor = false) {
+  const last = form.value.skus[form.value.skus.length - 1]
+  const maxIdx = form.value.skus.reduce((m, s) => Math.max(m, s.color_index || 0), -1)
+  form.value.skus.push(
+    last && !newColor
+      ? { color_index: last.color_index, color_name: last.color_name, color_hex: last.color_hex,
+          size: '', priceYuan: last.priceYuan, stock: 0, on: true }
+      : { color_index: maxIdx + 1, color_name: '', color_hex: '#1a1a1a',
+          size: '均码', priceYuan: 0, stock: 0, on: true }
+  )
+}
+
+// 提交前自检，别把唯一键冲突留给数据库以 500 的形式炸出来
+function skuProblem() {
+  const seen = new Map()
+  const colorOf = new Map()
+  for (let i = 0; i < form.value.skus.length; i++) {
+    const s = form.value.skus[i]
+    if (!s.color_name) return `第 ${i + 1} 行未填颜色名`
+    if (!s.size) return `第 ${i + 1} 行未填尺码`
+    const owner = colorOf.get(s.color_index)
+    if (owner === undefined) colorOf.set(s.color_index, s.color_name)
+    else if (owner !== s.color_name) {
+      return `第 ${i + 1} 行：色序 ${s.color_index} 已被颜色「${owner}」占用，不同颜色要用不同色序`
+    }
+    const key = s.color_index + '/' + s.size
+    if (seen.has(key)) return `第 ${seen.get(key)} 行与第 ${i + 1} 行重复：同色序同尺码只能有一条`
+    seen.set(key, i + 1)
+  }
+  return ''
 }
 
 function openCreate() {
   form.value = emptyForm()
-  addSku()
+  addSku(true)
   dialog.value = true
 }
 
@@ -234,9 +265,11 @@ async function save() {
   const f = form.value
   if (!f.name || !f.category_id) return ElMessage.warning('请填写名称和分类')
   if (!f.skus.length) return ElMessage.warning('至少一个 SKU')
-  for (const s of f.skus) {
-    if (!s.color_name || !s.size || !s.priceYuan) return ElMessage.warning('SKU 的颜色/尺码/价格必填')
+  for (let i = 0; i < f.skus.length; i++) {
+    if (!f.skus[i].priceYuan) return ElMessage.warning(`第 ${i + 1} 行 SKU 未填价格`)
   }
+  const bad = skuProblem()
+  if (bad) return ElMessage.warning(bad)
   const payload = {
     category_id: f.category_id, series_id: f.series_id || null,
     name: f.name, sub: f.sub, code: f.code, en_model: f.en_model, brief: f.brief,

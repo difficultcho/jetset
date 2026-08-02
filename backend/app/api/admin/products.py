@@ -3,6 +3,7 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.deps import DB
+from app.errors import BizError
 from app.models.catalog import Category, Sku, Spu, SpuImage
 from app.models.series import Series
 from app.schemas.admin import CategoryIn, ProductIn, StatusReq
@@ -78,6 +79,23 @@ def _refresh_spu_price(spu: Spu) -> None:
     active = [s.price for s in spu.skus if s.status == 1]
     if active:
         spu.price = min(active)
+
+
+def _validate_skus(skus_in: list) -> None:
+    """入参自检。sku 有 (spu_id, color_index, size) 唯一约束，冲突会以
+    IntegrityError → 500 的形式炸出来，运营看不懂；在这里挡成可读的 400。"""
+    owner: dict[int, str] = {}
+    seen: dict[tuple[int, str], int] = {}
+    for i, s in enumerate(skus_in, 1):
+        got = owner.setdefault(s.color_index, s.color_name)
+        if got != s.color_name:
+            raise BizError(f"第 {i} 行：色序 {s.color_index} 已被颜色「{got}」占用，"
+                           f"不同颜色要用不同色序")
+        key = (s.color_index, s.size)
+        if key in seen:
+            raise BizError(f"第 {seen[key]} 行与第 {i} 行重复："
+                           f"色序 {s.color_index} + 尺码「{s.size}」只能有一条")
+        seen[key] = i
 
 
 async def _apply_skus(session: AsyncSession, spu: Spu, skus_in: list,
@@ -178,6 +196,7 @@ async def _check_refs(session: AsyncSession, req: ProductIn) -> None:
 @router.post("/products", response_model=Resp[dict])
 async def create_product(req: ProductIn, session: DB):
     await _check_refs(session, req)
+    _validate_skus(req.skus)
     spu = Spu(
         category_id=req.category_id, series_id=req.series_id,
         name=req.name, sub=req.sub, en_model=req.en_model, code=req.code,
@@ -202,6 +221,7 @@ async def update_product(spu_id: int, req: ProductIn, session: DB):
     if spu is None:
         raise HTTPException(status_code=404, detail="商品不存在")
     await _check_refs(session, req)
+    _validate_skus(req.skus)
     spu.category_id, spu.series_id = req.category_id, req.series_id
     spu.name, spu.sub, spu.en_model, spu.code = req.name, req.sub, req.en_model, req.code
     spu.brief, spu.detail, spu.bullets = req.brief, req.detail, (req.bullets or None)
