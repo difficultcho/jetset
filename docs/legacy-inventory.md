@@ -112,6 +112,48 @@ asyncio.run(main())
 
 - **孤儿表** → 走 B2
 - **未建表** → 不正常，说明模型没注册或启动没跑 `create_all`，先查这个
+- **孤儿列（NOT NULL）** → **必须立刻删**，见下
+
+### B1b 🔍 孤儿列 —— 比孤儿表危险得多
+
+模型里删掉一个字段后，库里的列不会自动消失。`_add_missing_columns` 只加不删。
+如果那列是 `NOT NULL` 且没有数据库级默认值（SQLAlchemy 的 `default=""` 是 Python 侧的，
+不会写进 DDL），**之后所有 INSERT 都会失败**，报 `1364 Field 'x' doesn't have a default value`。
+
+```bash
+docker compose exec api python -c "
+import asyncio
+from sqlalchemy import inspect
+from app.db import engine, Base
+from app import models  # noqa: F401
+
+async def main():
+    async with engine.begin() as conn:
+        insp = await conn.run_sync(lambda c: inspect(c))
+        for t in sorted(Base.metadata.tables):
+            if not await conn.run_sync(lambda c, t=t: inspect(c).has_table(t)):
+                continue
+            db_cols = {c['name']: c for c in
+                       await conn.run_sync(lambda c, t=t: inspect(c).get_columns(t))}
+            code_cols = set(Base.metadata.tables[t].columns.keys())
+            for name in sorted(set(db_cols) - code_cols):
+                col = db_cols[name]
+                risk = '  ← NOT NULL 无默认值，会让 INSERT 全挂' if (
+                    not col['nullable'] and col.get('default') is None) else ''
+                print(f'{t}.{name}{risk}')
+    await engine.dispose()
+
+asyncio.run(main())
+"
+```
+
+标了 `←` 的必须删：
+
+```sql
+ALTER TABLE <表> DROP COLUMN <列>;
+```
+
+没标的只是占空间，可以缓。
 
 ### B2 🔍 看孤儿表里有多少数据
 
@@ -183,7 +225,10 @@ docker compose exec api python -m scripts.check_page_links
 
 1. **A 段优先** —— 素材还在容器里是真实风险（容器重建即丢）
 2. **C 段次之** —— 影响运营体验，但有自愈兜底，不紧急
-3. **B 段最后** —— 纯洁癖，零风险零收益，有空再说
+3. **B 段分两半**：
+   - **B1b 孤儿列最先做** —— NOT NULL 的孤儿列会让整张表插不进数据，属真实故障
+     （page.cover 就这么炸过：模型删了字段、库里的 NOT NULL 列还在，保存首页直接 1364）
+   - B2/B3 孤儿表最后 —— 不影响运行，纯洁癖，有空再说
 
 ## 已知不做
 
