@@ -21,10 +21,11 @@ Page({
   async fetch() {
     try {
       const page = await api.page('home');
-      if (page && page.blocks) {
-        wx.setStorageSync(PAGE_CACHE, page.blocks);
-        this.setData({ blocks: toPageBlocks(page.blocks) });
-      }
+      // 页面未配置/被停用时接口返回 null：必须清掉本地缓存并置空，
+      // 否则秒开缓存会一直显示已经不存在的旧内容
+      const blocks = (page && page.blocks) || [];
+      wx.setStorageSync(PAGE_CACHE, blocks);
+      this.setData({ blocks: toPageBlocks(blocks) });
     } catch (e) { console.error('[home] 取数失败：', e && e.message); }
   },
 
