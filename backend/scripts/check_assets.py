@@ -48,9 +48,8 @@ async def collect() -> dict[str, set]:
         }
         pages: set = set()
         for p in (await s.execute(select(Page))).scalars():
-            _walk(p.cover, pages)
             _walk(p.blocks, pages)
-        found["页面 page.cover/blocks"] = pages
+        found["页面 page.blocks"] = pages
 
         menus: set = set()
         for m in (await s.execute(select(ShopMenu))).scalars():
@@ -63,6 +62,23 @@ async def collect() -> dict[str, set]:
             _walk(st.consultant_qr, stores)
         found["门店 store.images/qr"] = stores
     return found
+
+
+def list_bucket(client) -> dict[str, int]:
+    """列出桶里 uploads/ 下的全部对象 → {路径: 字节数}。分页取，别漏。"""
+    out: dict[str, int] = {}
+    token = None
+    while True:
+        kw = {"Bucket": settings.s3_bucket, "Prefix": "uploads/", "MaxKeys": 1000}
+        if token:
+            kw["ContinuationToken"] = token
+        resp = client.list_objects_v2(**kw)
+        for obj in resp.get("Contents", []):
+            out["/" + obj["Key"]] = obj["Size"]
+        if not resp.get("IsTruncated"):
+            break
+        token = resp.get("NextContinuationToken")
+    return out
 
 
 def exists_in_s3(client, path: str) -> bool:
@@ -114,6 +130,27 @@ async def main() -> None:
                 print(f"    …… 另有 {len(miss) - 20} 个")
     else:
         print("\n✓ 库里引用的素材在对象存储中全部存在")
+    # 反方向：桶里有、库里没人引用的对象。
+    # 主要来源是"上传成功但保存失败"——图片点上传时就进桶了，页面保存是后一步，
+    # 保存报错时文件已经躺在桶里，没有任何记录指向它。
+    print("\n=== 桶里没人引用的对象 ===")
+    try:
+        in_bucket = list_bucket(client)
+    except Exception as e:
+        print(f"  列举失败（{type(e).__name__}），跳过：{e}")
+        in_bucket = {}
+    if in_bucket:
+        orphans = {k: v for k, v in in_bucket.items() if k not in all_paths}
+        mb = sum(orphans.values()) / 1024 / 1024
+        print(f"  桶内共 {len(in_bucket)} 个对象，其中 {len(orphans)} 个没人引用（{mb:.1f} MB）")
+        for k in sorted(orphans)[:30]:
+            print(f"    {k}  {orphans[k] // 1024} KB")
+        if len(orphans) > 30:
+            print(f"    …… 另有 {len(orphans) - 30} 个")
+        if orphans:
+            print("\n  这些是安全可删的：库里任何商品/页面/系列/门店都没指向它们。")
+            print("  但删之前请确认没有正在编辑、尚未保存的内容。")
+
     if orphan_local:
         print(f"\n△ 本地有但没传上去的 {len(orphan_local)} 个（可能是没被引用的历史文件）：")
         for n in orphan_local[:10]:
