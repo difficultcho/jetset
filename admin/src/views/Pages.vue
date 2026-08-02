@@ -12,13 +12,6 @@
         </template>
       </el-table-column>
       <el-table-column prop="key" label="标识" width="120" />
-      <el-table-column label="封面" width="90">
-        <template #default="{ row }">
-          <el-image v-if="row.cover" :src="imgUrl(row.cover)" fit="cover" class="thumb"
-            :preview-src-list="[imgUrl(row.cover)]" />
-          <span v-else class="sub">—</span>
-        </template>
-      </el-table-column>
       <el-table-column label="状态" width="90">
         <template #default="{ row }">
           <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
@@ -50,7 +43,7 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import http, { imgUrl } from '../api.js'
+import http from '../api.js'
 
 const router = useRouter()
 const list = ref([])
@@ -90,5 +83,4 @@ onMounted(fetch)
 <style scoped>
 .toolbar { margin-bottom: 16px; display: flex; align-items: center; gap: 16px; }
 .sub { color: #999; font-size: 12px; }
-.thumb { width: 48px; height: 38px; border-radius: 4px; border: 1px solid #eee; }
 </style>

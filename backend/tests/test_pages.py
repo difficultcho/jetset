@@ -105,3 +105,25 @@ async def test_page_home_configure_and_resolve(client):
 
     # 收尾：停用 home，避免影响其他用例
     await client.put("/api/admin/pages/home", headers=h, json={"blocks": blocks, "status": 0})
+
+
+async def test_fixed_page_stub_has_no_nulls(client):
+    """固定页未落库时返回的是内存壳，SQLAlchemy 列默认值尚未生效。
+    若把 None 透传给管理端，原样回传就会撞 PageIn 类型约束报 422。"""
+    h = await admin_login(client)
+    async with SessionFactory() as s:          # 制造「从未保存过」的状态
+        p = await s.get(Page, "brand")
+        if p is not None:
+            await s.delete(p)
+            await s.commit()
+
+    data = (await client.get("/api/admin/pages/brand", headers=h)).json()["data"]
+    for field in ("title", "sort", "status", "blocks"):
+        assert data[field] is not None, f"{field} 不该是 None"
+    assert data["status"] == 1
+
+    # 关键：原样回传必须能存下来，而不是 422
+    resp = await client.put("/api/admin/pages/brand", headers=h, json={
+        "title": data["title"], "sort": data["sort"],
+        "status": data["status"], "blocks": data["blocks"]})
+    assert resp.status_code == 200, resp.text

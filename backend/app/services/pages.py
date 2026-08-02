@@ -154,4 +154,4 @@ async def resolve_page(session: AsyncSession, key: str) -> dict | None:
             continue
         rb["link"] = await _resolve_link(session, rb.get("link")) if rb["kind"] != "video" else None
         blocks.append(rb)
-    return {"key": key, "title": page.title, "cover": page.cover, "blocks": blocks}
+    return {"key": key, "title": page.title, "blocks": blocks}

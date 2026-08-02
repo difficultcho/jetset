@@ -82,8 +82,6 @@ class StatusReq(BaseModel):
 
 class PageIn(BaseModel):
     title: str = Field(default="", max_length=128)
-    cover: str = Field(default="", max_length=512)
-    cover_tint: str = Field(default="#e6ddce", max_length=16)
     blocks: list[dict] = []   # 结构校验见 services.pages.validate_blocks
     sort: int = 0
     status: int = Field(default=1, ge=0, le=1)

@@ -173,7 +173,7 @@ async def seed_pages(session: AsyncSession) -> None:
     if (await session.execute(select(func.count()).select_from(Page))).scalar_one() > 0:
         return
     # 内容页：品牌故事（被首页 / 关于品牌页链接引用）
-    session.add(Page(key="story", title="品牌故事", cover_tint="#e6ddce", sort=1, blocks=[
+    session.add(Page(key="story", title="品牌故事", sort=1, blocks=[
         {"kind": "text", "preset": "eyebrow", "text": "THE STORY", "align": "center"},
         {"kind": "text", "preset": "quote", "text": "为山巅与海岸而生。", "align": "center"},
         {"kind": "text", "preset": "para",

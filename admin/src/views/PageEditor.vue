@@ -8,8 +8,6 @@
           <el-tag v-if="fixed" size="small" type="warning">固定挂载页</el-tag>
         </div>
         <div class="head-ops">
-          <span class="sub">封面</span>
-          <ImgUpload v-model="cover" :size="40" />
           <span class="sub">启用</span>
           <el-switch v-model="on" />
           <el-button type="primary" @click="save">保存</el-button>
@@ -163,8 +161,6 @@ const pageKey = route.params.key
 
 const loading = ref(false)
 const title = ref('')
-const cover = ref('')
-const coverTint = ref('#e6ddce')
 const sort = ref(0)
 const on = ref(true)
 const fixed = ref(false)
@@ -252,8 +248,6 @@ async function load() {
       http.get('/api/admin/products', { params: { page_size: 100 } })
     ])
     title.value = page.title
-    cover.value = page.cover
-    coverTint.value = page.cover_tint
     sort.value = page.sort
     on.value = page.status === 1
     fixed.value = page.fixed
@@ -272,8 +266,7 @@ async function load() {
 async function save() {
   try {
     await http.put('/api/admin/pages/' + pageKey, {
-      title: title.value, cover: cover.value, cover_tint: coverTint.value,
-      sort: sort.value, status: on.value ? 1 : 0, blocks: blocks.value.map(toOut)
+      title: title.value, sort: sort.value, status: on.value ? 1 : 0, blocks: blocks.value.map(toOut)
     })
     ElMessage.success('已保存')
   } catch (e) { /* 校验失败：拦截器已提示第几块的问题 */ }
