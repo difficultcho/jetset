@@ -1,5 +1,5 @@
 <view class="page">
-  <nav-bar brand="JET SET" />
+  <nav-bar title="{{title}}" />
   <page-blocks id="blocks" blocks="{{blocks}}" heroH="{{heroH}}" />
   <view class="foot" />
 </view>

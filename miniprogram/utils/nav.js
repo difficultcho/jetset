@@ -23,7 +23,11 @@ function goList(f) {
 
 function go(link) {
   if (!link) return;
-  if (link.kind === 'page') return go2('/pages/page/page?key=' + link.key);
+  if (link.kind === 'page') {
+    // 后端解析链接时已带出目标页标题，顺手传过去，避免内容页「空白→填上」的跳变
+    return go2('/pages/page/page?key=' + link.key
+               + '&title=' + encodeURIComponent(link.title || ''));
+  }
   if (link.kind === 'pdp') return go2('/pages/pdp/pdp?id=' + link.spu_id);
   if (link.kind === 'list') return goList(link);
 }

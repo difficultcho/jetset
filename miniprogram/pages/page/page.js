@@ -4,10 +4,12 @@ const { toPageBlocks } = require('../../utils/mapper.js');
 
 // 通用内容页外壳：加载任意配置化页面（key），交给 page-blocks 渲染
 Page({
-  data: { blocks: [], heroH: 600 },
+  data: { title: '', blocks: [], heroH: 600 },
 
   onLoad(opts) {
-    this.setData({ heroH: app.refreshMetrics().heroH });
+    // 标题由跳转方带入，先渲染出来；接口返回后再以服务端为准覆盖
+    this.setData({ heroH: app.refreshMetrics().heroH,
+                   title: opts.title ? decodeURIComponent(opts.title) : '' });
     this.key = opts.key || '';
     this.fetch();
   },
@@ -19,8 +21,8 @@ Page({
     try {
       const page = await api.page(this.key);
       if (!page) return wx.showToast({ title: '内容不存在', icon: 'none' });
-      wx.setNavigationBarTitle({ title: page.title || 'JET SET' });
-      this.setData({ blocks: toPageBlocks(page.blocks) });
+      // 全局 navigationStyle=custom，原生导航栏不存在，标题只能走自绘的 nav-bar
+      this.setData({ title: page.title || '', blocks: toPageBlocks(page.blocks) });
     } catch (e) {
       wx.showToast({ title: '加载失败', icon: 'none' });
     }
