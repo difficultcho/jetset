@@ -2,6 +2,7 @@
   "pages": [
     "pages/home/home",
     "pages/brand/brand",
+    "pages/page/page",
     "pages/shop/shop",
     "pages/me/me",
     "pages/stores/stores",
