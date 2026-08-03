@@ -67,9 +67,9 @@
                 <el-option label="正文段落" value="para" />
                 <el-option label="居中引文" value="quote" />
                 <el-option label="小字距标题" value="eyebrow" />
-                <el-option label="下划线链接" value="link" />
               </el-select>
             </span>
+            <span><el-checkbox v-model="b.underline">下划线</el-checkbox></span>
             <span>对齐
               <el-select v-model="b.align" size="small" style="width: 100px">
                 <el-option label="居左" value="left" />
@@ -177,7 +177,7 @@ const prodLabel = (p) => p.name + (p.code ? '｜' + p.code : '')
 function blank(kind) {
   const b = { _id: ++seq, _pct: 0, kind, img: '', src: '', poster: '',
               ratio: kind === 'image' ? 'hero' : '3/3.4', inset: false,
-              preset: 'para', text: '', align: 'left',
+              preset: 'para', underline: false, text: '', align: 'left',
               source: 'featured', series_id: null, category_id: null, spu_ids: [], count: 6,
               link: null }
   if (kind === 'linkrow') { b.left = { text: '', link: null }; b.right = { text: '', link: null } }
@@ -203,6 +203,15 @@ async function doVideo({ file }, b) {
 
 // 旧模型（post/campaign）留下的跳转在新规则下非法，载入时降级为「不跳转」，
 // 否则原样回传会被后端拒绝，而 LinkTarget 又渲染成空白框、看不出问题在哪
+// 「下划线链接」曾是一种排版，现拆成 preset + 独立的 underline 开关。
+// 老数据的 preset='link' 已不在后端白名单里，原样回传会被 validate_blocks 拒成 400。
+function healTextPreset(b) {
+  if (b.kind === 'text' && b.preset === 'link') {
+    return { ...b, preset: 'para', underline: true }
+  }
+  return b
+}
+
 let stale = 0
 function cleanLink(l) {
   if (!l) return null
@@ -212,7 +221,8 @@ function cleanLink(l) {
 }
 
 // 存储态 → 编辑态（link 结构直接沿用，交给 LinkTarget 组件维护）
-function toEdit(b) {
+function toEdit(b0) {
+  const b = healTextPreset(b0)
   const e = { ...blank(b.kind), ...b, _id: ++seq, _pct: 0 }
   if (b.kind === 'linkrow') {
     e.left = { text: (b.left && b.left.text) || '', link: cleanLink(b.left && b.left.link) }
@@ -227,7 +237,8 @@ function toEdit(b) {
 function toOut(b) {
   if (b.kind === 'image') return { kind: 'image', img: b.img, ratio: b.ratio, inset: !!b.inset, link: b.link || null }
   if (b.kind === 'video') return { kind: 'video', src: b.src, poster: b.poster, ratio: b.ratio, inset: !!b.inset }
-  if (b.kind === 'text') return { kind: 'text', preset: b.preset, text: b.text, align: b.align, link: b.link || null }
+  if (b.kind === 'text') return { kind: 'text', preset: b.preset, underline: !!b.underline,
+                                  text: b.text, align: b.align, link: b.link || null }
   if (b.kind === 'linkrow') {
     return { kind: 'linkrow',
              left: { text: b.left.text, link: b.left.link || null },

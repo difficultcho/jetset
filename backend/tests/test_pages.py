@@ -57,8 +57,8 @@ async def test_page_home_configure_and_resolve(client):
         {"kind": "linkrow",
          "left": {"text": "探索系列", "link": {"kind": "list", "category_id": leaf["id"]}},
          "right": {"text": "品牌故事", "link": {"kind": "page", "key": tkey}}},
-        {"kind": "text", "preset": "link", "text": "品牌故事", "align": "right",
-         "link": {"kind": "page", "key": tkey}},
+        {"kind": "text", "preset": "para", "underline": True, "text": "品牌故事",
+         "align": "right", "link": {"kind": "page", "key": tkey}},
         {"kind": "carousel", "source": "manual", "spu_ids": manual_ids, "count": 6},
         {"kind": "video", "src": "/uploads/b.mp4", "poster": "/uploads/p.jpg", "ratio": "3/3.4"},
         {"kind": "text", "preset": "para", "text": "山巅之上。",
@@ -127,3 +127,27 @@ async def test_fixed_page_stub_has_no_nulls(client):
         "title": data["title"], "sort": data["sort"],
         "status": data["status"], "blocks": data["blocks"]})
     assert resp.status_code == 200, resp.text
+
+
+async def test_underline_is_orthogonal_not_a_preset(client):
+    """下划线从排版预设拆成独立开关：link 不再是合法 preset，
+    underline 可搭配任意 preset 并原样透到 C 端。"""
+    h = await admin_login(client)
+
+    resp = await client.put("/api/admin/pages/home", headers=h, json={
+        "blocks": [{"kind": "text", "preset": "link", "text": "旧排版"}], "status": 1})
+    assert resp.status_code == 400
+
+    blocks = [
+        {"kind": "text", "preset": "para", "underline": True, "text": "带下划线的正文"},
+        {"kind": "text", "preset": "eyebrow", "underline": False, "text": "图注"},
+        {"kind": "text", "preset": "quote", "underline": True, "text": "带下划线的引文"},
+    ]
+    assert (await client.put("/api/admin/pages/home", headers=h,
+                             json={"blocks": blocks, "status": 1})).status_code == 200
+
+    got = (await client.get("/api/v1/pages/home")).json()["data"]["blocks"]
+    assert [b["underline"] for b in got] == [True, False, True]
+    assert [b["preset"] for b in got] == ["para", "eyebrow", "quote"]
+
+    await client.put("/api/admin/pages/home", headers=h, json={"blocks": blocks, "status": 0})

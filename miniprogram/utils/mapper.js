@@ -51,6 +51,7 @@ function toPageBlocks(blocks) {
       o.vid = 'vb' + i;
     } else if (b.kind === 'text') {
       o.preset = b.preset || 'para';
+      o.underline = !!b.underline;
       o.text = b.text || '';
       o.align = b.align || 'left';
     } else if (b.kind === 'linkrow') {

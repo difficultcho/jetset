@@ -4,6 +4,10 @@
 /* 段间距：每块顶部留白一致；首屏 hero 图顶到最上 */
 .gseg { margin-top: 56rpx; }
 .gseg-flush { margin-top: 0; }
+/* 小字距标题多用作上方图片的注释：贴紧上一块，与下一块拉开。
+   下间距用 padding 而非 margin —— 相邻块的垂直外边距会合并，
+   margin-bottom 碰上下一块的 margin-top:56 只会取大值，等于没写。 */
+.gseg-caption { margin-top: 16rpx; padding-bottom: 40rpx; }
 
 /* 图片 / 视频块 */
 .gb { position: relative; width: 100%; overflow: hidden; }
@@ -19,8 +23,11 @@
 .gt-center { text-align: center; }
 .gt-right { text-align: right; }
 
-/* 下划线链接 */
+/* 链接行专用：自成一套链接样式 */
 .ul-link { font-size: 24rpx; letter-spacing: 0.1em; color: #111; border-bottom: 1rpx solid #111; padding-bottom: 4rpx; }
+
+/* 文本块的下划线：正交样式开关，只管画线，字号字距仍由 preset 决定 */
+.gt-ul { border-bottom: 1rpx solid currentColor; padding-bottom: 4rpx; }
 
 /* 链接行 */
 .glinkrow { display: flex; justify-content: space-between; padding: 0 28rpx; }

@@ -3,7 +3,7 @@
 块结构（存储形态）：
   image    {kind, img, ratio('hero'=撑满首屏|'3/3.4'等), inset, link}
   video    {kind, src, poster, ratio, inset}            —— 视频不带链接
-  text     {kind, preset('para'|'quote'|'eyebrow'|'link'), text, align, link}
+  text     {kind, preset('para'|'quote'|'eyebrow'), underline, text, align, link}
   carousel {kind, source('featured'|'series'|'category'|'manual'),
             series_id, category_id, spu_ids, count}
 链接结构：{kind: 'page'|'list'|'pdp', key|series_id|category_id|spu_id}
@@ -20,7 +20,7 @@ from app.services.catalog import spu_to_list_item
 
 FIXED_PAGES = {"home", "brand"}  # 固定挂载页（首页 / 关于品牌 tab），不可删除
 BLOCK_KINDS = {"image", "video", "text", "carousel", "linkrow"}
-TEXT_PRESETS = {"para", "quote", "eyebrow", "link"}
+TEXT_PRESETS = {"para", "quote", "eyebrow"}   # 下划线改为正交的 underline 开关，不再是排版
 CAROUSEL_SOURCES = {"featured", "series", "category", "manual"}
 LINK_KINDS = {"page", "list", "pdp"}
 
