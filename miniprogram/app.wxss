@@ -9,7 +9,8 @@ page {
 
 /* 品牌字标 */
 .brand-mark {
-  font-weight: 300;
+  /* 组件内的字标另有一份（nav-bar 样式隔离，吃不到全局样式），改字重要两处同步 */
+  font-weight: 500;
   letter-spacing: 0.32em;
   padding-left: 0.32em;
 }

@@ -36,7 +36,7 @@
   color: #111;
 }
 .title.brand-mark {
-  font-weight: 300;
+  font-weight: 500;   /* 与 app.wxss 的 .brand-mark 保持一致 */
   font-size: 36rpx;
 }
 .right {
