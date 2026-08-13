@@ -17,8 +17,7 @@ class Series(Base):
     name: Mapped[str] = mapped_column(String(64))            # 2026夏日胶囊系列
     en: Mapped[str] = mapped_column(String(64), default="")  # HIGH SUMMER
     subtitle: Mapped[str] = mapped_column(String(128), default="")
-    cover_tint: Mapped[str] = mapped_column(String(16), default="#e8dcc8")  # 大卡占位色
-    cover: Mapped[str] = mapped_column(String(512), default="")             # 真实封面图
+    # 系列没有自己的配图：商城右侧的图由「商城配置」的 shop_menu.banners 提供（支持多图+跳转）
     sort: Mapped[int] = mapped_column(Integer, default=0)
     status: Mapped[int] = mapped_column(SmallInteger, default=1)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)

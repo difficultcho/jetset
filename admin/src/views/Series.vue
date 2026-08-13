@@ -5,13 +5,6 @@
     </div>
     <el-table :data="list" v-loading="loading">
       <el-table-column prop="sort" label="排序" width="70" />
-      <el-table-column label="封面" width="90">
-        <template #default="{ row }">
-          <el-image v-if="row.cover" :src="imgUrl(row.cover)" fit="cover" class="thumb"
-            :preview-src-list="[imgUrl(row.cover)]" />
-          <div v-else class="thumb tint" :style="{ background: row.cover_tint }" />
-        </template>
-      </el-table-column>
       <el-table-column label="系列" min-width="200">
         <template #default="{ row }">
           <div>{{ row.en || row.name }}</div>
@@ -34,15 +27,11 @@
   </el-card>
 
   <el-dialog v-model="dialog" :title="form.id ? '编辑系列' : '新增系列'" width="520px">
+    <div class="tip">系列在商城里的展示图请到「商城配置」设置——那里支持多图并可各自配跳转。</div>
     <el-form label-width="80px">
       <el-form-item label="名称" required><el-input v-model="form.name" placeholder="如：2026夏日胶囊系列" /></el-form-item>
       <el-form-item label="英文名"><el-input v-model="form.en" placeholder="如：HIGH SUMMER" /></el-form-item>
       <el-form-item label="副标题"><el-input v-model="form.subtitle" /></el-form-item>
-      <el-form-item label="封面图"><ImgUpload v-model="form.cover" /></el-form-item>
-      <el-form-item label="占位色">
-        <el-color-picker v-model="form.cover_tint" />
-        <span class="hint">无封面图时商城大卡的底色</span>
-      </el-form-item>
       <el-form-item label="排序"><el-input-number v-model="form.sort" :min="0" /></el-form-item>
       <el-form-item label="启用"><el-switch v-model="form.on" /></el-form-item>
     </el-form>
@@ -56,8 +45,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import http, { imgUrl } from '../api.js'
-import ImgUpload from '../components/ImgUpload.vue'
+import http from '../api.js'
 
 const list = ref([])
 const loading = ref(false)
@@ -65,7 +53,7 @@ const dialog = ref(false)
 const form = ref(empty())
 
 function empty() {
-  return { id: null, name: '', en: '', subtitle: '', cover: '', cover_tint: '#e8dcc8', sort: 0, on: true }
+  return { id: null, name: '', en: '', subtitle: '', sort: 0, on: true }
 }
 
 async function fetch() {
@@ -85,13 +73,13 @@ function openCreate() {
 
 function openEdit(row) {
   form.value = { id: row.id, name: row.name, en: row.en, subtitle: row.subtitle,
-                 cover: row.cover, cover_tint: row.cover_tint, sort: row.sort, on: row.status === 1 }
+                 sort: row.sort, on: row.status === 1 }
   dialog.value = true
 }
 
 function payload(f) {
-  return { name: f.name, en: f.en, subtitle: f.subtitle, cover: f.cover,
-           cover_tint: f.cover_tint || '#e8dcc8', sort: f.sort, status: f.on ? 1 : 0 }
+  return { name: f.name, en: f.en, subtitle: f.subtitle,
+           sort: f.sort, status: f.on ? 1 : 0 }
 }
 
 async function save() {
@@ -122,7 +110,5 @@ onMounted(fetch)
 <style scoped>
 .toolbar { margin-bottom: 16px; }
 .sub { color: #999; font-size: 12px; }
-.thumb { width: 56px; height: 56px; border-radius: 6px; border: 1px solid #eee; }
-.tint { display: inline-block; }
-.hint { color: #999; font-size: 12px; margin-left: 10px; }
+.tip { color: #999; font-size: 12px; margin-bottom: 12px; }
 </style>

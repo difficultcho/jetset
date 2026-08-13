@@ -26,7 +26,7 @@ CHILD_EN = {"滑雪裤": "SKI PANTS", "滑雪夹克": "SKI JACKETS", "羽绒服"
             "滑雪配饰": "ACCESSORIES", "长裤": "TROUSERS"}
 
 SERIES_STARS = {"name": "星星系列", "en": "STARS", "subtitle": "JET SET 标志性星标",
-                "cover_tint": "#dfe5e9", "sort": 0, "status": 1}
+                "sort": 0, "status": 1}
 
 SIZES = ["XS", "S", "M", "L"]
 
@@ -150,7 +150,7 @@ def main() -> None:
     series_rows = unwrap(client.get("/api/admin/series"))
     stars = next((s for s in series_rows if s["en"] == "STARS"), None)
     if stars is None:
-        stars = unwrap(client.post("/api/admin/series", json={**SERIES_STARS, "cover": ""}))
+        stars = unwrap(client.post("/api/admin/series", json=SERIES_STARS))
         print("✓ 系列「STARS」")
 
     # 3) 上传图片
@@ -164,13 +164,7 @@ def main() -> None:
                 "/api/v1/uploads", files={"file": (f.name, fh, mime)}))["url"]
         print(f"✓ 上传 {f.name} → {urls[f.name]}")
 
-    # STARS 封面用黑色星标裤
-    if not stars.get("cover") and "star-pants-black.jpg" in urls:
-        unwrap(client.put(f"/api/admin/series/{stars['id']}", json={
-            "name": stars["name"], "en": stars["en"], "subtitle": stars["subtitle"],
-            "cover": urls["star-pants-black.jpg"], "cover_tint": stars["cover_tint"],
-            "sort": stars["sort"], "status": 1}))
-        print("✓ STARS 封面已挂")
+    # 系列本身没有配图字段：商城里的图去「商城配置」挂（shop_menu.banners）
 
     # 4) 商品（按款号幂等）
     for p in PRODUCTS:
@@ -211,8 +205,8 @@ def main() -> None:
     for s in unwrap(client.get("/api/admin/series")):
         if s["en"] in AURELLE_SERIES_EN and s["status"] == 1:
             unwrap(client.put(f"/api/admin/series/{s['id']}", json={
-                "name": s["name"], "en": s["en"], "subtitle": s["subtitle"], "cover": s["cover"],
-                "cover_tint": s["cover_tint"], "sort": s["sort"] + 50, "status": 0}))
+                "name": s["name"], "en": s["en"], "subtitle": s["subtitle"],
+                "sort": s["sort"] + 50, "status": 0}))
             print(f"↓ 隐藏 AURELLE 系列「{s['en']}」")
 
     # 6) 汇总

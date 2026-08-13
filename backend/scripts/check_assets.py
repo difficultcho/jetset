@@ -11,14 +11,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from sqlalchemy import inspect, select  # noqa: E402
+from sqlalchemy import select  # noqa: E402
 
 from app.api.uploads import s3_client, s3_enabled  # noqa: E402
 from app.config import settings  # noqa: E402
 from app.db import SessionFactory, engine  # noqa: E402
 from app.models.catalog import SpuImage  # noqa: E402
 from app.models.cms import Page  # noqa: E402
-from app.models.series import Series  # noqa: E402
 from app.models.shop import ShopMenu  # noqa: E402
 from app.models.store import Store  # noqa: E402
 
@@ -42,9 +41,6 @@ async def collect() -> dict[str, set]:
     async with SessionFactory() as s:
         found["商品图 spu_image.url"] = {
             u for u in (await s.execute(select(SpuImage.url))).scalars() if u
-        }
-        found["系列封面 series.cover"] = {
-            c for c in (await s.execute(select(Series.cover))).scalars() if c
         }
         pages: set = set()
         for p in (await s.execute(select(Page))).scalars():

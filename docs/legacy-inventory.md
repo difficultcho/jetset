@@ -61,7 +61,7 @@ docker compose exec api python scripts/migrate_uploads_s3.py
 docker compose exec api python -m scripts.check_assets
 ```
 
-它把**库里所有引用到的素材路径**收齐（商品图 / 系列封面 / 页面块 / 商城图片跳链 / 门店图），
+它把**库里所有引用到的素材路径**收齐（商品图 / 页面块 / 商城图片跳链 / 门店图），
 逐个到对象存储确认存在，按来源分类报告。只读，不传不删不改库。
 
 期望末尾是 `✓ 库里引用的素材在对象存储中全部存在`。

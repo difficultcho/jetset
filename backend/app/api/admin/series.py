@@ -12,8 +12,7 @@ router = APIRouter()
 
 def _row(s: Series, product_count: int = 0) -> dict:
     return {"id": s.id, "name": s.name, "en": s.en, "subtitle": s.subtitle,
-            "cover": s.cover, "cover_tint": s.cover_tint, "sort": s.sort,
-            "status": s.status, "product_count": product_count}
+            "sort": s.sort, "status": s.status, "product_count": product_count}
 
 
 @router.get("/series", response_model=Resp[list[dict]])

@@ -60,8 +60,7 @@ async def series_list(session: DB):
         )
     ).scalars().all()
     return Resp(data=[
-        {"id": s.id, "name": s.name, "en": s.en, "subtitle": s.subtitle,
-         "cover_tint": s.cover_tint, "cover": s.cover}
+        {"id": s.id, "name": s.name, "en": s.en, "subtitle": s.subtitle}
         for s in rows
     ])
 

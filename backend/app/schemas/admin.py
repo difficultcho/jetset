@@ -54,8 +54,6 @@ class SeriesIn(BaseModel):
     name: str = Field(min_length=1, max_length=64)
     en: str = Field(default="", max_length=64)
     subtitle: str = Field(default="", max_length=128)
-    cover: str = Field(default="", max_length=512)
-    cover_tint: str = Field(default="#e8dcc8", max_length=16)
     sort: int = 0
     status: int = Field(default=1, ge=0, le=1)
 
