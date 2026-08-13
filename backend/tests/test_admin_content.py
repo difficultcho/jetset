@@ -49,15 +49,14 @@ async def test_category_create_update(client):
 async def test_series_crud_and_c_end(client):
     h = await admin_login(client)
     created = (await client.post("/api/admin/series", headers=h, json={
-        "name": "2027早春度假", "en": "RESORT 2027", "subtitle": "度假系列",
-        "sort": 50})).json()["data"]
+        "name": "2027早春度假", "en": "RESORT 2027", "sort": 50})).json()["data"]
     sid = created["id"]
 
-    # C 端可见（status=1）。系列没有配图字段——商城的图在 shop_menu.banners 里
+    # C 端可见（status=1）。系列只有名字——配图与文案都在 shop_menu 里
     pub = (await client.get("/api/v1/series")).json()["data"]
     mine = next(s for s in pub if s["id"] == sid)
-    assert mine["en"] == "RESORT 2027" and mine["subtitle"] == "度假系列"
-    assert "cover" not in mine and "cover_tint" not in mine
+    assert mine["en"] == "RESORT 2027" and mine["name"] == "2027早春度假"
+    assert not {"cover", "cover_tint", "subtitle"} & set(mine)
 
     # 下架后 C 端消失，管理端仍可见
     created["status"] = 0

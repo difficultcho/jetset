@@ -25,8 +25,7 @@ CATEGORY_TREE = [
 CHILD_EN = {"滑雪裤": "SKI PANTS", "滑雪夹克": "SKI JACKETS", "羽绒服": "DOWN",
             "滑雪配饰": "ACCESSORIES", "长裤": "TROUSERS"}
 
-SERIES_STARS = {"name": "星星系列", "en": "STARS", "subtitle": "JET SET 标志性星标",
-                "sort": 0, "status": 1}
+SERIES_STARS = {"name": "星星系列", "en": "STARS", "sort": 0, "status": 1}
 
 SIZES = ["XS", "S", "M", "L"]
 
@@ -205,7 +204,7 @@ def main() -> None:
     for s in unwrap(client.get("/api/admin/series")):
         if s["en"] in AURELLE_SERIES_EN and s["status"] == 1:
             unwrap(client.put(f"/api/admin/series/{s['id']}", json={
-                "name": s["name"], "en": s["en"], "subtitle": s["subtitle"],
+                "name": s["name"], "en": s["en"],
                 "sort": s["sort"] + 50, "status": 0}))
             print(f"↓ 隐藏 AURELLE 系列「{s['en']}」")
 

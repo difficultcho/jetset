@@ -53,7 +53,6 @@ class CategoryIn(BaseModel):
 class SeriesIn(BaseModel):
     name: str = Field(min_length=1, max_length=64)
     en: str = Field(default="", max_length=64)
-    subtitle: str = Field(default="", max_length=128)
     sort: int = 0
     status: int = Field(default=1, ge=0, le=1)
 

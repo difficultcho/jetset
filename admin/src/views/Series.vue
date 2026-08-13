@@ -8,7 +8,7 @@
       <el-table-column label="系列" min-width="200">
         <template #default="{ row }">
           <div>{{ row.en || row.name }}</div>
-          <div class="sub">{{ row.name }}<span v-if="row.subtitle"> · {{ row.subtitle }}</span></div>
+          <div class="sub">{{ row.name }}</div>
         </template>
       </el-table-column>
       <el-table-column prop="product_count" label="商品数" width="90" />
@@ -31,7 +31,6 @@
     <el-form label-width="80px">
       <el-form-item label="名称" required><el-input v-model="form.name" placeholder="如：2026夏日胶囊系列" /></el-form-item>
       <el-form-item label="英文名"><el-input v-model="form.en" placeholder="如：HIGH SUMMER" /></el-form-item>
-      <el-form-item label="副标题"><el-input v-model="form.subtitle" /></el-form-item>
       <el-form-item label="排序"><el-input-number v-model="form.sort" :min="0" /></el-form-item>
       <el-form-item label="启用"><el-switch v-model="form.on" /></el-form-item>
     </el-form>
@@ -53,7 +52,7 @@ const dialog = ref(false)
 const form = ref(empty())
 
 function empty() {
-  return { id: null, name: '', en: '', subtitle: '', sort: 0, on: true }
+  return { id: null, name: '', en: '', sort: 0, on: true }
 }
 
 async function fetch() {
@@ -72,14 +71,13 @@ function openCreate() {
 }
 
 function openEdit(row) {
-  form.value = { id: row.id, name: row.name, en: row.en, subtitle: row.subtitle,
+  form.value = { id: row.id, name: row.name, en: row.en,
                  sort: row.sort, on: row.status === 1 }
   dialog.value = true
 }
 
 function payload(f) {
-  return { name: f.name, en: f.en, subtitle: f.subtitle,
-           sort: f.sort, status: f.on ? 1 : 0 }
+  return { name: f.name, en: f.en, sort: f.sort, status: f.on ? 1 : 0 }
 }
 
 async function save() {

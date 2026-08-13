@@ -28,11 +28,11 @@ CATEGORY_TREE = [
     ("童装", "KIDS", []),
 ]
 
-# 系列（en, name, subtitle）
+# 系列（en, name）
 SERIES = [
-    ("HIGH SUMMER", "2026夏日胶囊系列", "现已于精品店及线上同步发售"),
-    ("CRUISE 2027", "度假成衣秀场", "探索度假系列的松弛美学"),
-    ("NEW ARRIVALS", "新品上新", "本季最新到店单品"),
+    ("HIGH SUMMER", "2026夏日胶囊系列"),
+    ("CRUISE 2027", "度假成衣秀场"),
+    ("NEW ARRIVALS", "新品上新"),
 ]
 
 DRESS_SIZES = ["0", "1", "2", "3"]
@@ -129,8 +129,8 @@ async def seed_catalog(session: AsyncSession) -> bool:
 
     # 系列
     series_by_en: dict[str, Series] = {}
-    for si, (en, name, subtitle) in enumerate(SERIES):
-        s = Series(name=name, en=en, subtitle=subtitle, sort=si)
+    for si, (en, name) in enumerate(SERIES):
+        s = Series(name=name, en=en, sort=si)
         session.add(s)
         series_by_en[en] = s
     await session.flush()

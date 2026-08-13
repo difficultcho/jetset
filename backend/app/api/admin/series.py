@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 def _row(s: Series, product_count: int = 0) -> dict:
-    return {"id": s.id, "name": s.name, "en": s.en, "subtitle": s.subtitle,
+    return {"id": s.id, "name": s.name, "en": s.en,
             "sort": s.sort, "status": s.status, "product_count": product_count}
 
 

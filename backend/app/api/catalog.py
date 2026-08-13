@@ -60,7 +60,7 @@ async def series_list(session: DB):
         )
     ).scalars().all()
     return Resp(data=[
-        {"id": s.id, "name": s.name, "en": s.en, "subtitle": s.subtitle}
+        {"id": s.id, "name": s.name, "en": s.en}
         for s in rows
     ])
 
@@ -162,6 +162,6 @@ async def product_detail(spu_id: int, session: DB):
     if spu.series_id:
         s = await session.get(Series, spu.series_id)
         if s:
-            series = {"id": s.id, "name": s.name, "en": s.en, "subtitle": s.subtitle}
+            series = {"id": s.id, "name": s.name, "en": s.en}
     cat = await session.get(Category, spu.category_id)
     return Resp(data=spu_to_detail(spu, series, cat.name if cat else ""))

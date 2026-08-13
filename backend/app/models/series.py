@@ -16,8 +16,7 @@ class Series(Base):
     id: Mapped[int] = mapped_column(BigIntPK, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(64))            # 2026夏日胶囊系列
     en: Mapped[str] = mapped_column(String(64), default="")  # HIGH SUMMER
-    subtitle: Mapped[str] = mapped_column(String(128), default="")
-    # 系列没有自己的配图：商城右侧的图由「商城配置」的 shop_menu.banners 提供（支持多图+跳转）
+    # 系列只有名字：商城右侧的图与文案由「商城配置」的 shop_menu 提供（支持多图+跳转）
     sort: Mapped[int] = mapped_column(Integer, default=0)
     status: Mapped[int] = mapped_column(SmallInteger, default=1)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
