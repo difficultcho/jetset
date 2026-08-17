@@ -8,8 +8,10 @@
   banners  图片跳链，固定尺寸依次罗列，图下可带一行左对齐文字标题（title，可空）；
            目的地复用页面体系的链接（page/list/pdp）
   entries  下钻入口。下钻「逻辑」按菜单项类型不同，但「产物」统一是一个商品列表过滤条件：
-             一级类目 → 它的二级类目      filter {cat: 二级名}
+             一级类目 → 它的子类目        filter {cat: 子类目名}
              系列     → 该系列涉及的一级类目 filter {series: id, cat: 一级名}
+           没建子类目的一级类目 entries 恒为空，此时小程序显示「全部XX」兜底，
+           否则该菜单项无路可走。
 """
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -44,18 +46,23 @@ def validate_banners(banners: list) -> None:
 
 
 async def _series_top_categories(session: AsyncSession, series_id: int) -> list[Category]:
-    """系列涉及的一级类目：由在售商品的二级类目归属去重派生，无需人工维护。"""
-    leaf_ids = (
+    """系列涉及的一级类目：由在售商品的类目归属去重派生，无需人工维护。
+
+    归并规则：有父级的归到父级，没父级的（本身就是叶子的一级类目）归到它自己。
+    不是所有品类都会细分出二级，所以「商品挂在一级类目上」是常规情况。
+    早期实现只认 parent_id 非空的类目，把这类商品整个丢掉，导致系列右侧一片空白。
+    """
+    cat_ids = (
         await session.execute(
             select(Spu.category_id).where(Spu.series_id == series_id, Spu.status == 1).distinct()
         )
     ).scalars().all()
-    if not leaf_ids:
+    if not cat_ids:
         return []
-    leaves = (
-        await session.execute(select(Category).where(Category.id.in_(leaf_ids)))
+    owned = (
+        await session.execute(select(Category).where(Category.id.in_(cat_ids)))
     ).scalars().all()
-    top_ids = {c.parent_id for c in leaves if c.parent_id is not None}
+    top_ids = {c.parent_id if c.parent_id is not None else c.id for c in owned}
     if not top_ids:
         return []
     return (

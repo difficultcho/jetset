@@ -179,7 +179,9 @@ async function load() {
     menus.value = ms
     seriesList.value = ss
     catTree.value = cs.filter((c) => c.parent_id === null)
-    catList.value = cs.filter((c) => c.parent_id !== null)  // 商品挂叶子品类
+    // 跳转目标可以是任意类目：后端按名字匹配时，有子类目的连子类目一起筛，
+    // 叶子则只筛自身。过滤掉一级类目会让「没建二级的一级类目」根本没法做跳转目标。
+    catList.value = cs
     pages.value = ps
     prodList.value = prods.items
   } finally {

@@ -2,7 +2,7 @@
   <el-card>
     <div class="toolbar">
       <el-button type="primary" @click="openCreate(null)">+ 新增一级品类</el-button>
-      <span class="hint">商品挂在二级品类（或没有子级的一级）下；隐藏≠删除，商品仍保留归属</span>
+      <span class="hint">商品挂在「叶子」品类下 —— 即没有子级的品类，一级二级都算；隐藏≠删除，商品仍保留归属</span>
     </div>
     <el-table :data="rows" v-loading="loading">
       <el-table-column prop="sort" label="排序" width="70" />

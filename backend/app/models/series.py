@@ -9,7 +9,7 @@ from app.utils import utcnow
 
 class Series(Base):
     """系列（策展合集）：跨品类聚合商品，如 HIGH SUMMER 2026 夏日胶囊系列。
-    与 category（品类树）正交——商品属于一个二级品类，可归入一个系列（1:N）。"""
+    与 category（品类树）正交——商品属于一个叶子品类，可归入一个系列（1:N）。"""
 
     __tablename__ = "series"
 

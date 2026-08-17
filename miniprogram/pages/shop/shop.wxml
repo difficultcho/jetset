@@ -34,6 +34,12 @@
         </view>
         <view class="ent-arrow" />
       </view>
+      <!-- 兜底：没有下钻入口时（一级类目下没建二级、系列商品都挂在无子类目的类目上），
+           至少留一条通往该菜单项全部商品的路，否则整项无路可走 -->
+      <view wx:if="{{cur && !entries.length}}" class="ent" bindtap="goAll">
+        <view class="ent-txt"><text class="ent-cn">全部{{cur.title}}</text></view>
+        <view class="ent-arrow" />
+      </view>
 
       <view wx:if="{{!menus.length}}" class="empty">内容即将上架，敬请期待</view>
       <view class="content-space" />

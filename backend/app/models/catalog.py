@@ -19,7 +19,13 @@ from app.utils import utcnow
 
 
 class Category(Base):
-    """品类树：一级 parent_id=None，二级 parent_id 指向一级。商品挂在二级（叶子）。"""
+    """品类树：一级 parent_id=None，二级 parent_id 指向一级（仅支持两级）。
+
+    商品挂在「叶子」上 —— 叶子 = 没有子类目的类目，与层级无关。
+    一级类目如果没建二级，它自己就是叶子，商品可以直接挂上去；
+    不是所有品类都需要细分，所以这是常规情况，不是脏数据。
+    凡是「向上归并到一级类目」的派生逻辑，都要写成 parent_id or 自身 id。
+    """
 
     __tablename__ = "category"
 
@@ -35,7 +41,8 @@ class Spu(Base):
     __tablename__ = "spu"
 
     id: Mapped[int] = mapped_column(BigIntPK, primary_key=True, autoincrement=True)
-    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"), index=True)  # 二级品类
+    # 叶子品类（无子类目者，一级二级皆可）
+    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"), index=True)
     series_id: Mapped[int | None] = mapped_column(ForeignKey("series.id"), default=None, index=True)
     name: Mapped[str] = mapped_column(String(128))
     sub: Mapped[str] = mapped_column(String(128), default="", server_default="")  # 短名（卡片/走马灯）

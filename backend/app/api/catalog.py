@@ -66,7 +66,7 @@ async def series_list(session: DB):
 
 
 async def _category_ids(session, cat: str) -> list[int]:
-    """按品类名匹配：命中一级则含其全部二级，命中二级则仅其自身。"""
+    """按品类名匹配：命中的类目有子类目则连同子类目一起，没有（叶子）则仅其自身。"""
     row = (
         await session.execute(select(Category).where(Category.name == cat, Category.status == 1))
     ).scalar_one_or_none()

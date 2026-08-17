@@ -39,7 +39,7 @@ DRESS_SIZES = ["0", "1", "2", "3"]
 SHOE_SIZES = ["36", "37", "38", "39", "40"]
 ONE_SIZE = ["均码"]
 
-# 商品：name, sub, code, 价元, sale元(可空), 二级品类, 系列en, 颜色名, 色值, sizes, video, bullets
+# 商品：name, sub, code, 价元, sale元(可空), 叶子品类, 系列en, 颜色名, 色值, sizes, video, bullets
 PRODUCTS = [
     ("SOLEIL 挂脖牛仔连衣裙", "挂脖牛仔连衣裙", "AU433DSS266", 9650, None, "中长款", "HIGH SUMMER",
      "蓝色", "#4a5d7e", DRESS_SIZES, True,

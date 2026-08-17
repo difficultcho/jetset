@@ -23,7 +23,7 @@ class ImageIn(BaseModel):
 
 
 class ProductIn(BaseModel):
-    category_id: int                       # 二级（叶子）品类
+    category_id: int                       # 叶子品类（无子类目者，一级二级皆可）
     series_id: int | None = None           # 归属系列
     name: str = Field(min_length=1, max_length=128)
     sub: str = Field(default="", max_length=128)       # 短名（卡片/走马灯）

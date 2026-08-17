@@ -267,7 +267,9 @@ async function load() {
     if (stale) ElMessage.warning(`${stale} 处旧版跳转配置已失效，已重置为「不跳转」，请重新选择目标后保存`)
     pages.value = allPages.filter((p) => p.key !== pageKey)  // 排除自身，避免自引用
     seriesList.value = ss
-    catList.value = cs.filter((c) => c.parent_id !== null)  // 商品挂叶子品类
+    // 跳转目标／走马灯取数都可以是任意类目：后端会把子类目一并纳入，叶子则只取自身。
+    // 过滤掉一级类目会让「没建二级的一级类目」根本没法做跳转目标或走马灯数据源。
+    catList.value = cs
     prodList.value = ps.items
   } finally {
     loading.value = false

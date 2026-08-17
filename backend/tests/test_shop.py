@@ -96,3 +96,48 @@ async def test_shop_menu_config_and_resolve(client):
     assert (await client.delete(f"/api/admin/shop/menus/{created['id']}", headers=h)).status_code == 200
     data = (await client.get("/api/v1/shop")).json()["data"]
     assert all(m["kind"] == "category" for m in data["menus"])
+
+
+async def test_series_entries_include_childless_top_category(client):
+    """商品可以直接挂在「还没建二级类目」的一级类目上（管理端就是这么给选的）。
+
+    这种类目自己就是叶子，向上归并到它自己。早期实现只认 parent_id 非空的类目，
+    导致这类商品在商城里彻底摸不到——系列选中后右侧一片空白。
+    """
+    h = await admin_login(client)
+
+    # 一个没有任何二级类目的一级类目
+    top = (await client.post("/api/admin/categories", headers=h, json={
+        "name": "无子类目一级", "en": "FLAT", "parent_id": None, "sort": 90})).json()["data"]
+    assert top["parent_id"] is None
+    se = (await client.post("/api/admin/series", headers=h, json={
+        "name": "平铺系列", "en": "FLAT SERIES", "sort": 90})).json()["data"]
+
+    # 在售商品直接挂在这个一级类目上
+    spu = (await client.post("/api/admin/products", headers=h, json={
+        "category_id": top["id"], "series_id": se["id"], "name": "平铺商品",
+        "code": "FLAT001", "status": 1,
+        "skus": [{"color_index": 0, "color_name": "黑", "size": "均码",
+                  "price": 100000, "stock": 3}]})).json()["data"]
+
+    await client.put("/api/admin/shop/menus", headers=h, json={
+        "kind": "series", "ref_id": se["id"], "sort": 90, "status": 1, "banners": []})
+
+    data = (await client.get("/api/v1/shop")).json()["data"]
+    sm = next(m for m in data["menus"] if m["key"] == f"series-{se['id']}")
+    # 关键：入口派生出来了，而不是空列表
+    assert [e["title"] for e in sm["entries"]] == ["无子类目一级"]
+    assert sm["entries"][0]["filter"] == {"series": se["id"], "cat": "无子类目一级"}
+
+    # 入口的过滤条件真能筛到这个商品（否则入口点进去还是空列表）
+    got = (await client.get("/api/v1/products", params={
+        "cat": "无子类目一级", "series": se["id"]})).json()["data"]
+    assert [it["id"] for it in got["items"]] == [spu["id"]]
+
+    # 收尾：不影响其他用例的菜单/数量断言
+    await client.post(f"/api/admin/products/{spu['id']}/status", headers=h, json={"status": 0})
+    rows = (await client.get("/api/admin/shop/menus", headers=h)).json()["data"]
+    mine = next(r for r in rows if r["kind"] == "series" and r["ref_id"] == se["id"])
+    await client.delete(f"/api/admin/shop/menus/{mine['id']}", headers=h)
+    await client.put(f"/api/admin/categories/{top['id']}", headers=h, json={
+        "name": "无子类目一级", "en": "FLAT", "parent_id": None, "sort": 90, "status": 0})
