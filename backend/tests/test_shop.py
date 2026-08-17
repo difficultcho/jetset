@@ -34,15 +34,21 @@ async def test_shop_menu_config_and_resolve(client):
     bad = await client.put("/api/admin/shop/menus", headers=h, json={
         "kind": "category", "ref_id": leaf["id"], "banners": []})
     assert bad.status_code == 400
+    # 文字标题超长被拒
+    bad = await client.put("/api/admin/shop/menus", headers=h, json={
+        "kind": "series", "ref_id": s["id"],
+        "banners": [{"img": "/uploads/a.jpg", "title": "字" * 61}]})
+    assert bad.status_code == 400
 
     # 上部自定义项：挂系列，配两张图（一张跳内容页，一张跳商品列表）
     created = (await client.put("/api/admin/shop/menus", headers=h, json={
         "kind": "series", "ref_id": s["id"], "title": "成衣系列", "en": "READY TO WEAR",
         "sort": 1, "status": 1,
         "banners": [
-            {"img": "/uploads/a.jpg", "link": {"kind": "page", "key": target["key"]}},
+            {"img": "/uploads/a.jpg", "title": "  秀场大片  ",
+             "link": {"kind": "page", "key": target["key"]}},
             {"img": "/uploads/b.jpg", "link": {"kind": "list", "category_id": leaf["id"]}},
-            {"img": "/uploads/c.jpg", "link": None},
+            {"img": "/uploads/c.jpg", "title": "", "link": None},
         ]})).json()["data"]
     assert created["id"] > 0
 
@@ -53,6 +59,9 @@ async def test_shop_menu_config_and_resolve(client):
     assert sm["banners"][0]["link"] == {"kind": "page", "key": target["key"], "title": "商城内容页"}
     assert sm["banners"][1]["link"]["cat"] == leaf["name"]
     assert sm["banners"][2]["link"] is None    # 不跳转
+    # 文字标题：去空白后原样透出；没填的补空串，C 端据此决定是否渲染
+    assert sm["banners"][0]["title"] == "秀场大片"
+    assert sm["banners"][1]["title"] == "" and sm["banners"][2]["title"] == ""
     # 系列的下钻入口 = 该系列在售商品涉及的一级类目（去重派生），带上系列限定
     for e in sm["entries"]:
         assert e["filter"]["series"] == s["id"] and "cat" in e["filter"]

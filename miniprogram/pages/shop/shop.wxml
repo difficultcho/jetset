@@ -18,25 +18,22 @@
     </scroll-view>
 
     <scroll-view class="content" scroll-y>
-      <!-- 上部：图片跳链，等宽等高依次罗列 -->
-      <view class="bn" wx:for="{{banners}}" wx:key="index" data-i="{{index}}" bindtap="goBanner">
-        <image class="bn-img" src="{{item.img}}" mode="aspectFill" />
+      <!-- 上部：图片跳链，等宽等高依次罗列；图下可带一行左对齐文字标题 -->
+      <view class="bn-cell" wx:for="{{banners}}" wx:key="index" data-i="{{index}}" bindtap="goBanner">
+        <view class="bn">
+          <image class="bn-img" src="{{item.img}}" mode="aspectFill" />
+        </view>
+        <text wx:if="{{item.title}}" class="bn-title">{{item.title}}</text>
       </view>
 
       <!-- 下部：下钻入口，每项通向一个商品列表 -->
-      <block wx:if="{{cur}}">
-        <view class="ent" bindtap="goAll">
-          <view class="ent-txt"><text class="ent-cn">全部{{cur.title}}</text></view>
-          <view class="ent-arrow" />
+      <view class="ent" wx:for="{{entries}}" wx:key="title" data-i="{{index}}" bindtap="goEntry">
+        <view class="ent-txt">
+          <text class="ent-cn">{{item.title}}</text>
+          <text wx:if="{{item.en}}" class="ent-en">{{item.en}}</text>
         </view>
-        <view class="ent" wx:for="{{entries}}" wx:key="title" data-i="{{index}}" bindtap="goEntry">
-          <view class="ent-txt">
-            <text class="ent-cn">{{item.title}}</text>
-            <text wx:if="{{item.en}}" class="ent-en">{{item.en}}</text>
-          </view>
-          <view class="ent-arrow" />
-        </view>
-      </block>
+        <view class="ent-arrow" />
+      </view>
 
       <view wx:if="{{!menus.length}}" class="empty">内容即将上架，敬请期待</view>
       <view class="content-space" />

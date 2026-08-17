@@ -68,7 +68,9 @@ function toPageBlocks(blocks) {
 // 商城左菜单：图片补全域名，其余（filter/link）后端已解析好，直接透传
 function toShopMenus(menus) {
   return (menus || []).map((m) => Object.assign({}, m, {
-    banners: (m.banners || []).map((b) => ({ img: fullImg(b.img), link: b.link || null }))
+    banners: (m.banners || []).map((b) => ({
+      img: fullImg(b.img), title: b.title || '', link: b.link || null
+    }))
   }));
 }
 

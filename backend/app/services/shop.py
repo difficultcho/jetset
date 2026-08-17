@@ -5,7 +5,8 @@
   下部  一级类目，由品类树派生；shop_menu 只为其附加图片跳链
 
 每个菜单项选中后，右侧分两部分：
-  banners  图片跳链，固定尺寸依次罗列；目的地复用页面体系的链接（page/list/pdp）
+  banners  图片跳链，固定尺寸依次罗列，图下可带一行左对齐文字标题（title，可空）；
+           目的地复用页面体系的链接（page/list/pdp）
   entries  下钻入口。下钻「逻辑」按菜单项类型不同，但「产物」统一是一个商品列表过滤条件：
              一级类目 → 它的二级类目      filter {cat: 二级名}
              系列     → 该系列涉及的一级类目 filter {series: id, cat: 一级名}
@@ -22,6 +23,9 @@ from app.services.pages import LINK_KINDS, _resolve_link
 MENU_KINDS = {"series", "category"}
 
 
+BANNER_TITLE_MAX = 60
+
+
 def validate_banners(banners: list) -> None:
     """保存时的结构校验（引用对象是否仍有效由 C 端解析兜底）。"""
     if not isinstance(banners, list):
@@ -29,6 +33,11 @@ def validate_banners(banners: list) -> None:
     for i, b in enumerate(banners, 1):
         if not isinstance(b, dict) or not (b.get("img") or "").strip():
             raise BizError(f"第 {i} 张图片未上传")
+        title = b.get("title") or ""
+        if not isinstance(title, str):
+            raise BizError(f"第 {i} 张图片的文字标题格式无效")
+        if len(title.strip()) > BANNER_TITLE_MAX:
+            raise BizError(f"第 {i} 张图片的文字标题不能超过 {BANNER_TITLE_MAX} 字")
         link = b.get("link")
         if link is not None and (not isinstance(link, dict) or link.get("kind") not in LINK_KINDS):
             raise BizError(f"第 {i} 张图片跳转配置无效")
@@ -65,7 +74,11 @@ async def _banners(session: AsyncSession, row: ShopMenu | None) -> list[dict]:
     for b in row.banners:
         if not isinstance(b, dict) or not b.get("img"):
             continue
-        out.append({"img": b["img"], "link": await _resolve_link(session, b.get("link"))})
+        out.append({
+            "img": b["img"],
+            "title": (b.get("title") or "").strip(),   # 图片下方的文字标题，可为空
+            "link": await _resolve_link(session, b.get("link")),
+        })
     return out
 
 

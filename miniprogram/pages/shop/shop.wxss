@@ -20,10 +20,14 @@
 
 /* 上部：图片跳链（固定画幅，等宽等高依次罗列）
    画幅由外层 view 撑开、image 绝对定位填满 —— 与 page-blocks 的 .gb/.gb-fill 同一套。
-   不可把 aspect-ratio 直接写在 image 上：image 自带 320px 默认宽，会撑破右侧内容区。 */
+   不可把 aspect-ratio 直接写在 image 上：image 自带 320px 默认宽，会撑破右侧内容区。
+   文字标题必须落在画幅盒子之外，否则会被 overflow:hidden 裁掉。 */
+.bn-cell { margin-bottom: 24rpx; }
 .bn { position: relative; width: 100%; aspect-ratio: 16 / 10; overflow: hidden;
-      margin-bottom: 24rpx; background: #f6f6f6; }
+      background: #f6f6f6; }
 .bn-img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.bn-title { display: block; text-align: left; margin-top: 12rpx;
+            font-size: 25rpx; line-height: 1.4; color: #333; }
 
 /* 下部：下钻入口 */
 .ent { display: flex; align-items: center; justify-content: space-between; padding: 30rpx 4rpx; border-bottom: 1rpx solid #f0f0f0; }

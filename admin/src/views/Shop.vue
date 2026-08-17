@@ -89,12 +89,14 @@
       </template>
     </el-form>
 
-    <div class="grp-head"><b>图片跳链</b><span class="sub">图片等宽依次排列；不选目标则不可点</span>
-      <span class="grow" /><el-button size="small" @click="cur.banners.push({ img: '', link: null })">+ 添加图片</el-button>
+    <div class="grp-head"><b>图片跳链</b><span class="sub">图片等宽依次排列；文字标题显示在图片下方左对齐；不选目标则不可点</span>
+      <span class="grow" /><el-button size="small" @click="cur.banners.push({ img: '', title: '', link: null })">+ 添加图片</el-button>
     </div>
     <div v-for="(b, i) in cur.banners" :key="i" class="bn">
       <ImgUpload v-model="b.img" :size="72" />
       <div class="bn-right">
+        <el-input v-model="b.title" size="small" maxlength="60" show-word-limit
+          placeholder="图片下方的文字标题（留空则不显示）" />
         <LinkTarget v-model="b.link" :pages="pages" :cats="catList" :series="seriesList" :prods="prodList" />
       </div>
       <div class="bn-ops">
@@ -201,7 +203,7 @@ function edit(row) {
   const banners = (row.banners || []).map((b) => {
     const ok = b.link && LINK_KINDS.includes(b.link.kind)
     if (b.link && !ok) stale++
-    return { img: b.img, link: ok ? b.link : null }
+    return { img: b.img, title: b.title || '', link: ok ? b.link : null }
   })
   if (stale) ElMessage.warning(`${stale} 处旧版跳转配置已失效，已重置为「不跳转」`)
   cur.value = { ...row, banners }
@@ -238,6 +240,6 @@ onMounted(load)
 .sub { color: #999; font-size: 12px; }
 .empty { color: #bbb; font-size: 13px; padding: 16px 0; text-align: center; }
 .bn { display: flex; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
-.bn-right { flex: 1; min-width: 0; }
+.bn-right { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
 .bn-ops { display: flex; gap: 4px; }
 </style>

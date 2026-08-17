@@ -8,8 +8,7 @@ Page({
     sbh: 20,
     menus: [],       // 左菜单：上部自定义项（系列）+ 下部一级类目
     curKey: '',
-    cur: null,       // 当前菜单项（含自身 filter，供「全部」入口用）
-    banners: [],     // 右侧上部：图片跳链
+    banners: [],     // 右侧上部：图片跳链（可带文字标题）
     entries: []      // 右侧下部：下钻入口，每项就是一个商品列表过滤条件
   },
 
@@ -48,7 +47,7 @@ Page({
 
   _select(m) {
     this.setData({
-      curKey: m.key, cur: m,
+      curKey: m.key,
       banners: m.banners || [],
       entries: m.entries || []
     });
@@ -59,15 +58,10 @@ Page({
     if (b) nav.go(b.link);
   },
 
-  // 下钻入口 / 当前项全部商品 —— 都落到同一个商品列表页
+  // 下钻入口 —— 每项落到一个商品列表页
   goEntry(e) {
     const it = this.data.entries[e.currentTarget.dataset.i];
     if (it) nav.goList(Object.assign({}, it.filter, { title: it.title }));
-  },
-
-  goAll() {
-    const m = this.data.cur;
-    if (m) nav.goList(Object.assign({}, m.filter, { title: m.title }));
   },
 
   goSearch() { wx.navigateTo({ url: '/pages/list/list' }); }
