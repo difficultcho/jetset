@@ -13,7 +13,9 @@ const MENU = [
 ];
 
 Page({
-  data: { sbh: 20, registered: false, user: null, menu: MENU, code: '' },
+  // 没有「未注册」态：打开小程序时后端已按 openid 静默建号。
+  // initial 是头像占位字母，取称呼首字，没填就用品牌首字母。
+  data: { sbh: 20, user: {}, initial: 'J', menu: MENU },
 
   onLoad() { this.setData({ sbh: app.refreshMetrics().sbh }); },
 
@@ -30,17 +32,12 @@ Page({
     try {
       const u = await api.me();
       app.globalData.userInfo = u;
-      this.setData({
-        user: u,
-        registered: !!u.name,
-        code: 'JETS' + String(100000 + (u.id || 0) * 37 % 900000).slice(0, 6)
-      });
+      this.setData({ user: u, initial: (u.name || 'JET SET').trim().charAt(0).toUpperCase() });
     } catch (e) { /* 静默 */ }
   },
 
   openJoin() { wx.navigateTo({ url: '/pages/open-card/open-card' }); },
   goProfile() { wx.navigateTo({ url: '/pages/profile/profile' }); },
-  goCode() { wx.navigateTo({ url: '/pages/member-code/member-code' }); },
   goOrders() { wx.navigateTo({ url: '/pages/orders/orders' }); },
   goBookings() { wx.navigateTo({ url: '/pages/bookings/bookings' }); },
   goWishlist() { wx.navigateTo({ url: '/pages/wishlist/wishlist' }); },

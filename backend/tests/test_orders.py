@@ -143,3 +143,31 @@ async def test_expired_orders_cancelled(client):
     resp = await client.get(f"/api/v1/orders/{order_id}", headers=headers)
     assert resp.json()["data"]["status"] == "cancelled"
     assert await _sku_stock(client, sku["id"]) == stock_before
+
+
+async def test_first_order_backfills_user_phone(client):
+    """身份是 openid，用户从不单独填手机号；首单时从收货地址回填一次，供客服按号码检索。
+    已有值不覆盖——用户在资料页改过就以他填的为准。"""
+    headers, sku, addr_id = await _prepare(client, "phone-backfill")
+
+    assert (await client.get("/api/v1/me", headers=headers)).json()["data"]["phone"] is None
+
+    await client.post("/api/v1/orders", headers=headers, json={
+        "items": [{"sku_id": sku["id"], "qty": 1}], "address_id": addr_id})
+    assert (await client.get("/api/v1/me", headers=headers)).json()["data"]["phone"] == "13800138000"
+
+    # 用户自己改成别的号码后，再下一单不该被地址覆盖回去
+    await client.put("/api/v1/me", headers=headers, json={"phone": "13900139000"})
+    await client.post("/api/v1/orders", headers=headers, json={
+        "items": [{"sku_id": sku["id"], "qty": 1}], "address_id": addr_id})
+    assert (await client.get("/api/v1/me", headers=headers)).json()["data"]["phone"] == "13900139000"
+
+
+async def test_profile_accepts_miniprogram_gender_labels(client):
+    """小程序展示用「男士/女士」，早期后端只收「男/女」，导致开卡与改资料必然 422。"""
+    headers = await login(client, "gender-labels")
+    for value in ("男士", "女士", "男", ""):
+        resp = await client.put("/api/v1/me", headers=headers, json={"gender": value})
+        assert resp.status_code == 200, f"{value} 应被接受：{resp.text}"
+    assert (await client.put("/api/v1/me", headers=headers,
+                             json={"gender": "其他"})).status_code == 422

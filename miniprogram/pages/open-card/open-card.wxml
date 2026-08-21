@@ -1,5 +1,5 @@
 <view class="page">
-  <nav-bar title="加入我们" />
+  <nav-bar title="完善资料" />
   <scroll-view class="body" scroll-y>
     <view class="member-card">
       <image class="mc-logo" src="/assets/jetset-logo.png" mode="aspectFit" />
@@ -7,25 +7,26 @@
     </view>
 
     <view class="form-card">
-      <view class="form-t">激活立享会员特权</view>
-      <view class="row"><text class="rl"><text class="star">*</text>姓名</text><input class="ri" value="{{form.name}}" data-k="name" bindinput="onInput" placeholder="请输入" placeholder-class="ph" /></view>
-      <view class="row"><text class="rl"><text class="star">*</text>手机</text><input class="ri" value="{{form.phone}}" type="number" data-k="phone" bindinput="onInput" placeholder="请输入" placeholder-class="ph" /></view>
+      <!-- 打开小程序即已是会员（openid 即账号），这里只是补充资料，
+           所以除了称呼外都不设必填，也不再有「激活/开卡」这一步。 -->
+      <view class="form-t">完善资料，获得更贴合你的服务</view>
+      <view class="row"><text class="rl"><text class="star">*</text>称呼</text><input class="ri" value="{{form.name}}" data-k="name" bindinput="onInput" placeholder="请输入" placeholder-class="ph" /></view>
+      <view class="row"><text class="rl">手机</text><input class="ri" value="{{form.phone}}" type="number" data-k="phone" bindinput="onInput" placeholder="选填，便于订单联系" placeholder-class="ph" /></view>
       <view class="row">
-        <text class="rl"><text class="star">*</text>性别</text>
+        <text class="rl">性别</text>
         <view class="gender">
           <view class="g {{form.gender === '男士' ? 'on' : ''}}" data-g="男士" bindtap="pickGender">男士</view>
           <view class="g {{form.gender === '女士' ? 'on' : ''}}" data-g="女士" bindtap="pickGender">女士</view>
         </view>
       </view>
       <picker mode="date" value="{{form.birthday}}" bindchange="pickBirthday">
-        <view class="row"><text class="rl"><text class="star">*</text>生日</text><text class="rv">{{form.birthday || '请选择'}}</text></view>
+        <view class="row"><text class="rl">生日</text><text class="rv">{{form.birthday || '选填'}}</text></view>
       </picker>
     </view>
 
-    <view class="agree" bindtap="toggleAgree">
-      <view class="green-dot {{agree ? 'on' : ''}}" />
-      <text class="agree-t">我已阅读并同意《会员服务声明》及《隐私政策》</text>
-    </view>
+    <!-- 不放自制的「同意隐私政策」勾选：它不产生任何合规效力（微信的合规机制是后台
+         声明《用户隐私保护指引》+ 平台级授权弹窗），却拦住了一个无害的资料编辑动作。
+         隐私指引由微信在「右上角 … → 更多资料」统一提供入口。 -->
 
     <view class="submit-wrap"><view class="submit-btn" bindtap="submit">{{submitting ? '提交中…' : '提交'}}</view></view>
     <view class="body-space" />

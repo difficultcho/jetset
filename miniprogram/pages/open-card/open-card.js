@@ -1,7 +1,7 @@
 const api = require('../../utils/api.js');
 
 Page({
-  data: { form: { name: '', phone: '', gender: '男士', birthday: '' }, agree: true, submitting: false },
+  data: { form: { name: '', phone: '', gender: '男士', birthday: '' }, submitting: false },
 
   onLoad() {
     api.me().then((u) => {
@@ -12,18 +12,16 @@ Page({
   onInput(e) { this.setData({ ['form.' + e.currentTarget.dataset.k]: e.detail.value }); },
   pickGender(e) { this.setData({ 'form.gender': e.currentTarget.dataset.g }); },
   pickBirthday(e) { this.setData({ 'form.birthday': e.detail.value }); },
-  toggleAgree() { this.setData({ agree: !this.data.agree }); },
 
   async submit() {
     const f = this.data.form;
-    if (!f.name) return wx.showToast({ title: '请填写姓名', icon: 'none' });
-    if (!f.phone) return wx.showToast({ title: '请填写手机号', icon: 'none' });
-    if (!this.data.agree) return wx.showToast({ title: '请阅读并同意会员声明', icon: 'none' });
+    if (!f.name) return wx.showToast({ title: '请填写称呼', icon: 'none' });
     if (this.data.submitting) return;
     this.setData({ submitting: true });
     try {
-      await api.updateMe({ name: f.name, gender: f.gender, birthday: f.birthday });
-      wx.showToast({ title: '开卡成功', icon: 'none' });
+      // phone 一并提交——之前漏了它，用户填的号码被静默丢弃，资料页永远显示未填写
+      await api.updateMe({ name: f.name, phone: f.phone, gender: f.gender, birthday: f.birthday });
+      wx.showToast({ title: '已保存', icon: 'none' });
       setTimeout(() => wx.navigateBack(), 700);
     } catch (e) {
       wx.showToast({ title: (e && e.message) || '提交失败', icon: 'none' });

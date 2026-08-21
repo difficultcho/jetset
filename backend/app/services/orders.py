@@ -156,6 +156,10 @@ async def create_order(session: AsyncSession, user: User, items: list[OrderLineR
     )
     session.add(order)
     await session.flush()
+    # 首单回填联系方式：用户从不单独填手机号（身份是 openid），但收货地址里一定有。
+    # 只在为空时写入，之后用户在资料页改了就不再覆盖。纯粹为了客服能按号码搜到人。
+    if not user.phone and address.phone:
+        user.phone = address.phone
     if uc is not None:
         await coupon_svc.lock_for_order(session, uc, order.id)
     if points_used > 0:

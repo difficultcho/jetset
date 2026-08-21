@@ -9,7 +9,7 @@ Page({
   async onLoad() {
     try {
       const u = await api.me();
-      this.setData({ user: { nick: u.name, avatar: u.avatar, phone: u.phone || '未绑定', gender: u.gender || '男士', birthday: u.birthday, region: u.region, email: '' } });
+      this.setData({ user: { nick: u.name, avatar: u.avatar, phone: u.phone || '', gender: u.gender || '男士', birthday: u.birthday, region: u.region, email: '' } });
       this.dirty = {};
     } catch (e) { /* 静默 */ }
   },
@@ -23,6 +23,7 @@ Page({
   },
 
   onNick(e) { this._set('nick', e.detail.value, 'name'); },
+  onPhone(e) { this._set('phone', e.detail.value, 'phone'); },
   pickGender(e) { this._set('gender', e.currentTarget.dataset.g, 'gender'); },
   pickBirthday(e) { this._set('birthday', e.detail.value, 'birthday'); },
   pickRegion(e) { this._set('region', e.detail.value.join(' '), 'region'); },

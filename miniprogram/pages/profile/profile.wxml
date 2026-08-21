@@ -10,7 +10,8 @@
     </view>
 
     <view class="row"><text class="rl"><text class="star">*</text>昵称</text><input class="ri" value="{{user.nick}}" placeholder="请输入昵称" placeholder-class="ph" bindinput="onNick" /></view>
-    <view class="row"><text class="rl"><text class="star">*</text>手机号</text><text class="rv">{{user.phone}}</text></view>
+    <!-- 手机号是联系方式，不是身份（身份是 openid），所以可改、非必填、不标星 -->
+    <view class="row"><text class="rl">手机号</text><input class="ri" value="{{user.phone}}" type="number" placeholder="选填，便于订单联系" placeholder-class="ph" bindinput="onPhone" /></view>
     <view class="row">
       <text class="rl"><text class="star">*</text>称谓</text>
       <view class="gender">

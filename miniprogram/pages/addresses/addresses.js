@@ -15,7 +15,8 @@ Page({
     } catch (e) { /* 静默 */ }
   },
 
-  // 微信收货地址（演示：注入一条）
+  // 从微信通讯录导入收货地址：微信弹窗让用户挑一条，选中后落库成本站地址。
+  // 这也是全项目唯一能拿到真实手机号的路径（用户在下单语境下主动给出）。
   wxAddress() {
     wx.chooseAddress({
       success: async (a) => {
@@ -26,9 +27,18 @@ Page({
             detail: a.detailInfo
           });
           this.load();
-        } catch (e) { /* 静默 */ }
+          wx.showToast({ title: '已导入', icon: 'none' });
+        } catch (e) {
+          wx.showToast({ title: (e && e.message) || '导入失败', icon: 'none' });
+        }
       },
-      fail: () => {}
+      // 用户取消不提示；真出错要说一声，否则和「点了没反应」无法区分。
+      // errMsg 里带 "cancel" 的是用户主动取消（含未授权时的取消）。
+      fail: (err) => {
+        if (String((err && err.errMsg) || '').indexOf('cancel') === -1) {
+          wx.showToast({ title: '打不开微信地址簿', icon: 'none' });
+        }
+      }
     });
   },
 
