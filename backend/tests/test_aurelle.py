@@ -2,12 +2,15 @@ async def test_stores(client):
     resp = await client.get("/api/v1/stores")
     assert resp.status_code == 200
     stores = resp.json()["data"]
-    assert len(stores) == 3
+    assert len(stores) == 6                      # 国内 3 + 海外 3
     assert any(s["short_name"] == "北京三里屯" for s in stores)
+    assert any(s["country"] == "瑞士" for s in stores)
 
-    # 省市筛选
-    resp = await client.get("/api/v1/stores", params={"province": "四川省"})
-    assert resp.json()["data"][0]["city"] == "成都市"
+    # 国家/城市筛选（第一级是国家，不是省份）
+    resp = await client.get("/api/v1/stores", params={"country": "瑞士"})
+    assert {s["city"] for s in resp.json()["data"]} == {"St. Moritz", "Verbier"}
+    resp = await client.get("/api/v1/stores", params={"city": "Courchevel"})
+    assert resp.json()["data"][0]["country"] == "法国"
 
     # 门店详情
     sid = stores[0]["id"]
@@ -16,10 +19,13 @@ async def test_stores(client):
 
 
 async def test_store_regions(client):
+    """下拉数据源：国家去重后按门店 sort 排序，城市按国家分组。"""
     resp = await client.get("/api/v1/stores/regions")
     data = resp.json()["data"]
-    assert "北京市" in data["provinces"]
-    assert "成都市" in data["cities"]["四川省"]
+    assert data["countries"][0] == "中国"        # sort 最小的门店在国内 → 中国排最前
+    assert set(data["countries"]) == {"中国", "瑞士", "法国"}
+    assert data["cities"]["瑞士"] == ["St. Moritz", "Verbier"]
+    assert "成都市" in data["cities"]["中国"]
 
 
 async def test_pages_public_seed(client):

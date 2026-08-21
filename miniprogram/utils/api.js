@@ -17,8 +17,9 @@ const api = {
   series: () => request('GET', '/api/v1/series'),
 
   // 门店
-  stores: (province, city) => request('GET', '/api/v1/stores' +
-    (province || city ? '?' + [province && 'province=' + encodeURIComponent(province), city && 'city=' + encodeURIComponent(city)].filter(Boolean).join('&') : '')),
+  // 门店筛选第一级是国家/地区。页面目前取全量后在前端过滤，参数留着备用。
+  stores: (country, city) => request('GET', '/api/v1/stores' +
+    (country || city ? '?' + [country && 'country=' + encodeURIComponent(country), city && 'city=' + encodeURIComponent(city)].filter(Boolean).join('&') : '')),
   storeRegions: () => request('GET', '/api/v1/stores/regions'),
   storeDetail: (id) => request('GET', '/api/v1/stores/' + id),
 

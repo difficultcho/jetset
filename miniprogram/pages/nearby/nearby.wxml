@@ -1,16 +1,20 @@
 <view class="page">
   <nav-bar title="附近门店" />
+  <!-- 两级筛选：国家/地区 → 城市。两个下拉的第一项都是「不限」，否则选中后无法回到全部。 -->
   <view class="filters">
-    <view class="search"><view class="ic-search" /><input class="si" placeholder="搜索门店" placeholder-class="ph" /></view>
     <view class="drops">
-      <view class="drop" bindtap="toggleProv"><text>{{prov || '请选择省份'}}</text><view class="da" /></view>
-      <view class="drop" bindtap="toggleCity"><text>{{city || '请选择城市'}}</text><view class="da" /></view>
+      <view class="drop" bindtap="toggleCountry"><text>{{country || '国家/地区'}}</text><view class="da" /></view>
+      <view class="drop" bindtap="toggleCity"><text>{{city || '城市'}}</text><view class="da" /></view>
     </view>
-    <view wx:if="{{provOpen}}" class="popover">
-      <view class="pop-item" wx:for="{{provs}}" wx:key="*this" data-v="{{item}}" bindtap="pickProv">{{item}}</view>
+    <view wx:if="{{countryOpen}}" class="popover">
+      <view class="pop-item {{!country ? 'on' : ''}}" data-v="" bindtap="pickCountry">不限</view>
+      <view class="pop-item {{country === item ? 'on' : ''}}" wx:for="{{countries}}" wx:key="*this"
+        data-v="{{item}}" bindtap="pickCountry">{{item}}</view>
     </view>
-    <view wx:if="{{cityOpen && prov}}" class="popover right">
-      <view class="pop-item" wx:for="{{cities[prov]}}" wx:key="*this" data-v="{{item}}" bindtap="pickCity">{{item}}</view>
+    <view wx:if="{{cityOpen && country}}" class="popover right">
+      <view class="pop-item {{!city ? 'on' : ''}}" data-v="" bindtap="pickCity">不限</view>
+      <view class="pop-item {{city === item ? 'on' : ''}}" wx:for="{{cities[country]}}" wx:key="*this"
+        data-v="{{item}}" bindtap="pickCity">{{item}}</view>
     </view>
   </view>
 
@@ -22,7 +26,8 @@
       </view>
       <view class="store-head">
         <text class="store-name">{{item.name}}</text>
-        <view class="store-nav"><view class="ic-nav" /></view>
+        <!-- catchtap：别冒泡到外层的 goDetail，否则点导航会同时跳详情页 -->
+        <view class="store-nav" data-id="{{item.id}}" catchtap="openMap"><view class="ic-nav" /></view>
       </view>
       <view class="store-line">地址：{{item.addr}}</view>
       <view class="store-line">联系方式：<text class="tel" data-tel="{{item.tel}}" catchtap="call">{{item.tel}}</text></view>

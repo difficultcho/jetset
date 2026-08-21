@@ -4,13 +4,22 @@
   </view>
   <scroll-view class="body" scroll-y>
     <view class="pad">
+      <!-- 封面取门店实拍（见 stores.js::fetchHeroes）；没传门店图时回落到条纹占位。
+           画幅由外层 .entry-img 撑开，真图/占位都填满它——image 自带 320px 默认宽，
+           aspect-ratio 不能直接写在 image 上。 -->
       <view class="entry" bindtap="goNearby">
-        <view class="entry-img" style="background:repeating-linear-gradient(135deg,#c9cdd4 0 16rpx,#bfc4cc 16rpx 32rpx);"><text class="ph-label">storefront · 夜幕店面</text></view>
+        <view class="entry-img">
+          <image wx:if="{{heroA}}" class="entry-real" src="{{heroA}}" mode="aspectFill" />
+          <view wx:else class="entry-ph" style="background:repeating-linear-gradient(135deg,#c9cdd4 0 16rpx,#bfc4cc 16rpx 32rpx);"><text class="ph-label">storefront · 夜幕店面</text></view>
+        </view>
         <view class="entry-en">FIND A STORE</view>
         <view class="entry-cn">附近的门店</view>
       </view>
       <view class="entry" bindtap="goIntro">
-        <view class="entry-img" style="background:repeating-linear-gradient(135deg,#e8e0d3 0 16rpx,#e1d7c6 16rpx 32rpx);"><text class="ph-label">interior · 精品店内景</text></view>
+        <view class="entry-img">
+          <image wx:if="{{heroB}}" class="entry-real" src="{{heroB}}" mode="aspectFill" />
+          <view wx:else class="entry-ph" style="background:repeating-linear-gradient(135deg,#e8e0d3 0 16rpx,#e1d7c6 16rpx 32rpx);"><text class="ph-label">interior · 精品店内景</text></view>
+        </view>
         <view class="entry-en">OUR STORES</view>
         <view class="entry-cn">门店介绍</view>
       </view>

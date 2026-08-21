@@ -60,6 +60,7 @@ class SeriesIn(BaseModel):
 class StoreIn(BaseModel):
     name: str = Field(min_length=1, max_length=128)
     short_name: str = Field(default="", max_length=64)
+    country: str = Field(default="", max_length=64)
     province: str = Field(default="", max_length=32)
     city: str = Field(default="", max_length=32)
     address: str = Field(default="", max_length=256)

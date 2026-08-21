@@ -9,5 +9,4 @@
 .info-t { font-size: 29rpx; font-weight: 600; margin-bottom: 18rpx; }
 .line { font-size: 26rpx; color: #555; line-height: 1.8; }
 .tel { color: #576b95; text-decoration: underline; }
-.sub { width: 100%; aspect-ratio: 16 / 12; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 24rpx; margin-top: 16rpx; }
 .body-space { height: 40rpx; }

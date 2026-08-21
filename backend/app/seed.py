@@ -95,16 +95,32 @@ PRODUCTS = [
      ["天然石坠饰", "皮革绳链", "长度可调"]),
 ]
 
+# 门店：筛选第一级是 country。sort 决定顺序——国内店排在前面，海外按需排。
 STORES = [
-    {"name": "北京三里屯精品店", "short_name": "北京三里屯", "province": "北京市", "city": "北京市",
+    {"name": "北京三里屯精品店", "short_name": "北京三里屯", "country": "中国",
+     "province": "北京市", "city": "北京市",
      "address": "北京市朝阳区三里屯路南区，L1层S6-18，L2层S6-25商铺", "tel": "010-8860 3618",
      "business_hours": "周日至周四 10:00-22:00，周五至周六 10:00-23:00", "lat": 39.9367, "lng": 116.4550},
-    {"name": "上海南京西路精品店", "short_name": "上海南京西路", "province": "上海市", "city": "上海市",
+    {"name": "上海南京西路精品店", "short_name": "上海南京西路", "country": "中国",
+     "province": "上海市", "city": "上海市",
      "address": "上海市静安区南京西路1266号，L1层112商铺", "tel": "021-6288 1866",
      "business_hours": "周一至周日 10:00-22:00", "lat": 31.2277, "lng": 121.4610},
-    {"name": "成都春熙路精品店", "short_name": "成都春熙路", "province": "四川省", "city": "成都市",
+    {"name": "成都春熙路精品店", "short_name": "成都春熙路", "country": "中国",
+     "province": "四川省", "city": "成都市",
      "address": "成都市锦江区中纱帽街8号，M68商铺", "tel": "028-6511 8898",
      "business_hours": "周一至周日 10:00-22:00", "lat": 30.6520, "lng": 104.0817},
+    {"name": "圣莫里茨精品店", "short_name": "St. Moritz", "country": "瑞士",
+     "province": "", "city": "St. Moritz",
+     "address": "Via Serlas 22, 7500 St. Moritz", "tel": "+41 81 000 0000",
+     "business_hours": "Mon-Sat 10:00-19:00", "lat": 46.4977, "lng": 9.8383},
+    {"name": "韦尔比耶精品店", "short_name": "Verbier", "country": "瑞士",
+     "province": "", "city": "Verbier",
+     "address": "Rue de Médran 12, 1936 Verbier", "tel": "+41 27 000 0000",
+     "business_hours": "Mon-Sat 10:00-19:00", "lat": 46.0961, "lng": 7.2286},
+    {"name": "库尔舍瓦勒精品店", "short_name": "Courchevel", "country": "法国",
+     "province": "", "city": "Courchevel",
+     "address": "Rue du Rocher, 73120 Courchevel", "tel": "+33 4 79 00 00 00",
+     "business_hours": "Mon-Sun 10:00-19:30", "lat": 45.4154, "lng": 6.6348},
 ]
 
 DEFAULT_STOCK = 50

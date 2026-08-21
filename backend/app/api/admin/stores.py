@@ -11,7 +11,8 @@ router = APIRouter()
 
 def _row(s: Store) -> dict:
     return {"id": s.id, "name": s.name, "short_name": s.short_name,
-            "province": s.province, "city": s.city, "address": s.address,
+            "country": s.country, "province": s.province, "city": s.city,
+            "address": s.address,
             "tel": s.tel, "business_hours": s.business_hours,
             "images": s.images or [], "consultant_qr": s.consultant_qr,
             "lat": s.lat, "lng": s.lng, "sort": s.sort, "status": s.status}

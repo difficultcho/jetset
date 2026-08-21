@@ -140,19 +140,20 @@ async def test_store_crud_and_c_end(client):
     h = await admin_login(client)
     created = (await client.post("/api/admin/stores", headers=h, json={
         "name": "深圳湾万象城精品店", "short_name": "深圳湾万象城",
-        "province": "广东省", "city": "深圳市", "address": "深圳湾万象城 L1",
+        "country": "中国", "province": "广东省", "city": "深圳市",
+        "address": "深圳湾万象城 L1",
         "tel": "0755-88888888", "business_hours": "10:00-22:00",
         "images": ["/uploads/sz1.jpg", "/uploads/sz2.jpg"],
         "lat": 22.52, "lng": 113.94})).json()["data"]
     sid = created["id"]
 
-    # C 端列表 + 省市筛选 + 详情
-    pub = (await client.get("/api/v1/stores", params={"province": "广东省"})).json()["data"]
+    # C 端列表 + 国家/城市筛选 + 详情
+    pub = (await client.get("/api/v1/stores", params={"city": "深圳市"})).json()["data"]
     assert any(s["id"] == sid for s in pub)
     detail = (await client.get(f"/api/v1/stores/{sid}")).json()["data"]
     assert detail["images"] == ["/uploads/sz1.jpg", "/uploads/sz2.jpg"]
     regions = (await client.get("/api/v1/stores/regions")).json()["data"]
-    assert "广东省" in regions["provinces"]
+    assert "深圳市" in regions["cities"]["中国"]
 
     # 下架后 C 端消失
     created["status"] = 0

@@ -14,7 +14,7 @@
       <el-table-column label="门店" min-width="200">
         <template #default="{ row }">
           <div>{{ row.name }}</div>
-          <div class="sub">{{ row.province }} {{ row.city }} · {{ row.address }}</div>
+          <div class="sub">{{ [row.country, row.city].filter(Boolean).join(' · ') }} · {{ row.address }}</div>
         </template>
       </el-table-column>
       <el-table-column prop="tel" label="电话" width="130" />
@@ -38,8 +38,16 @@
       <el-row :gutter="12">
         <el-col :span="12"><el-form-item label="名称" required><el-input v-model="form.name" placeholder="如：北京三里屯精品店" /></el-form-item></el-col>
         <el-col :span="12"><el-form-item label="短名"><el-input v-model="form.short_name" placeholder="导航栏标题，如：北京三里屯" /></el-form-item></el-col>
-        <el-col :span="12"><el-form-item label="省份"><el-input v-model="form.province" placeholder="如：北京市" /></el-form-item></el-col>
-        <el-col :span="12"><el-form-item label="城市"><el-input v-model="form.city" placeholder="如：北京市" /></el-form-item></el-col>
+        <el-col :span="12">
+          <el-form-item label="国家/地区" required>
+            <el-input v-model="form.country" placeholder="如：中国 / 瑞士 / 法国" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12"><el-form-item label="城市"><el-input v-model="form.city" placeholder="如：上海市 / St. Moritz" /></el-form-item></el-col>
+        <el-col :span="24">
+          <div class="hint">门店页的两级筛选是「国家/地区 → 城市」。名称要写一致，否则会分裂成两组
+            （「中国」和「中国大陆」会各占一项）。顺序由下面的「排序」决定，数字小的国家排在前面。</div>
+        </el-col>
       </el-row>
       <el-form-item label="地址"><el-input v-model="form.address" /></el-form-item>
       <el-row :gutter="12">
@@ -80,7 +88,7 @@ const dialog = ref(false)
 const form = ref(empty())
 
 function empty() {
-  return { id: null, name: '', short_name: '', province: '', city: '', address: '',
+  return { id: null, name: '', short_name: '', country: '', province: '', city: '', address: '',
            tel: '', business_hours: '', images: [], consultant_qr: '',
            lat: null, lng: null, sort: 0, on: true }
 }
@@ -102,7 +110,8 @@ function openCreate() {
 
 function openEdit(row) {
   form.value = { id: row.id, name: row.name, short_name: row.short_name,
-                 province: row.province, city: row.city, address: row.address,
+                 country: row.country, province: row.province, city: row.city,
+                 address: row.address,
                  tel: row.tel, business_hours: row.business_hours,
                  images: [...(row.images || [])], consultant_qr: row.consultant_qr,
                  lat: row.lat, lng: row.lng, sort: row.sort, on: row.status === 1 }
@@ -110,7 +119,8 @@ function openEdit(row) {
 }
 
 function payload(f) {
-  return { name: f.name, short_name: f.short_name, province: f.province, city: f.city,
+  return { name: f.name, short_name: f.short_name, country: f.country,
+           province: f.province, city: f.city,
            address: f.address, tel: f.tel, business_hours: f.business_hours,
            images: f.images, consultant_qr: f.consultant_qr,
            lat: f.lat, lng: f.lng, sort: f.sort, status: f.on ? 1 : 0 }
@@ -118,6 +128,8 @@ function payload(f) {
 
 async function save() {
   if (!form.value.name) return ElMessage.warning('请填写名称')
+  // 没有国家/地区的门店进不了任何分组，在门店页的筛选里永远选不到
+  if (!form.value.country) return ElMessage.warning('请填写国家/地区')
   if (form.value.id) await http.put('/api/admin/stores/' + form.value.id, payload(form.value))
   else await http.post('/api/admin/stores', payload(form.value))
   ElMessage.success('已保存')

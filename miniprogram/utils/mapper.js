@@ -112,7 +112,7 @@ function toDetail(d) {
 function toStore(s) {
   return {
     id: s.id, name: s.name, short: s.short_name || s.name,
-    province: s.province, city: s.city, addr: s.address, tel: s.tel,
+    country: s.country, province: s.province, city: s.city, addr: s.address, tel: s.tel,
     hours: s.business_hours, images: (s.images || []).map(fullImg), qr: fullImg(s.consultant_qr),
     lat: s.lat, lng: s.lng
   };

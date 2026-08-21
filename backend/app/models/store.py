@@ -15,6 +15,9 @@ class Store(Base):
     id: Mapped[int] = mapped_column(BigIntPK, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(128))          # 北京三里屯精品店
     short_name: Mapped[str] = mapped_column(String(64), default="")  # 北京三里屯
+    # 筛选的第一级是国家/地区——品牌在多国有店，省份撑不住这个层级。
+    # province 保留：国内开出多家店后可作为中国境内的二级细分，目前前端不使用。
+    country: Mapped[str] = mapped_column(String(64), default="", index=True)   # 中国 / 瑞士
     province: Mapped[str] = mapped_column(String(32), default="", index=True)
     city: Mapped[str] = mapped_column(String(32), default="", index=True)
     address: Mapped[str] = mapped_column(String(256), default="")
