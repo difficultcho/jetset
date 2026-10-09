@@ -33,6 +33,11 @@
           <el-tag v-if="row.featured" type="warning" size="small">精选</el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="可销售" width="90">
+        <template #default="{ row }">
+          <el-switch :model-value="row.sellable !== false" @change="(v) => toggleSellable(row, v)" />
+        </template>
+      </el-table-column>
       <el-table-column label="上架" width="80">
         <template #default="{ row }">
           <el-switch :model-value="row.status === 1" @change="(v) => toggle(row, v)" />
@@ -71,10 +76,11 @@
           </el-form-item>
         </el-col>
         <el-col :span="8"><el-form-item label="款号"><el-input v-model="form.code" placeholder="如：AU433DSS266" /></el-form-item></el-col>
-        <el-col :span="6"><el-form-item label="角标"><el-input v-model="form.badge" placeholder="如：SALE" /></el-form-item></el-col>
-        <el-col :span="6"><el-form-item label="划线价"><el-input-number v-model="form.originalYuan" :min="0.01" :precision="2" :controls="false" placeholder="元，可空" style="width: 100%" /></el-form-item></el-col>
-        <el-col :span="4"><el-form-item label="精选"><el-switch v-model="form.featured" /></el-form-item></el-col>
-        <el-col :span="4"><el-form-item label="视频"><el-switch v-model="form.has_video" /></el-form-item></el-col>
+        <el-col :span="5"><el-form-item label="角标"><el-input v-model="form.badge" placeholder="如：SALE" /></el-form-item></el-col>
+        <el-col :span="5"><el-form-item label="划线价"><el-input-number v-model="form.originalYuan" :min="0.01" :precision="2" :controls="false" placeholder="元，可空" style="width: 100%" /></el-form-item></el-col>
+        <el-col :span="4"><el-form-item label="可销售"><el-switch v-model="form.sellable" /></el-form-item></el-col>
+        <el-col :span="3"><el-form-item label="精选"><el-switch v-model="form.featured" /></el-form-item></el-col>
+        <el-col :span="3"><el-form-item label="视频"><el-switch v-model="form.has_video" /></el-form-item></el-col>
         <el-col :span="4"><el-form-item label="排序"><el-input-number v-model="form.sort" :min="0" :controls="false" style="width: 100%" /></el-form-item></el-col>
       </el-row>
       <el-form-item label="简介"><el-input v-model="form.brief" type="textarea" :rows="2" /></el-form-item>
@@ -176,7 +182,7 @@ function seriesName(id) {
 function emptyForm() {
   return { id: null, category_id: null, series_id: null, name: '', sub: '', code: '',
            en_model: '', brief: '', detail: '', bulletsText: '', badge: '',
-           featured: false, has_video: false, originalYuan: null,
+           featured: false, has_video: false, sellable: true, originalYuan: null,
            sort: 0, status: 1, skus: [], images: [] }
 }
 
@@ -240,6 +246,7 @@ async function openEdit(id) {
     name: d.name, sub: d.sub || '', code: d.code || '', en_model: d.en_model,
     brief: d.brief, detail: d.detail, bulletsText: (d.bullets || []).join('\n'),
     badge: d.badge || '', featured: d.featured, has_video: !!d.has_video,
+    sellable: d.sellable !== false,
     originalYuan: d.original_price ? d.original_price / 100 : null,
     sort: d.sort, status: d.status,
     skus: d.skus.map((s) => ({ color_index: s.color_index, color_name: s.color_name, color_hex: s.color_hex,
@@ -276,6 +283,7 @@ async function save() {
     detail: f.detail,
     bullets: f.bulletsText.split('\n').map((s) => s.trim()).filter(Boolean),
     badge: f.badge || null, featured: f.featured, has_video: f.has_video,
+    sellable: f.sellable !== false,
     original_price: f.originalYuan ? Math.round(f.originalYuan * 100) : null,
     sort: f.sort, status: f.status,
     skus: f.skus.map((s) => ({ color_index: s.color_index, color_name: s.color_name, color_hex: s.color_hex || '#888888',
@@ -298,6 +306,12 @@ async function toggle(row, on) {
   await http.post(`/api/admin/products/${row.id}/status`, { status: on ? 1 : 0 })
   row.status = on ? 1 : 0
   ElMessage.success(on ? '已上架' : '已下架')
+}
+
+async function toggleSellable(row, on) {
+  await http.post(`/api/admin/products/${row.id}/sellable`, { sellable: on })
+  row.sellable = on
+  ElMessage.success(on ? '已设为可销售' : '已设为不可销售')
 }
 
 onMounted(async () => {

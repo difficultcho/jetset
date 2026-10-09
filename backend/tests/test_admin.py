@@ -76,6 +76,50 @@ async def test_product_crud(client):
     assert any(p["id"] == spu_id for p in page["items"])
 
 
+async def test_unsellable_cannot_be_bought(client):
+    """可销售默认开启；关闭后仍可浏览，但不能加购、不能下单。"""
+    h = await admin_login(client)
+    user_h = await login(client, "no-sell")
+
+    payload = {
+        "category_id": 1, "name": "仅供陈列", "sort": 0, "status": 1, "sellable": False,
+        "skus": [
+            {"color_index": 0, "color_name": "黑", "color_hex": "#111", "size": "M",
+             "price": 10000, "stock": 5}
+        ],
+    }
+    spu_id = (await client.post("/api/admin/products", headers=h, json=payload)).json()["data"]["id"]
+    detail = (await client.get(f"/api/v1/products/{spu_id}")).json()["data"]
+    assert detail["sellable"] is False
+    sku_id = detail["skus"][0]["id"]
+
+    resp = await client.post("/api/v1/cart/items", headers=user_h,
+                             json={"sku_id": sku_id, "qty": 1})
+    assert resp.status_code == 400
+    assert resp.json()["message"] == "暂不支持购买"
+
+    addr = await client.post("/api/v1/addresses", headers=user_h, json={
+        "name": "陈列", "phone": "13900000001", "region": "", "detail": "路 1 号"})
+    resp = await client.post("/api/v1/orders", headers=user_h, json={
+        "items": [{"sku_id": sku_id, "qty": 1}],
+        "address_id": addr.json()["data"]["id"],
+    })
+    assert resp.status_code == 400
+    assert resp.json()["message"] == "暂不支持购买"
+
+    # 重新打开后恢复购买
+    resp = await client.post(f"/api/admin/products/{spu_id}/sellable", headers=h,
+                             json={"sellable": True})
+    assert resp.json()["data"]["sellable"] is True
+    resp = await client.post("/api/v1/cart/items", headers=user_h,
+                             json={"sku_id": sku_id, "qty": 1})
+    assert resp.status_code == 200
+    assert resp.json()["data"][0]["qty"] == 1
+
+    # 测试库是整场共用的，下架以免计入品类商品数
+    await client.post(f"/api/admin/products/{spu_id}/status", headers=h, json={"status": 0})
+
+
 async def test_ship_flow(client):
     admin_h = await admin_login(client)
     user_h = await login(client, "adm-ship")

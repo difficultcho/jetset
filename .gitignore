@@ -19,6 +19,8 @@ admin/dist/
 
 # art work
 design/Redefining Luxury Ski- & Outdoor-wear – JET SET/*
+assets/
+claude_crawl_web_assets.tar.gz
 
 # 本机个人配置（Claude Code 等本地工具），项目级的 settings.json / CLAUDE.md 仍进版本库
 .claude/*.local.json

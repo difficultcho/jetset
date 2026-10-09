@@ -38,6 +38,7 @@ class ProductIn(BaseModel):
     original_price: int | None = Field(default=None, ge=1)  # 划线原价（分）
     sort: int = 0
     status: int = Field(default=1, ge=0, le=1)
+    sellable: bool = True
     skus: list[SkuIn] = Field(min_length=1)
     images: list[ImageIn] = []
 
@@ -76,6 +77,10 @@ class StoreIn(BaseModel):
 
 class StatusReq(BaseModel):
     status: int = Field(ge=0, le=1)
+
+
+class SellableReq(BaseModel):
+    sellable: bool
 
 
 class PageIn(BaseModel):

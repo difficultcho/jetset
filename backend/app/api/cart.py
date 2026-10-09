@@ -3,6 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from app.deps import DB, CurrentUser
+from app.errors import BizError
 from app.models.cart import CartItem
 from app.models.catalog import Sku
 from app.schemas.cart import CartAdd, CartItemOut, CartPatch
@@ -40,9 +41,15 @@ async def get_cart(user: CurrentUser, session: DB):
 
 @router.post("/cart/items", response_model=Resp[list[CartItemOut]])
 async def add_item(req: CartAdd, user: CurrentUser, session: DB):
-    sku = await session.get(Sku, req.sku_id)
+    sku = (
+        await session.execute(
+            select(Sku).options(selectinload(Sku.spu)).where(Sku.id == req.sku_id)
+        )
+    ).scalar_one_or_none()
     if sku is None or sku.status != 1:
         raise HTTPException(status_code=404, detail="商品规格不存在")
+    if not sku.spu.sellable:
+        raise BizError("暂不支持购买")
     existing = (
         await session.execute(
             select(CartItem).where(CartItem.user_id == user.id, CartItem.sku_id == req.sku_id)

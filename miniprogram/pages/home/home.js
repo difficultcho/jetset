@@ -10,9 +10,20 @@ Page({
 
   onLoad() {
     this.setData(app.refreshMetrics());
+    // 右上角菜单：转发给朋友 + 分享到朋友圈。未声明 onShareAppMessage 时「转发」是灰的
+    wx.showShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     // 先用上次的块秒开，取数交给 onShow（它在 onLoad 之后必然触发，不必在此重复请求）
     const cached = wx.getStorageSync(PAGE_CACHE);
     if (cached && cached.length) this.setData({ blocks: toPageBlocks(cached) });
+  },
+
+  // 不指定 imageUrl：微信用当前页截图做卡片，避免依赖 downloadFile 合法域名
+  onShareAppMessage() {
+    return { title: 'JET SET', path: '/pages/home/home' };
+  },
+
+  onShareTimeline() {
+    return { title: 'JET SET' };
   },
 
   // 折叠屏展开/收起、分屏会改变窗口尺寸，几何需重算（内容取数不受影响）

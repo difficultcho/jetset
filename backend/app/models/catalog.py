@@ -60,6 +60,8 @@ class Spu(Base):
     sales: Mapped[int] = mapped_column(Integer, default=0)
     sort: Mapped[int] = mapped_column(Integer, default=0)
     status: Mapped[int] = mapped_column(SmallInteger, default=1)  # 1 上架 0 下架
+    # 可销售：上架商品仍可浏览，关闭后不能加购、不能下单。缺省为可销售，旧数据不受影响
+    sellable: Mapped[bool] = mapped_column(Boolean, default=True, server_default="1")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     images: Mapped[list["SpuImage"]] = relationship(

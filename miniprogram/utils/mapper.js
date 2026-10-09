@@ -98,6 +98,7 @@ function toDetail(d) {
     code: d.code || d.en_model || ('AU' + d.id),
     hasVideo: !!d.has_video,
     series: d.series || null,
+    sellable: d.sellable !== false,
     colors: d.colors.map((c) => c.name),
     sw: d.colors.map((c) => c.hex),
     imgs,

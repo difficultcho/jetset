@@ -83,6 +83,9 @@ Page({
   },
 
   async addBag() {
+    if (this.data.prod && !this.data.prod.sellable) {
+      return wx.showToast({ title: '暂不支持购买', icon: 'none' });
+    }
     const sku = this._sku();
     if (!sku) return wx.showToast({ title: '该规格暂不可选', icon: 'none' });
     if (sku.stock < 1) return wx.showToast({ title: '该规格缺货', icon: 'none' });
@@ -98,6 +101,9 @@ Page({
   },
 
   buyNow() {
+    if (this.data.prod && !this.data.prod.sellable) {
+      return wx.showToast({ title: '暂不支持购买', icon: 'none' });
+    }
     const sku = this._sku();
     if (!sku) return wx.showToast({ title: '该规格暂不可选', icon: 'none' });
     if (sku.stock < 1) return wx.showToast({ title: '该规格缺货', icon: 'none' });

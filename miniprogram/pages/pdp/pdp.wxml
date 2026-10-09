@@ -88,8 +88,8 @@
 
   <!-- 底部操作栏 -->
   <view class="action-bar">
-    <view class="act-add" bindtap="addBag">加入购物袋</view>
-    <view class="act-buy" bindtap="buyNow">即刻选购</view>
+    <view class="act-add {{prod.sellable ? '' : 'off'}}" bindtap="addBag">加入购物袋</view>
+    <view class="act-buy {{prod.sellable ? '' : 'off'}}" bindtap="buyNow">即刻选购</view>
     <view class="act-star {{wished ? 'on' : ''}}" bindtap="toggleWish" />
   </view>
 

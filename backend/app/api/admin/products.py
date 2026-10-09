@@ -6,7 +6,7 @@ from app.deps import DB
 from app.errors import BizError
 from app.models.catalog import Category, Sku, Spu, SpuImage
 from app.models.series import Series
-from app.schemas.admin import CategoryIn, ProductIn, StatusReq
+from app.schemas.admin import CategoryIn, ProductIn, SellableReq, StatusReq
 from app.schemas.common import Page, Resp
 
 router = APIRouter()
@@ -157,6 +157,7 @@ async def list_products(
             "series_id": spu.series_id,
             "price": spu.price, "sales": spu.sales, "badge": spu.badge,
             "featured": spu.featured, "sort": spu.sort, "status": spu.status,
+            "sellable": spu.sellable,
             "sku_count": len([s for s in spu.skus if s.status == 1]),
             "stock_total": sum(s.stock for s in spu.skus if s.status == 1),
         }
@@ -177,7 +178,7 @@ async def get_product(spu_id: int, session: DB):
         "bullets": spu.bullets or [], "has_video": spu.has_video,
         "original_price": spu.original_price,
         "badge": spu.badge, "featured": spu.featured, "sort": spu.sort,
-        "status": spu.status, "price": spu.price,
+        "status": spu.status, "sellable": spu.sellable, "price": spu.price,
         "skus": [_sku_dict(s) for s in sorted(spu.skus, key=lambda x: (x.color_index, x.id))],
         "images": [
             {"id": i.id, "color_index": i.color_index, "url": i.url, "sort": i.sort}
@@ -203,6 +204,7 @@ async def create_product(req: ProductIn, session: DB):
         brief=req.brief, detail=req.detail, bullets=req.bullets or None,
         badge=req.badge, featured=req.featured, has_video=req.has_video,
         original_price=req.original_price, sort=req.sort, status=req.status,
+        sellable=req.sellable,
     )
     session.add(spu)
     await session.flush()
@@ -227,6 +229,7 @@ async def update_product(spu_id: int, req: ProductIn, session: DB):
     spu.brief, spu.detail, spu.bullets = req.brief, req.detail, (req.bullets or None)
     spu.badge, spu.has_video, spu.original_price = req.badge, req.has_video, req.original_price
     spu.featured, spu.sort, spu.status = req.featured, req.sort, req.status
+    spu.sellable = req.sellable
     await _apply_skus(session, spu, req.skus, list(spu.skus))
     await _apply_images(session, spu.id, req.images)
     await session.flush()
@@ -244,3 +247,13 @@ async def toggle_status(spu_id: int, req: StatusReq, session: DB):
     spu.status = req.status
     await session.commit()
     return Resp(data={"id": spu.id, "status": spu.status})
+
+
+@router.post("/products/{spu_id}/sellable", response_model=Resp[dict])
+async def toggle_sellable(spu_id: int, req: SellableReq, session: DB):
+    spu = await session.get(Spu, spu_id)
+    if spu is None:
+        raise HTTPException(status_code=404, detail="商品不存在")
+    spu.sellable = req.sellable
+    await session.commit()
+    return Resp(data={"id": spu.id, "sellable": spu.sellable})

@@ -35,6 +35,8 @@ async def _load_skus(session: AsyncSession, sku_ids: list[int]) -> dict[int, Sku
         sku = sku_map.get(sid)
         if sku is None or sku.status != 1 or sku.spu.status != 1:
             raise BizError("部分商品已下架，请刷新后重试")
+        if not sku.spu.sellable:
+            raise BizError("暂不支持购买")
     return sku_map
 
 

@@ -63,6 +63,7 @@ def spu_to_detail(spu: Spu, series: dict | None = None, category: str = "") -> d
         "original_price": spu.original_price,
         "series": series,
         "category": category,   # 品类名（详情页同品类推荐用）
+        "sellable": spu.sellable,
         "colors": [colors[i] for i in sorted(colors)],
         "sizes": sizes,
         "skus": [
