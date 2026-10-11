@@ -90,6 +90,8 @@ class Sku(Base):
     spu_id: Mapped[int] = mapped_column(ForeignKey("spu.id"), index=True)
     color_index: Mapped[int] = mapped_column(Integer, default=0)
     color_name: Mapped[str] = mapped_column(String(64), default="")
+    # 生产商的颜色编码（如 5101）。展示给顾客的仍是 color_name
+    color_code: Mapped[str] = mapped_column(String(16), default="", server_default="")
     color_hex: Mapped[str] = mapped_column(String(16), default="")
     size: Mapped[str] = mapped_column(String(16), default="均码")
     price: Mapped[int] = mapped_column(Integer)  # 单位：分

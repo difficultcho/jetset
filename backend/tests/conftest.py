@@ -10,6 +10,9 @@ os.environ["MOCK_MODE"] = "true"
 os.environ["JWT_SECRET"] = "test-secret-0123456789abcdef0123456789abcdef"
 os.environ["UPLOAD_DIR"] = f"{_tmp}/uploads"
 os.environ["FREIGHT_CENTS"] = "0"
+# 本地 .env 里是线上管理员密码。测试必须用自己的账号，不能跟着那份文件走。
+os.environ["ADMIN_USERNAME"] = "admin"
+os.environ["ADMIN_PASSWORD"] = "jetset-admin"
 
 import pytest
 from httpx import ASGITransport, AsyncClient

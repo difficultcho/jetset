@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.deps import DB
 from app.errors import BizError
+from app.models.cart import CartItem
 from app.models.catalog import Category, Sku, Spu, SpuImage
 from app.models.series import Series
 from app.schemas.admin import CategoryIn, ProductIn, SellableReq, StatusReq
@@ -70,7 +71,7 @@ async def update_category(cat_id: int, req: CategoryIn, session: DB):
 def _sku_dict(s: Sku) -> dict:
     return {
         "id": s.id, "color_index": s.color_index, "color_name": s.color_name,
-        "color_hex": s.color_hex, "size": s.size, "price": s.price,
+        "color_code": s.color_code, "color_hex": s.color_hex, "size": s.size, "price": s.price,
         "stock": s.stock, "status": s.status,
     }
 
@@ -84,13 +85,15 @@ def _refresh_spu_price(spu: Spu) -> None:
 def _validate_skus(skus_in: list) -> None:
     """入参自检。sku 有 (spu_id, color_index, size) 唯一约束，冲突会以
     IntegrityError → 500 的形式炸出来，运营看不懂；在这里挡成可读的 400。"""
-    owner: dict[int, str] = {}
+    owner: dict[int, tuple[str, str, str]] = {}
     seen: dict[tuple[int, str], int] = {}
     for i, s in enumerate(skus_in, 1):
-        got = owner.setdefault(s.color_index, s.color_name)
-        if got != s.color_name:
-            raise BizError(f"第 {i} 行：色序 {s.color_index} 已被颜色「{got}」占用，"
-                           f"不同颜色要用不同色序")
+        sig = (s.color_name, s.color_code, (s.color_hex or "").lower())
+        got = owner.setdefault(s.color_index, sig)
+        if got != sig:
+            raise BizError(
+                f"第 {i} 行：色序 {s.color_index} 已是「{got[0]} / {got[1] or '无编码'}」，"
+                f"同色序的颜色名、颜色编码、色值必须一致")
         key = (s.color_index, s.size)
         if key in seen:
             raise BizError(f"第 {seen[key]} 行与第 {i} 行重复："
@@ -111,12 +114,12 @@ async def _apply_skus(session: AsyncSession, spu: Spu, skus_in: list,
         incoming_keys.add(key)
         if key in existing:
             row = existing[key]
-            row.color_name, row.color_hex = si.color_name, si.color_hex
+            row.color_name, row.color_code, row.color_hex = si.color_name, si.color_code, si.color_hex
             row.price, row.stock, row.status = si.price, si.stock, si.status
         else:
             session.add(Sku(
                 spu_id=spu.id, color_index=si.color_index, color_name=si.color_name,
-                color_hex=si.color_hex, size=si.size, price=si.price,
+                color_code=si.color_code, color_hex=si.color_hex, size=si.size, price=si.price,
                 stock=si.stock, status=si.status,
             ))
     for key, row in existing.items():
@@ -247,6 +250,25 @@ async def toggle_status(spu_id: int, req: StatusReq, session: DB):
     spu.status = req.status
     await session.commit()
     return Resp(data={"id": spu.id, "status": spu.status})
+
+
+@router.delete("/products/{spu_id}", response_model=Resp[None])
+async def delete_product(spu_id: int, session: DB):
+    """删掉商品及其规格、图片。购物袋里的对应项一并去掉。
+
+    订单行只存了下单快照，没有外键，历史订单仍在。
+    """
+    spu = await session.get(Spu, spu_id)
+    if spu is None:
+        raise HTTPException(status_code=404, detail="商品不存在")
+    sku_ids = list((await session.execute(select(Sku.id).where(Sku.spu_id == spu_id))).scalars())
+    if sku_ids:
+        await session.execute(delete(CartItem).where(CartItem.sku_id.in_(sku_ids)))
+    await session.execute(delete(SpuImage).where(SpuImage.spu_id == spu_id))
+    await session.execute(delete(Sku).where(Sku.spu_id == spu_id))
+    await session.delete(spu)
+    await session.commit()
+    return Resp()
 
 
 @router.post("/products/{spu_id}/sellable", response_model=Resp[dict])

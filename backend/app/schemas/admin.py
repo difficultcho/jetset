@@ -9,6 +9,7 @@ class AdminLoginReq(BaseModel):
 class SkuIn(BaseModel):
     color_index: int = Field(ge=0)
     color_name: str = Field(min_length=1, max_length=64)
+    color_code: str = Field(default="", max_length=16)
     color_hex: str = Field(default="#888888", max_length=16)
     size: str = Field(min_length=1, max_length=16)
     price: int = Field(ge=1)  # 分

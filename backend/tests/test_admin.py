@@ -76,6 +76,62 @@ async def test_product_crud(client):
     assert any(p["id"] == spu_id for p in page["items"])
 
 
+async def test_sku_color_code_consistency(client):
+    """颜色编码随 SKU 保存；同色序的编码必须一致，同色序同尺码不能有两行。"""
+    h = await admin_login(client)
+    payload = {
+        "category_id": 1, "name": "颜色编码校验", "sort": 0, "status": 1,
+        "skus": [
+            {"color_index": 0, "color_name": "雾蓝", "color_code": "5101", "color_hex": "#88a",
+             "size": "S", "price": 10000, "stock": 1},
+            {"color_index": 0, "color_name": "雾蓝", "color_code": "5101", "color_hex": "#88a",
+             "size": "M", "price": 10000, "stock": 1},
+        ],
+    }
+    resp = await client.post("/api/admin/products", headers=h, json=payload)
+    assert resp.status_code == 200, resp.text
+    spu_id = resp.json()["data"]["id"]
+    detail = (await client.get(f"/api/admin/products/{spu_id}", headers=h)).json()["data"]
+    assert {s["color_code"] for s in detail["skus"]} == {"5101"}
+
+    mismatch = [dict(s) for s in payload["skus"]]
+    mismatch[1]["color_code"] = "6009"
+    resp = await client.put(f"/api/admin/products/{spu_id}", headers=h,
+                            json={**payload, "skus": mismatch})
+    assert resp.status_code == 400
+    assert "颜色编码" in resp.json()["message"]
+
+    dup = [dict(payload["skus"][0]), dict(payload["skus"][0])]
+    resp = await client.post("/api/admin/products", headers=h, json={**payload, "name": "重复尺码", "skus": dup})
+    assert resp.status_code == 400
+    assert "只能有一条" in resp.json()["message"]
+
+    await client.post(f"/api/admin/products/{spu_id}/status", headers=h, json={"status": 0})
+
+
+async def test_delete_product_removes_cart_item(client):
+    h = await admin_login(client)
+    user_h = await login(client, "del-sku")
+    payload = {
+        "category_id": 1, "name": "待删除", "sort": 0, "status": 1,
+        "skus": [
+            {"color_index": 0, "color_name": "黑", "color_code": "9055", "color_hex": "#111",
+             "size": "S", "price": 10000, "stock": 1},
+        ],
+    }
+    spu_id = (await client.post("/api/admin/products", headers=h, json=payload)).json()["data"]["id"]
+    detail = (await client.get(f"/api/v1/products/{spu_id}")).json()["data"]
+    sku_id = detail["skus"][0]["id"]
+    resp = await client.post("/api/v1/cart/items", headers=user_h, json={"sku_id": sku_id, "qty": 1})
+    assert resp.status_code == 200
+
+    resp = await client.delete(f"/api/admin/products/{spu_id}", headers=h)
+    assert resp.status_code == 200, resp.text
+    assert (await client.get(f"/api/v1/products/{spu_id}")).status_code == 404
+    cart = (await client.get("/api/v1/cart", headers=user_h)).json()["data"]
+    assert cart == []
+
+
 async def test_unsellable_cannot_be_bought(client):
     """可销售默认开启；关闭后仍可浏览，但不能加购、不能下单。"""
     h = await admin_login(client)

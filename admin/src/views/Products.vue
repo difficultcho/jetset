@@ -54,7 +54,7 @@
   </el-card>
 
   <!-- 编辑/新增 -->
-  <el-dialog v-model="dialog" :title="form.id ? '编辑商品' : '新增商品'" width="880px" top="4vh">
+  <el-dialog v-model="dialog" :title="form.id ? '编辑商品' : '新增商品'" width="980px" top="4vh">
     <el-form label-width="80px">
       <el-row :gutter="12">
         <el-col :span="12"><el-form-item label="名称" required><el-input v-model="form.name" placeholder="完整名，如：SOLEIL 挂脖牛仔连衣裙" /></el-form-item></el-col>
@@ -95,13 +95,16 @@
       <el-form-item label="SKU" required>
         <el-table :data="form.skus" size="small" border style="width: 100%">
           <el-table-column label="色序" width="70">
-            <template #default="{ row }"><el-input-number v-model="row.color_index" :min="0" :controls="false" style="width: 100%" /></template>
+            <template #default="{ row }"><el-input-number v-model="row.color_index" :min="0" :controls="false" style="width: 100%" @change="onColorIndex(row)" /></template>
           </el-table-column>
-          <el-table-column label="颜色名" min-width="120">
-            <template #default="{ row }"><el-input v-model="row.color_name" /></template>
+          <el-table-column label="颜色名" min-width="110">
+            <template #default="{ row }"><el-input v-model="row.color_name" @input="syncColor(row, 'color_name')" /></template>
+          </el-table-column>
+          <el-table-column label="颜色编码" width="100">
+            <template #default="{ row }"><el-input v-model="row.color_code" maxlength="16" placeholder="5101" @input="syncColor(row, 'color_code')" /></template>
           </el-table-column>
           <el-table-column label="色值" width="70">
-            <template #default="{ row }"><el-color-picker v-model="row.color_hex" /></template>
+            <template #default="{ row }"><el-color-picker v-model="row.color_hex" @change="syncColor(row, 'color_hex')" /></template>
           </el-table-column>
           <el-table-column label="尺码" width="90">
             <template #default="{ row }"><el-input v-model="row.size" /></template>
@@ -206,11 +209,27 @@ function addSku(newColor = false) {
   const maxIdx = form.value.skus.reduce((m, s) => Math.max(m, s.color_index || 0), -1)
   form.value.skus.push(
     last && !newColor
-      ? { color_index: last.color_index, color_name: last.color_name, color_hex: last.color_hex,
-          size: '', priceYuan: last.priceYuan, stock: 0, on: true }
-      : { color_index: maxIdx + 1, color_name: '', color_hex: '#1a1a1a',
+      ? { color_index: last.color_index, color_name: last.color_name, color_code: last.color_code || '',
+          color_hex: last.color_hex, size: '', priceYuan: last.priceYuan, stock: 0, on: true }
+      : { color_index: maxIdx + 1, color_name: '', color_code: '', color_hex: '#1a1a1a',
           size: '均码', priceYuan: 0, stock: 0, on: true }
   )
+}
+
+// 同一色序共用颜色名、颜色编码、色值。改其中一项时，同色序的其它尺码跟着变。
+function syncColor(row, field) {
+  for (const s of form.value.skus) {
+    if (s !== row && s.color_index === row.color_index) s[field] = row[field]
+  }
+}
+
+// 改色序：并入已有色序时，采用那一组已经填好的颜色，避免把一组颜色拆成两套名字。
+function onColorIndex(row) {
+  const mate = form.value.skus.find((s) => s !== row && s.color_index === row.color_index)
+  if (!mate) return
+  row.color_name = mate.color_name
+  row.color_code = mate.color_code || ''
+  row.color_hex = mate.color_hex
 }
 
 // 提交前自检，别把唯一键冲突留给数据库以 500 的形式炸出来
@@ -221,10 +240,11 @@ function skuProblem() {
     const s = form.value.skus[i]
     if (!s.color_name) return `第 ${i + 1} 行未填颜色名`
     if (!s.size) return `第 ${i + 1} 行未填尺码`
+    const sig = `${s.color_name}\0${s.color_code || ''}\0${(s.color_hex || '').toLowerCase()}`
     const owner = colorOf.get(s.color_index)
-    if (owner === undefined) colorOf.set(s.color_index, s.color_name)
-    else if (owner !== s.color_name) {
-      return `第 ${i + 1} 行：色序 ${s.color_index} 已被颜色「${owner}」占用，不同颜色要用不同色序`
+    if (owner === undefined) colorOf.set(s.color_index, sig)
+    else if (owner !== sig) {
+      return `第 ${i + 1} 行：色序 ${s.color_index} 的颜色名、颜色编码、色值必须与其它尺码一致`
     }
     const key = s.color_index + '/' + s.size
     if (seen.has(key)) return `第 ${seen.get(key)} 行与第 ${i + 1} 行重复：同色序同尺码只能有一条`
@@ -249,7 +269,8 @@ async function openEdit(id) {
     sellable: d.sellable !== false,
     originalYuan: d.original_price ? d.original_price / 100 : null,
     sort: d.sort, status: d.status,
-    skus: d.skus.map((s) => ({ color_index: s.color_index, color_name: s.color_name, color_hex: s.color_hex,
+    skus: d.skus.map((s) => ({ color_index: s.color_index, color_name: s.color_name,
+                               color_code: s.color_code || '', color_hex: s.color_hex,
                                size: s.size, priceYuan: s.price / 100, stock: s.stock, on: s.status === 1 })),
     images: d.images.map((i) => ({ color_index: i.color_index, url: i.url, sort: i.sort || 0 }))
   }
@@ -286,7 +307,8 @@ async function save() {
     sellable: f.sellable !== false,
     original_price: f.originalYuan ? Math.round(f.originalYuan * 100) : null,
     sort: f.sort, status: f.status,
-    skus: f.skus.map((s) => ({ color_index: s.color_index, color_name: s.color_name, color_hex: s.color_hex || '#888888',
+    skus: f.skus.map((s) => ({ color_index: s.color_index, color_name: s.color_name,
+                               color_code: (s.color_code || '').trim(), color_hex: s.color_hex || '#888888',
                                size: s.size, price: Math.round(s.priceYuan * 100), stock: s.stock, status: s.on ? 1 : 0 })),
     images: f.images.map((i, idx) => ({ color_index: i.color_index, url: i.url, sort: idx }))
   }
