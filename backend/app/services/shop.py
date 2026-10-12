@@ -8,10 +8,11 @@
   banners  图片跳链，固定尺寸依次罗列，图下可带一行左对齐文字标题（title，可空）；
            目的地复用页面体系的链接（page/list/pdp）
   entries  下钻入口。下钻「逻辑」按菜单项类型不同，但「产物」统一是一个商品列表过滤条件：
-             一级类目 → 它的子类目        filter {cat: 子类目名}
+             一级类目 → 它的子类目        filter {cat: 子类目名}，并带 image
              系列     → 该系列涉及的一级类目 filter {series: id, cat: 一级名}
-           没建子类目的一级类目 entries 恒为空，此时小程序显示「全部XX」兜底，
-           否则该菜单项无路可走。
+           子类目的 image 是该类目下综合排序第一个上架商品的首图；没有商品或没有图则为 null。
+           小程序据此把子类画成两列方块。没建子类目时 entries 恒为空，
+           「全部XX」不是方块，由小程序放在上部图片跳链那一区。
 """
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,6 +21,7 @@ from app.errors import BizError
 from app.models.catalog import Category, Spu
 from app.models.series import Series
 from app.models.shop import ShopMenu
+from app.services.catalog import _first_image
 from app.services.pages import LINK_KINDS, _resolve_link
 
 MENU_KINDS = {"series", "category"}
@@ -89,6 +91,42 @@ async def _banners(session: AsyncSession, row: ShopMenu | None) -> list[dict]:
     return out
 
 
+async def _child_cover_images(session: AsyncSession, child_ids: list[int]) -> dict[int, str | None]:
+    """每个子类目一张封面：sort、id 升序下第一个上架商品的首图。
+
+    第一个商品没有图时不往后找，与「第一个商品的第一张图」一致。没有上架商品则为 None。
+    """
+    covers: dict[int, str | None] = {cid: None for cid in child_ids}
+    if not child_ids:
+        return covers
+    rows = (
+        await session.execute(
+            select(Spu.id, Spu.category_id, Spu.sort).where(
+                Spu.status == 1, Spu.category_id.in_(child_ids)
+            )
+        )
+    ).all()
+    winner: dict[int, tuple[int, int]] = {}
+    for spu_id, category_id, sort in rows:
+        cand = (sort, spu_id)
+        cur = winner.get(category_id)
+        if cur is None or cand < cur:
+            winner[category_id] = cand
+    if not winner:
+        return covers
+    spus = {
+        spu.id: spu
+        for spu in (
+            await session.execute(
+                select(Spu).where(Spu.id.in_([spu_id for _sort, spu_id in winner.values()]))
+            )
+        ).scalars()
+    }
+    for cid, (_sort, spu_id) in winner.items():
+        covers[cid] = _first_image(spus[spu_id])
+    return covers
+
+
 async def resolve_shop(session: AsyncSession) -> dict:
     """C 端商城骨架：左菜单 + 每项的图片跳链与下钻入口。"""
     rows = (await session.execute(select(ShopMenu))).scalars().all()
@@ -136,10 +174,17 @@ async def resolve_shop(session: AsyncSession) -> dict:
     for c in cats:
         if c.parent_id is not None:
             children.setdefault(c.parent_id, []).append(c)
+    covers = await _child_cover_images(
+        session, [s.id for subs in children.values() for s in subs]
+    )
     for t in [c for c in cats if c.parent_id is None]:
         r = by_ref.get(("category", t.id))
         entries = [
-            {"title": s.name, "en": s.en, "filter": {"cat": s.name}} for s in children.get(t.id, [])
+            {
+                "title": s.name, "en": s.en, "filter": {"cat": s.name},
+                "image": covers.get(s.id),
+            }
+            for s in children.get(t.id, [])
         ]
         menus.append({
             "key": f"cat-{t.id}", "kind": "category", "id": t.id,

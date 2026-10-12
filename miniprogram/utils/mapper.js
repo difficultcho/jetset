@@ -65,12 +65,17 @@ function toPageBlocks(blocks) {
   });
 }
 
-// 商城左菜单：图片补全域名，其余（filter/link）后端已解析好，直接透传
+// 商城左菜单：图片补全域名，其余（filter/link）后端已解析好，直接透传。
+// 子类方块用 card 交给 prod-img：有图显示封面，无图走组件里的占位。
 function toShopMenus(menus) {
   return (menus || []).map((m) => Object.assign({}, m, {
     banners: (m.banners || []).map((b) => ({
       img: fullImg(b.img), title: b.title || '', link: b.link || null
-    }))
+    })),
+    entries: (m.entries || []).map((e) => {
+      const image = fullImg(e.image);
+      return Object.assign({}, e, { image: image, card: { img: image, name: e.title || '' } });
+    })
   }));
 }
 

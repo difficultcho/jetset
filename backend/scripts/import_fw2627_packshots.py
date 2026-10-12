@@ -108,11 +108,10 @@ def main() -> None:
     print(f"已登录 {BASE}")
 
     cats = unwrap(client.get("/api/admin/categories"))
-    parents = {c["id"] for c in cats if any(x.get("parent_id") == c["id"] for x in cats)}
-    leaves = [c for c in cats if c["name"] == "滑雪裤" and c["id"] not in parents]
-    if len(leaves) != 1:
-        raise SystemExit(f"需要恰好一个叶子品类「滑雪裤」，实际 {[c['id'] for c in leaves]}")
-    category_id = leaves[0]["id"]
+    named = [c for c in cats if c["name"] == "滑雪裤"]
+    if len(named) != 1:
+        raise SystemExit(f"需要恰好一个品类「滑雪裤」，实际 {[c['id'] for c in named]}")
+    category_id = named[0]["id"]
     print(f"品类「滑雪裤」id={category_id}")
 
     def all_products() -> list[dict]:

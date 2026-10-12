@@ -141,3 +141,62 @@ async def test_series_entries_include_childless_top_category(client):
     await client.delete(f"/api/admin/shop/menus/{mine['id']}", headers=h)
     await client.put(f"/api/admin/categories/{top['id']}", headers=h, json={
         "name": "无子类目一级", "en": "FLAT", "parent_id": None, "sort": 90, "status": 0})
+
+
+async def test_subcategory_cover_is_first_product_image(client):
+    """子类方块的封面：综合排序第一个上架商品的首图。空子类、或第一个商品没图，都是 null。"""
+    h = await admin_login(client)
+
+    parent = (await client.post("/api/admin/categories", headers=h, json={
+        "name": "方块父级", "en": "TILES", "parent_id": None, "sort": 80})).json()["data"]
+    filled = (await client.post("/api/admin/categories", headers=h, json={
+        "name": "有货子类", "en": "FILLED", "parent_id": parent["id"], "sort": 1})).json()["data"]
+    blank = (await client.post("/api/admin/categories", headers=h, json={
+        "name": "无图子类", "en": "NOIMG", "parent_id": parent["id"], "sort": 2})).json()["data"]
+    empty = (await client.post("/api/admin/categories", headers=h, json={
+        "name": "空子类", "en": "EMPTY", "parent_id": parent["id"], "sort": 3})).json()["data"]
+
+    sku = {"color_index": 0, "color_name": "黑", "size": "均码", "price": 10000, "stock": 1}
+
+    async def add(cat_id, name, sort, images, status=1):
+        return (await client.post("/api/admin/products", headers=h, json={
+            "category_id": cat_id, "name": name, "code": name, "status": status, "sort": sort,
+            "skus": [sku], "images": images,
+        })).json()["data"]
+
+    # 更小的 id、更大的 sort，不能抢封面
+    later = await add(filled["id"], "方块较后", 5, [
+        {"color_index": 0, "url": "/uploads/tile-later.jpg", "sort": 0}])
+    # 下架商品即使 sort 更小也不算
+    hidden = await add(filled["id"], "方块下架", 0, [
+        {"color_index": 0, "url": "/uploads/tile-hidden.jpg", "sort": 0}], status=0)
+    first = await add(filled["id"], "方块第一", 1, [
+        {"color_index": 0, "url": "/uploads/tile-second.jpg", "sort": 1},
+        {"color_index": 0, "url": "/uploads/tile-first.jpg", "sort": 0},
+    ])
+    # 这个子类里 sort 最小的商品没有图，不改用后面那件的图
+    noimg = await add(blank["id"], "方块无图", 0, [])
+    skipped = await add(blank["id"], "方块无图之后", 1, [
+        {"color_index": 0, "url": "/uploads/tile-skip.jpg", "sort": 0}])
+
+    data = (await client.get("/api/v1/shop")).json()["data"]
+    menu = next(m for m in data["menus"] if m["key"] == f"cat-{parent['id']}")
+    by = {e["title"]: e for e in menu["entries"]}
+    assert [e["title"] for e in menu["entries"]] == ["有货子类", "无图子类", "空子类"]
+    assert by["有货子类"]["image"] == "/uploads/tile-first.jpg"
+    assert by["有货子类"]["filter"] == {"cat": "有货子类"}
+    assert by["无图子类"]["image"] is None
+    assert by["空子类"]["image"] is None
+    # 「全部XX」不是入口封面，菜单本身不带 image
+    assert "image" not in menu
+
+    for spu in (later, hidden, first, noimg, skipped):
+        await client.post(f"/api/admin/products/{spu['id']}/status", headers=h, json={"status": 0})
+    for cat, name, en, parent_id, sort in (
+        (filled, "有货子类", "FILLED", parent["id"], 1),
+        (blank, "无图子类", "NOIMG", parent["id"], 2),
+        (empty, "空子类", "EMPTY", parent["id"], 3),
+        (parent, "方块父级", "TILES", None, 80),
+    ):
+        await client.put(f"/api/admin/categories/{cat['id']}", headers=h, json={
+            "name": name, "en": en, "parent_id": parent_id, "sort": sort, "status": 0})

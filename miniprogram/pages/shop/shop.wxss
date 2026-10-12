@@ -29,7 +29,14 @@
 .bn-title { display: block; text-align: left; margin-top: 12rpx;
             font-size: 25rpx; line-height: 1.4; color: #333; }
 
-/* 下部：下钻入口 */
+/* 子类方块：画幅在外层 view 上，和商品卡一样 3:4。image 的默认宽度会撑破列 */
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 48rpx 24rpx; margin-top: 8rpx; }
+.tile { min-width: 0; }
+.tile-img { position: relative; width: 100%; aspect-ratio: 3 / 4; overflow: hidden; background: #f6f6f6; }
+.tile-name { display: block; width: 100%; margin-top: 16rpx; font-size: 26rpx; line-height: 1.4; color: #222;
+             overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* 「全部XX」和系列入口：横条 */
 .ent { display: flex; align-items: center; justify-content: space-between; padding: 30rpx 4rpx; border-bottom: 1rpx solid #f0f0f0; }
 .ent-txt { display: flex; align-items: baseline; gap: 14rpx; min-width: 0; }
 .ent-cn { font-size: 27rpx; color: #222; }

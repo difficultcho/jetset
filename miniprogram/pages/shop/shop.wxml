@@ -26,20 +26,31 @@
         <text wx:if="{{item.title}}" class="bn-title">{{item.title}}</text>
       </view>
 
-      <!-- 下部：下钻入口，每项通向一个商品列表 -->
-      <view class="ent" wx:for="{{entries}}" wx:key="title" data-i="{{index}}" bindtap="goEntry">
-        <view class="ent-txt">
-          <text class="ent-cn">{{item.title}}</text>
-          <text wx:if="{{item.en}}" class="ent-en">{{item.en}}</text>
-        </view>
-        <view class="ent-arrow" />
-      </view>
-      <!-- 兜底：没有下钻入口时（一级类目下没建二级、系列商品都挂在无子类目的类目上），
-           至少留一条通往该菜单项全部商品的路，否则整项无路可走 -->
+      <!-- 没有下钻入口时（一级类目没建子类、系列也没有可去的类目），
+           「全部XX」留在上部图片跳链这一区，不画成子类方块 -->
       <view wx:if="{{cur && !entries.length}}" class="ent" bindtap="goAll">
         <view class="ent-txt"><text class="ent-cn">全部{{cur.title}}</text></view>
         <view class="ent-arrow" />
       </view>
+
+      <!-- 子类：有数据就自动排成两列方块。封面是该类第一个上架商品的首图，没有则占位 -->
+      <view wx:if="{{cur && cur.kind === 'category' && entries.length}}" class="tiles">
+        <view class="tile" wx:for="{{entries}}" wx:key="title" data-i="{{index}}" bindtap="goEntry">
+          <view class="tile-img"><prod-img prod="{{item.card}}" /></view>
+          <text class="tile-name">{{item.title}}</text>
+        </view>
+      </view>
+
+      <!-- 系列的下钻是一级类目，不是子类，仍用横条 -->
+      <block wx:if="{{cur && cur.kind === 'series'}}">
+        <view class="ent" wx:for="{{entries}}" wx:key="title" data-i="{{index}}" bindtap="goEntry">
+          <view class="ent-txt">
+            <text class="ent-cn">{{item.title}}</text>
+            <text wx:if="{{item.en}}" class="ent-en">{{item.en}}</text>
+          </view>
+          <view class="ent-arrow" />
+        </view>
+      </block>
 
       <view wx:if="{{!menus.length}}" class="empty">内容即将上架，敬请期待</view>
       <view class="content-space" />

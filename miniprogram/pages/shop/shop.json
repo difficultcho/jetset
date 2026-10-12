@@ -1,5 +1,6 @@
 {
   "usingComponents": {
-    "fab-stack": "/components/fab-stack/fab-stack"
+    "fab-stack": "/components/fab-stack/fab-stack",
+    "prod-img": "/components/prod-img/prod-img"
   }
 }
