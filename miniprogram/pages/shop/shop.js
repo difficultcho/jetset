@@ -9,7 +9,7 @@ Page({
     menus: [],       // 左菜单：上部自定义项（系列）+ 下部一级类目
     curKey: '',
     cur: null,       // 当前菜单项（含自身 filter，供无下钻入口时的兜底入口用）
-    banners: [],     // 右侧上部：图片跳链（可带文字标题）。没有子类时「全部XX」也在这一区
+    banners: [],     // 右侧上部：图片跳链。没有下一级时，靠它进入本项全部商品
     entries: []      // 子类，或系列归并出的一级类目；都是两列方块
   },
 
@@ -63,12 +63,6 @@ Page({
   goEntry(e) {
     const it = this.data.entries[e.currentTarget.dataset.i];
     if (it) nav.goList(Object.assign({}, it.filter, { title: it.title }));
-  },
-
-  // 无下钻入口时的兜底：整个菜单项的全部商品
-  goAll() {
-    const m = this.data.cur;
-    if (m) nav.goList(Object.assign({}, m.filter, { title: m.title }));
   },
 
   goSearch() { wx.navigateTo({ url: '/pages/list/list' }); }

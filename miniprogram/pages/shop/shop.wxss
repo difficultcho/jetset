@@ -36,12 +36,5 @@
 .tile-name { display: block; width: 100%; margin-top: 16rpx; font-size: 26rpx; line-height: 1.4; color: #222;
              overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
-/* 「全部XX」：横条，留在图片跳链那一区 */
-.ent { display: flex; align-items: center; justify-content: space-between; padding: 30rpx 4rpx; border-bottom: 1rpx solid #f0f0f0; }
-.ent-txt { display: flex; align-items: baseline; gap: 14rpx; min-width: 0; }
-.ent-cn { font-size: 27rpx; color: #222; }
-.ent-en { font-size: 21rpx; letter-spacing: 0.12em; color: #b0b0b0; }
-.ent-arrow { width: 16rpx; height: 16rpx; flex-shrink: 0; border-top: 2rpx solid #bbb; border-right: 2rpx solid #bbb; transform: rotate(45deg); }
-
 .empty { text-align: center; color: #b0b0b0; font-size: 26rpx; padding: 60rpx 0; }
 .content-space { height: 200rpx; }

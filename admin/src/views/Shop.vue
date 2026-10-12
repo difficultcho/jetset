@@ -3,7 +3,7 @@
     <template #header>
       <div class="head-row">
         <span>商城左菜单</span>
-        <span class="sub">右侧上部是图片跳链，没有下一级时「全部XX」也在这一区；子类和系列下的一级类目都自动排成两列方块</span>
+        <span class="sub">右侧上部是图片跳链，可跳到本项全部商品；子类和系列下的一级类目都自动排成两列方块</span>
       </div>
     </template>
 
@@ -54,7 +54,11 @@
         </template>
       </el-table-column>
       <el-table-column label="二级类目" min-width="220">
-        <template #default="{ row }"><span class="sub">{{ subsOf(row) || '—' }}</span></template>
+        <template #default="{ row }">
+          <span v-if="subsOf(row)" class="sub">{{ subsOf(row) }}</span>
+          <span v-else-if="!hasOwnLink(row)" class="warn">没有子类，需配一张跳到「本项全部商品」的图</span>
+          <span v-else class="sub">没有子类</span>
+        </template>
       </el-table-column>
       <el-table-column label="图片跳链" width="100">
         <template #default="{ row }">{{ (row.banners || []).length }} 张</template>
@@ -97,7 +101,8 @@
       <div class="bn-right">
         <el-input v-model="b.title" size="small" maxlength="60" show-word-limit
           placeholder="图片下方的文字标题（留空则不显示）" />
-        <LinkTarget v-model="b.link" :pages="pages" :cats="catList" :series="seriesList" :prods="prodList" />
+        <LinkTarget v-model="b.link" :pages="pages" :cats="catList" :series="seriesList" :prods="prodList"
+          :self-link="selfLink" />
       </div>
       <div class="bn-ops">
         <el-button link size="small" :disabled="i === 0" @click="move(i, -1)">上移</el-button>
@@ -105,7 +110,10 @@
         <el-button link type="danger" size="small" @click="cur.banners.splice(i, 1)">删除</el-button>
       </div>
     </div>
-    <div v-if="!cur.banners.length" class="empty">未配置图片，右侧上部留空</div>
+    <div v-if="cur.kind === 'category' && !subsOf(cur) && !hasOwnLink(cur)" class="warn">
+      这个类目没有子类。加一张图片，跳转选「本项全部商品」，顾客才能进入商品。
+    </div>
+    <div v-else-if="!cur.banners.length" class="empty">未配置图片，右侧上部留空</div>
 
     <template #footer>
       <el-button @click="editDialog = false">取消</el-button>
@@ -139,6 +147,11 @@ const curOn = computed({
   get: () => cur.value.status === 1,
   set: (v) => { cur.value.status = v ? 1 : 0 }
 })
+const selfLink = computed(() => {
+  if (cur.value.kind === 'category') return { category_id: cur.value.ref_id }
+  if (cur.value.kind === 'series') return { series_id: cur.value.ref_id }
+  return null
+})
 
 const tops = computed(() => menus.value.filter((m) => m.kind === 'series'))
 const cats = computed(() => menus.value.filter((m) => m.kind === 'category'))
@@ -159,6 +172,15 @@ function enOf(m) {
 }
 function subsOf(m) {
   return catList.value.filter((c) => c.parent_id === m.ref_id).map((c) => c.name).join('、')
+}
+function hasOwnLink(m) {
+  return (m.banners || []).some((b) => {
+    const link = b && b.link
+    if (!b.img || !link || link.kind !== 'list') return false
+    if (m.kind === 'category') return link.category_id === m.ref_id && !link.series_id
+    if (m.kind === 'series') return link.series_id === m.ref_id && !link.category_id
+    return false
+  })
 }
 function move(i, d) {
   const b = cur.value.banners
@@ -240,6 +262,7 @@ onMounted(load)
 .grp-head.second { margin-top: 32px; }
 .grow { flex: 1; }
 .sub { color: #999; font-size: 12px; }
+.warn { color: #a15c07; font-size: 12px; }
 .empty { color: #bbb; font-size: 13px; padding: 16px 0; text-align: center; }
 .bn { display: flex; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
 .bn-right { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }

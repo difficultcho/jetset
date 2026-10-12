@@ -1,8 +1,9 @@
 <template>
   <span class="lt">
     <span>点击跳转
-      <el-select :model-value="kind" size="small" style="width: 120px" @change="onKind">
+      <el-select :model-value="kind" size="small" style="width: 148px" @change="onKind">
         <el-option label="不跳转" value="none" />
+        <el-option v-if="selfLink" label="本项全部商品" value="self" />
         <el-option label="内容页" value="page" />
         <el-option label="商品列表" value="list" />
         <el-option label="商品详情" value="pdp" />
@@ -29,8 +30,9 @@
             :value="s.id" :disabled="s.status !== 1" />
         </el-select>
       </span>
-      <span class="sub">优先品类；都不选 = 全部商品</span>
+      <span class="sub">优先品类；都不选 = 全店商品</span>
     </template>
+    <span v-else-if="kind === 'self'" class="sub">进入当前这项名下的全部商品</span>
     <span v-else-if="kind === 'pdp'">商品
       <el-select :model-value="v.spu_id" size="small" filterable style="width: 220px" placeholder="选择商品"
         @change="(x) => set({ spu_id: x })">
@@ -48,7 +50,9 @@ const props = defineProps({
   pages: { type: Array, default: () => [] },
   cats: { type: Array, default: () => [] },
   series: { type: Array, default: () => [] },
-  prods: { type: Array, default: () => [] }
+  prods: { type: Array, default: () => [] },
+  // { category_id } 或 { series_id }。只在商城菜单的图片跳链里传入。
+  selfLink: { type: Object, default: null }
 })
 const emit = defineEmits(['update:modelValue'])
 
@@ -57,11 +61,23 @@ const catLabel = (c) => (c.parent_name ? c.parent_name + ' / ' : '') + c.name
 const prodLabel = (p) => p.name + (p.code ? '｜' + p.code : '')
 
 const v = computed(() => props.modelValue || {})
-const kind = computed(() => v.value.kind || 'none')
 
-// 切换目标类型：none→清空；其余先落 kind，等选具体对象补 key/id
+function isSelf(link) {
+  const own = props.selfLink
+  if (!own || !link || link.kind !== 'list') return false
+  const cat = link.category_id || null
+  const ser = link.series_id || null
+  if (own.category_id) return cat === own.category_id && !ser
+  if (own.series_id) return ser === own.series_id && !cat
+  return false
+}
+
+const kind = computed(() => (isSelf(v.value) ? 'self' : (v.value.kind || 'none')))
+
+// 切换目标类型：none→清空；self→当前菜单项的商品列表；其余先落 kind
 function onKind(k) {
   if (k === 'none') emit('update:modelValue', null)
+  else if (k === 'self') emit('update:modelValue', { kind: 'list', ...props.selfLink })
   else emit('update:modelValue', { kind: k })
 }
 function set(patch) {

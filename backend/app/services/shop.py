@@ -12,8 +12,8 @@
              系列     → 该系列涉及的一级类目 filter {series: id, cat: 一级名}，并带 image
            image 都是该入口对应商品里、综合排序第一个上架商品的首图；没有图则为 null。
            系列入口的商品范围含这个一级类目自己和它的全部子类目，且只算该系列。
-           小程序把这两类入口都画成两列方块。没有入口时 entries 恒为空，
-           「全部XX」不是方块，由小程序放在上部图片跳链那一区。
+           小程序把这两类入口都画成两列方块。没有入口时右侧只剩图片跳链；
+           跳进「本项全部商品」由图片跳链完成，链接的列表标题用菜单显示名。
 """
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -77,17 +77,41 @@ async def _series_top_categories(session: AsyncSession, series_id: int) -> list[
     ).scalars().all()
 
 
-async def _banners(session: AsyncSession, row: ShopMenu | None) -> list[dict]:
+def _own_list(raw, *, category_id: int | None = None, series_id: int | None = None) -> bool:
+    """图片跳链是否指向当前菜单项自己的全部商品。另一侧 id 有值则不算。"""
+    if not isinstance(raw, dict) or raw.get("kind") != "list":
+        return False
+    cat = raw.get("category_id") if isinstance(raw.get("category_id"), int) and raw.get("category_id") > 0 else None
+    ser = raw.get("series_id") if isinstance(raw.get("series_id"), int) and raw.get("series_id") > 0 else None
+    if category_id is not None:
+        return cat == category_id and ser is None
+    if series_id is not None:
+        return ser == series_id and cat is None
+    return False
+
+
+async def _banners(
+    session: AsyncSession,
+    row: ShopMenu | None,
+    *,
+    menu_title: str,
+    category_id: int | None = None,
+    series_id: int | None = None,
+) -> list[dict]:
     if row is None or not row.banners:
         return []
     out = []
     for b in row.banners:
         if not isinstance(b, dict) or not b.get("img"):
             continue
+        link = await _resolve_link(session, b.get("link"))
+        # 「本项全部商品」的列表标题用左侧显示名，不用类目名或系列英文名
+        if link is not None and _own_list(b.get("link"), category_id=category_id, series_id=series_id):
+            link = {**link, "title": menu_title}
         out.append({
             "img": b["img"],
             "title": (b.get("title") or "").strip(),   # 图片下方的文字标题，可为空
-            "link": await _resolve_link(session, b.get("link")),
+            "link": link,
         })
     return out
 
@@ -222,7 +246,9 @@ async def resolve_shop(session: AsyncSession) -> dict:
                     "key": f"series-{s.id}", "kind": "series", "id": s.id,
                     "title": r.title or s.name, "en": r.en or s.en,
                     "filter": {"series": s.id},
-                    "banners": await _banners(session, r),
+                    "banners": await _banners(
+                        session, r, menu_title=r.title or s.name, series_id=s.id
+                    ),
                 },
                 s.id,
                 await _series_top_categories(session, s.id),
@@ -256,6 +282,7 @@ async def resolve_shop(session: AsyncSession) -> dict:
     )
     for t in [c for c in cats if c.parent_id is None]:
         r = by_ref.get(("category", t.id))
+        menu_title = r.title if r and r.title else t.name
         entries = [
             {
                 "title": s.name, "en": s.en, "filter": {"cat": s.name},
@@ -265,9 +292,12 @@ async def resolve_shop(session: AsyncSession) -> dict:
         ]
         menus.append({
             "key": f"cat-{t.id}", "kind": "category", "id": t.id,
-            "title": (r.title if r and r.title else t.name), "en": (r.en if r and r.en else t.en),
+            "title": menu_title, "en": (r.en if r and r.en else t.en),
             "filter": {"cat": t.name},
-            "banners": await _banners(session, r), "entries": entries,
+            "banners": await _banners(
+                session, r, menu_title=menu_title, category_id=t.id
+            ),
+            "entries": entries,
         })
 
     return {"menus": menus}

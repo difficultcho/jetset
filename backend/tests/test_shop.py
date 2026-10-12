@@ -262,3 +262,47 @@ async def test_series_entry_cover_includes_child_products(client):
     ):
         await client.put(f"/api/admin/categories/{cat['id']}", headers=h, json={
             "name": name, "en": en, "parent_id": parent_id, "sort": sort, "status": 0})
+
+
+async def test_own_list_banner_uses_menu_title(client):
+    """图片跳链选「本项全部商品」时，列表标题用菜单显示名。指向别的类目则仍用那个类目名。"""
+    h = await admin_login(client)
+    cats = (await client.get("/api/admin/categories", headers=h)).json()["data"]
+    top = next(c for c in cats if c["parent_id"] is None and c["status"] == 1)
+    leaf = next(c for c in cats if c["parent_id"] is not None and c["status"] == 1)
+    se = (await client.post("/api/admin/series", headers=h, json={
+        "name": "本项系列", "en": "OWN SERIES", "sort": 60})).json()["data"]
+
+    await client.put("/api/admin/shop/menus", headers=h, json={
+        "kind": "series", "ref_id": se["id"], "title": "本项系列名", "sort": 60, "status": 1,
+        "banners": [
+            {"img": "/uploads/own-series.jpg",
+             "link": {"kind": "list", "series_id": se["id"]}},
+            {"img": "/uploads/other-cat.jpg",
+             "link": {"kind": "list", "category_id": leaf["id"]}},
+        ]})
+    data = (await client.get("/api/v1/shop")).json()["data"]
+    sm = next(m for m in data["menus"] if m["key"] == f"series-{se['id']}")
+    assert sm["banners"][0]["link"] == {"kind": "list", "series": se["id"], "title": "本项系列名"}
+    assert sm["banners"][1]["link"] == {"kind": "list", "cat": leaf["name"], "title": leaf["name"]}
+
+    await client.put("/api/admin/shop/menus", headers=h, json={
+        "kind": "category", "ref_id": top["id"], "title": "本项类目名",
+        "banners": [
+            {"img": "/uploads/own-cat.jpg",
+             "link": {"kind": "list", "category_id": top["id"]}},
+            {"img": "/uploads/mixed.jpg",
+             "link": {"kind": "list", "category_id": top["id"], "series_id": se["id"]}},
+        ]})
+    data = (await client.get("/api/v1/shop")).json()["data"]
+    tm = next(m for m in data["menus"] if m["key"] == f"cat-{top['id']}")
+    assert tm["banners"][0]["link"] == {"kind": "list", "cat": top["name"], "title": "本项类目名"}
+    # 同时写了系列 id 就不是「本项全部」，标题保持类目名
+    assert tm["banners"][1]["link"]["title"] == top["name"]
+    assert tm["banners"][1]["link"]["cat"] == top["name"]
+
+    rows = (await client.get("/api/admin/shop/menus", headers=h)).json()["data"]
+    mine = next(r for r in rows if r["kind"] == "series" and r["ref_id"] == se["id"])
+    await client.delete(f"/api/admin/shop/menus/{mine['id']}", headers=h)
+    await client.put("/api/admin/shop/menus", headers=h, json={
+        "kind": "category", "ref_id": top["id"], "title": "", "banners": []})

@@ -26,14 +26,8 @@
         <text wx:if="{{item.title}}" class="bn-title">{{item.title}}</text>
       </view>
 
-      <!-- 没有下钻入口时（一级类目没建子类、系列也没有可去的类目），
-           「全部XX」留在上部图片跳链这一区，不画成子类方块 -->
-      <view wx:if="{{cur && !entries.length}}" class="ent" bindtap="goAll">
-        <view class="ent-txt"><text class="ent-cn">全部{{cur.title}}</text></view>
-        <view class="ent-arrow" />
-      </view>
-
-      <!-- 下钻入口：类目的子类，或系列归并出的一级类目。有数据就两列方块 -->
+      <!-- 下钻入口：类目的子类，或系列归并出的一级类目。有数据就两列方块。
+           没有下一级时，只靠上面的图片跳链进入全部商品 -->
       <view wx:if="{{entries.length}}" class="tiles">
         <view class="tile" wx:for="{{entries}}" wx:key="title" data-i="{{index}}" bindtap="goEntry">
           <view class="tile-img"><prod-img prod="{{item.card}}" /></view>
