@@ -9,9 +9,10 @@
            目的地复用页面体系的链接（page/list/pdp）
   entries  下钻入口。下钻「逻辑」按菜单项类型不同，但「产物」统一是一个商品列表过滤条件：
              一级类目 → 它的子类目        filter {cat: 子类目名}，并带 image
-             系列     → 该系列涉及的一级类目 filter {series: id, cat: 一级名}
-           子类目的 image 是该类目下综合排序第一个上架商品的首图；没有商品或没有图则为 null。
-           小程序据此把子类画成两列方块。没建子类目时 entries 恒为空，
+             系列     → 该系列涉及的一级类目 filter {series: id, cat: 一级名}，并带 image
+           image 都是该入口对应商品里、综合排序第一个上架商品的首图；没有图则为 null。
+           系列入口的商品范围含这个一级类目自己和它的全部子类目，且只算该系列。
+           小程序把这两类入口都画成两列方块。没有入口时 entries 恒为空，
            「全部XX」不是方块，由小程序放在上部图片跳链那一区。
 """
 from sqlalchemy import select
@@ -91,6 +92,68 @@ async def _banners(session: AsyncSession, row: ShopMenu | None) -> list[dict]:
     return out
 
 
+async def _series_cover_images(
+    session: AsyncSession, specs: list[tuple[int, Category]]
+) -> dict[tuple[int, int], str | None]:
+    """每个（系列, 一级类目）一张封面。
+
+    商品范围与列表筛选一致：该类目自己加上它的全部子类目，且 series_id 相符、上架。
+    排序仍是 sort、id 升序。第一个商品没有图时不往后找。
+    """
+    covers: dict[tuple[int, int], str | None] = {(sid, cat.id): None for sid, cat in specs}
+    if not specs:
+        return covers
+    top_ids = {cat.id for _sid, cat in specs}
+    scope: dict[int, set[int]] = {tid: {tid} for tid in top_ids}
+    children = (
+        await session.execute(
+            select(Category.id, Category.parent_id).where(Category.parent_id.in_(top_ids))
+        )
+    ).all()
+    for child_id, parent_id in children:
+        scope[parent_id].add(child_id)
+    all_ids = {cid for ids in scope.values() for cid in ids}
+    series_ids = {sid for sid, _cat in specs}
+    rows = (
+        await session.execute(
+            select(Spu.id, Spu.category_id, Spu.series_id, Spu.sort).where(
+                Spu.status == 1,
+                Spu.series_id.in_(series_ids),
+                Spu.category_id.in_(all_ids),
+            )
+        )
+    ).all()
+    by_cat: dict[int, list[tuple[int, int | None, int]]] = {}
+    for spu_id, category_id, series_id, sort in rows:
+        by_cat.setdefault(category_id, []).append((spu_id, series_id, sort))
+
+    winner: dict[tuple[int, int], tuple[int, int]] = {}
+    for sid, cat in specs:
+        best: tuple[int, int] | None = None
+        for cid in scope[cat.id]:
+            for spu_id, series_id, sort in by_cat.get(cid, []):
+                if series_id != sid:
+                    continue
+                cand = (sort, spu_id)
+                if best is None or cand < best:
+                    best = cand
+        if best is not None:
+            winner[(sid, cat.id)] = best
+    if not winner:
+        return covers
+    spus = {
+        spu.id: spu
+        for spu in (
+            await session.execute(
+                select(Spu).where(Spu.id.in_({spu_id for _sort, spu_id in winner.values()}))
+            )
+        ).scalars()
+    }
+    for key, (_sort, spu_id) in winner.items():
+        covers[key] = _first_image(spus[spu_id])
+    return covers
+
+
 async def _child_cover_images(session: AsyncSession, child_ids: list[int]) -> dict[int, str | None]:
     """每个子类目一张封面：sort、id 升序下第一个上架商品的首图。
 
@@ -149,20 +212,34 @@ async def resolve_shop(session: AsyncSession) -> dict:
                 )
             ).scalars()
         }
+        pending: list[tuple[dict, int, list[Category]]] = []
         for r in tops:
             s = series_map.get(r.ref_id)
             if s is None:  # 系列被删/停用 → 该菜单项自动隐藏
                 continue
-            entries = [
-                {"title": c.name, "en": c.en, "filter": {"series": s.id, "cat": c.name}}
-                for c in await _series_top_categories(session, s.id)
+            pending.append((
+                {
+                    "key": f"series-{s.id}", "kind": "series", "id": s.id,
+                    "title": r.title or s.name, "en": r.en or s.en,
+                    "filter": {"series": s.id},
+                    "banners": await _banners(session, r),
+                },
+                s.id,
+                await _series_top_categories(session, s.id),
+            ))
+        series_covers = await _series_cover_images(
+            session, [(sid, cat) for _menu, sid, cats in pending for cat in cats]
+        )
+        for menu, sid, cats in pending:
+            menu["entries"] = [
+                {
+                    "title": c.name, "en": c.en,
+                    "filter": {"series": sid, "cat": c.name},
+                    "image": series_covers.get((sid, c.id)),
+                }
+                for c in cats
             ]
-            menus.append({
-                "key": f"series-{s.id}", "kind": "series", "id": s.id,
-                "title": r.title or s.name, "en": r.en or s.en,
-                "filter": {"series": s.id},
-                "banners": await _banners(session, r), "entries": entries,
-            })
+            menus.append(menu)
 
     # 下部：一级类目——名称/排序/上下架以品类管理为准
     cats = (

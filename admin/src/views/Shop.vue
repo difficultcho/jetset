@@ -3,7 +3,7 @@
     <template #header>
       <div class="head-row">
         <span>商城左菜单</span>
-        <span class="sub">右侧上部是图片跳链，没有子类时「全部XX」也在这一区；有子类时下部自动排成两列方块</span>
+        <span class="sub">右侧上部是图片跳链，没有下一级时「全部XX」也在这一区；子类和系列下的一级类目都自动排成两列方块</span>
       </div>
     </template>
 

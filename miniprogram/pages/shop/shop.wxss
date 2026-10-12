@@ -36,7 +36,7 @@
 .tile-name { display: block; width: 100%; margin-top: 16rpx; font-size: 26rpx; line-height: 1.4; color: #222;
              overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
-/* 「全部XX」和系列入口：横条 */
+/* 「全部XX」：横条，留在图片跳链那一区 */
 .ent { display: flex; align-items: center; justify-content: space-between; padding: 30rpx 4rpx; border-bottom: 1rpx solid #f0f0f0; }
 .ent-txt { display: flex; align-items: baseline; gap: 14rpx; min-width: 0; }
 .ent-cn { font-size: 27rpx; color: #222; }

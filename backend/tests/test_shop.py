@@ -128,6 +128,7 @@ async def test_series_entries_include_childless_top_category(client):
     # 关键：入口派生出来了，而不是空列表
     assert [e["title"] for e in sm["entries"]] == ["无子类目一级"]
     assert sm["entries"][0]["filter"] == {"series": se["id"], "cat": "无子类目一级"}
+    assert sm["entries"][0]["image"] is None
 
     # 入口的过滤条件真能筛到这个商品（否则入口点进去还是空列表）
     got = (await client.get("/api/v1/products", params={
@@ -197,6 +198,67 @@ async def test_subcategory_cover_is_first_product_image(client):
         (blank, "无图子类", "NOIMG", parent["id"], 2),
         (empty, "空子类", "EMPTY", parent["id"], 3),
         (parent, "方块父级", "TILES", None, 80),
+    ):
+        await client.put(f"/api/admin/categories/{cat['id']}", headers=h, json={
+            "name": name, "en": en, "parent_id": parent_id, "sort": sort, "status": 0})
+
+
+async def test_series_entry_cover_includes_child_products(client):
+    """系列方块的封面按该系列在这个一级类目（含其子类）里的第一个上架商品。"""
+    h = await admin_login(client)
+    parent = (await client.post("/api/admin/categories", headers=h, json={
+        "name": "系列封面父", "en": "S-PARENT", "parent_id": None, "sort": 70})).json()["data"]
+    child = (await client.post("/api/admin/categories", headers=h, json={
+        "name": "系列封面子", "en": "S-CHILD", "parent_id": parent["id"], "sort": 1})).json()["data"]
+    other = (await client.post("/api/admin/categories", headers=h, json={
+        "name": "系列其他类", "en": "S-OTHER", "parent_id": None, "sort": 71})).json()["data"]
+    se = (await client.post("/api/admin/series", headers=h, json={
+        "name": "封面系列", "en": "COVER SERIES", "sort": 70})).json()["data"]
+    other_series = (await client.post("/api/admin/series", headers=h, json={
+        "name": "别的系列", "en": "OTHER SERIES", "sort": 71})).json()["data"]
+    sku = {"color_index": 0, "color_name": "黑", "size": "均码", "price": 10000, "stock": 1}
+
+    async def add(cat_id, series_id, name, sort, images, status=1):
+        return (await client.post("/api/admin/products", headers=h, json={
+            "category_id": cat_id, "series_id": series_id, "name": name, "code": name,
+            "status": status, "sort": sort, "skus": [sku], "images": images,
+        })).json()["data"]
+
+    later = await add(child["id"], se["id"], "系列较后", 5, [
+        {"color_index": 0, "url": "/uploads/series-later.jpg", "sort": 0}])
+    hidden = await add(child["id"], se["id"], "系列下架", 0, [
+        {"color_index": 0, "url": "/uploads/series-hidden.jpg", "sort": 0}], status=0)
+    # 挂在子类上，仍应成为父级方块的封面
+    first = await add(child["id"], se["id"], "系列第一", 1, [
+        {"color_index": 0, "url": "/uploads/series-second.jpg", "sort": 1},
+        {"color_index": 0, "url": "/uploads/series-first.jpg", "sort": 0},
+    ])
+    stranger = await add(parent["id"], other_series["id"], "系列无关", 0, [
+        {"color_index": 0, "url": "/uploads/series-other.jpg", "sort": 0}])
+    side = await add(other["id"], se["id"], "系列旁支", 1, [
+        {"color_index": 0, "url": "/uploads/series-side.jpg", "sort": 0}])
+
+    await client.put("/api/admin/shop/menus", headers=h, json={
+        "kind": "series", "ref_id": se["id"], "sort": 70, "status": 1, "banners": []})
+
+    data = (await client.get("/api/v1/shop")).json()["data"]
+    sm = next(m for m in data["menus"] if m["key"] == f"series-{se['id']}")
+    by = {e["title"]: e for e in sm["entries"]}
+    assert [e["title"] for e in sm["entries"]] == ["系列封面父", "系列其他类"]
+    assert by["系列封面父"]["image"] == "/uploads/series-first.jpg"
+    assert by["系列封面父"]["filter"] == {"series": se["id"], "cat": "系列封面父"}
+    assert by["系列其他类"]["image"] == "/uploads/series-side.jpg"
+    assert "系列封面子" not in by
+
+    for spu in (later, hidden, first, stranger, side):
+        await client.post(f"/api/admin/products/{spu['id']}/status", headers=h, json={"status": 0})
+    rows = (await client.get("/api/admin/shop/menus", headers=h)).json()["data"]
+    mine = next(r for r in rows if r["kind"] == "series" and r["ref_id"] == se["id"])
+    await client.delete(f"/api/admin/shop/menus/{mine['id']}", headers=h)
+    for cat, name, en, parent_id, sort in (
+        (child, "系列封面子", "S-CHILD", parent["id"], 1),
+        (parent, "系列封面父", "S-PARENT", None, 70),
+        (other, "系列其他类", "S-OTHER", None, 71),
     ):
         await client.put(f"/api/admin/categories/{cat['id']}", headers=h, json={
             "name": name, "en": en, "parent_id": parent_id, "sort": sort, "status": 0})

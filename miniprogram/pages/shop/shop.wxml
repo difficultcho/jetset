@@ -33,24 +33,13 @@
         <view class="ent-arrow" />
       </view>
 
-      <!-- 子类：有数据就自动排成两列方块。封面是该类第一个上架商品的首图，没有则占位 -->
-      <view wx:if="{{cur && cur.kind === 'category' && entries.length}}" class="tiles">
+      <!-- 下钻入口：类目的子类，或系列归并出的一级类目。有数据就两列方块 -->
+      <view wx:if="{{entries.length}}" class="tiles">
         <view class="tile" wx:for="{{entries}}" wx:key="title" data-i="{{index}}" bindtap="goEntry">
           <view class="tile-img"><prod-img prod="{{item.card}}" /></view>
           <text class="tile-name">{{item.title}}</text>
         </view>
       </view>
-
-      <!-- 系列的下钻是一级类目，不是子类，仍用横条 -->
-      <block wx:if="{{cur && cur.kind === 'series'}}">
-        <view class="ent" wx:for="{{entries}}" wx:key="title" data-i="{{index}}" bindtap="goEntry">
-          <view class="ent-txt">
-            <text class="ent-cn">{{item.title}}</text>
-            <text wx:if="{{item.en}}" class="ent-en">{{item.en}}</text>
-          </view>
-          <view class="ent-arrow" />
-        </view>
-      </block>
 
       <view wx:if="{{!menus.length}}" class="empty">内容即将上架，敬请期待</view>
       <view class="content-space" />
