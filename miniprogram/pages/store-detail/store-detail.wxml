@@ -1,9 +1,11 @@
 <view class="page" wx:if="{{store}}">
   <nav-bar title="{{store.short}}" />
   <scroll-view class="body" scroll-y>
-    <view class="big">
-      <image wx:if="{{store.images[0]}}" class="big-real" src="{{store.images[0]}}" mode="aspectFill" />
-      <view wx:else class="big-ph" style="background:repeating-linear-gradient(135deg,#ddd6ca 0 16rpx,#d3cbba 16rpx 32rpx);"><text class="ph-label">storefront · {{store.short}}</text></view>
+    <view class="shot">
+      <view class="big">
+        <image wx:if="{{store.images[0]}}" class="big-real" src="{{store.images[0]}}" mode="aspectFill" />
+        <view wx:else class="big-ph" style="background:repeating-linear-gradient(135deg,#ddd6ca 0 16rpx,#d3cbba 16rpx 32rpx);"><text class="ph-label">storefront · {{store.short}}</text></view>
+      </view>
     </view>
     <view class="info">
       <view class="info-t">店铺信息</view>
@@ -13,9 +15,11 @@
     </view>
     <!-- 第 1 张是顶部大图，第 2 张起依次排在店铺信息下面。没有更多图就留空——
          不再补占位条纹：那是开发期脚手架，真实用户看到只会觉得页面没做完。 -->
-    <block wx:for="{{store.images}}" wx:key="*this" wx:for-index="i">
-      <image wx:if="{{i > 0}}" class="sub-real" src="{{item}}" mode="aspectFill" />
-    </block>
+    <view class="shot">
+      <block wx:for="{{store.images}}" wx:key="*this" wx:for-index="i">
+        <image wx:if="{{i > 0}}" class="sub-real" src="{{item}}" mode="aspectFill" />
+      </block>
+    </view>
     <view class="body-space" />
   </scroll-view>
 </view>

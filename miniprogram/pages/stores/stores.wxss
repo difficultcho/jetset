@@ -3,8 +3,9 @@
 .hdr-bar { height: 88rpx; display: flex; align-items: center; justify-content: center; }
 .hdr-brand { font-size: 38rpx; }
 .body { flex: 1; height: 0; }
-.pad { padding: 90rpx 80rpx 40rpx; }
-.entry { margin-bottom: 88rpx; }
+.pad { padding: 24rpx 32rpx 0; }
+.entry { margin-bottom: 32rpx; }
+.entry:last-child { margin-bottom: 0; }
 .entry-img { width: 100%; aspect-ratio: 16 / 10.5; overflow: hidden; }
 .entry-real { width: 100%; height: 100%; }
 .entry-ph {
@@ -14,6 +15,7 @@
 /* 占位说明文字：与 nearby / store-intro / store-detail 一致的小号灰字。
    页面 wxss 互不共享，这里漏了就会退化成正文样式（28rpx 深色），看着像排版坏了。 */
 .ph-label { font-family: monospace; font-size: 20rpx; letter-spacing: 0.2em; color: rgba(70,60,50,0.6); }
-.entry-en { margin-top: 28rpx; font-size: 30rpx; letter-spacing: 0.22em; }
-.entry-cn { margin-top: 10rpx; font-size: 26rpx; color: #555; letter-spacing: 0.08em; }
-.tab-space { height: calc(180rpx + env(safe-area-inset-bottom)); }
+.entry-en { margin-top: 12rpx; font-size: 24rpx; line-height: 1.25; letter-spacing: 0.16em; }
+.entry-cn { margin-top: 4rpx; font-size: 22rpx; line-height: 1.3; color: #555; letter-spacing: 0.04em; }
+/* 只留出底栏本身的高度，再加一点空隙，避免内容被 Tab 挡住时又多出一截可滑区域 */
+.tab-space { height: calc(148rpx + env(safe-area-inset-bottom)); }
