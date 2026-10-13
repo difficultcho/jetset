@@ -7,6 +7,7 @@ from app.errors import BizError
 from app.models.cart import CartItem
 from app.models.catalog import Category, Sku, Spu, SpuImage
 from app.models.series import Series
+from app.models.shop import ShopMenu
 from app.schemas.admin import CategoryIn, ProductIn, SellableReq, StatusReq
 from app.schemas.common import Page, Resp
 
@@ -66,6 +67,38 @@ async def update_category(cat_id: int, req: CategoryIn, session: DB):
         setattr(c, field, value)
     await session.commit()
     return Resp(data={"id": c.id, "name": c.name, "parent_id": c.parent_id, "status": c.status})
+
+
+@router.delete("/categories/{cat_id}", response_model=Resp[None])
+async def delete_category(cat_id: int, session: DB):
+    """删掉品类。有子级或仍挂着商品时拒绝，避免父级被删后子级悬空、商品失去归属。
+
+    关掉子品类不会让父级变成叶子；要让商品能挂回父级，需要把子品类删掉。
+    一级品类在商城左菜单上的配置行一并去掉。
+    """
+    c = await session.get(Category, cat_id)
+    if c is None:
+        raise HTTPException(status_code=404, detail="品类不存在")
+    children = (
+        await session.execute(select(func.count()).where(Category.parent_id == cat_id))
+    ).scalar_one()
+    if children:
+        raise HTTPException(status_code=400, detail=f"仍有 {children} 个子品类，请先删除子品类")
+    used = (
+        await session.execute(select(func.count()).where(Spu.category_id == cat_id))
+    ).scalar_one()
+    if used:
+        raise HTTPException(status_code=400, detail=f"仍有 {used} 个商品归属该品类，请先移出")
+    menu = (
+        await session.execute(
+            select(ShopMenu).where(ShopMenu.kind == "category", ShopMenu.ref_id == cat_id)
+        )
+    ).scalar_one_or_none()
+    if menu is not None:
+        await session.delete(menu)
+    await session.delete(c)
+    await session.commit()
+    return Resp()
 
 
 def _sku_dict(s: Sku) -> dict:

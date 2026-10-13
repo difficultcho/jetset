@@ -2,7 +2,7 @@
   <el-card>
     <div class="toolbar">
       <el-button type="primary" @click="openCreate(null)">+ 新增一级品类</el-button>
-      <span class="hint">商品挂在「叶子」品类下 —— 即没有子级的品类，一级二级都算；隐藏≠删除，商品仍保留归属</span>
+      <span class="hint">商品挂在没有子级的品类上。关闭不会去掉子级，父级仍然不能选；要挂回父级，请删除子品类。有商品或还有子级时不能删</span>
     </div>
     <el-table :data="rows" v-loading="loading">
       <el-table-column prop="sort" label="排序" width="70" />
@@ -25,10 +25,11 @@
           <el-switch :model-value="row.status === 1" @change="(v) => toggle(row, v)" />
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="170">
+      <el-table-column label="操作" width="220">
         <template #default="{ row }">
           <el-button link type="primary" @click="openEdit(row)">编辑</el-button>
           <el-button v-if="!row.parent_id" link @click="openCreate(row.id)">+ 子品类</el-button>
+          <el-button link type="danger" @click="del(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -58,7 +59,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import http from '../api.js'
 
 const cats = ref([])
@@ -118,6 +119,13 @@ async function save() {
   else await http.post('/api/admin/categories', payload(form.value))
   ElMessage.success('已保存')
   dialog.value = false
+  fetch()
+}
+
+async function del(row) {
+  await ElMessageBox.confirm(`删除品类「${row.name}」？有商品或还有子级时会拒绝。`, '确认', { type: 'warning' })
+  await http.delete('/api/admin/categories/' + row.id)
+  ElMessage.success('已删除')
   fetch()
 }
 

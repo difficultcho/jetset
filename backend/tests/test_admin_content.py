@@ -38,12 +38,62 @@ async def test_category_create_update(client):
         "name": "滑雪服测试", "parent_id": child["id"]})
     assert resp.status_code == 400
 
-    # 收尾：隐藏该一级，C 端树恢复原状（不影响目录用例的精确断言）
-    resp = await client.put(f"/api/admin/categories/{top['id']}", headers=h, json={
-        "name": "滑雪服测试", "en": "SKI TEST", "sort": 90, "status": 0})
+    # 收尾：删掉测试品类，C 端树恢复原状（不影响目录用例的精确断言）
+    resp = await client.delete(f"/api/admin/categories/{child['id']}", headers=h)
+    assert resp.status_code == 200
+    resp = await client.delete(f"/api/admin/categories/{top['id']}", headers=h)
     assert resp.status_code == 200
     tops = (await client.get("/api/v1/categories")).json()["data"]
     assert not any(t["id"] == top["id"] for t in tops)
+
+
+async def test_delete_category_frees_parent(client):
+    """子品类关掉后仍占着父级。删掉子品类后，父级不再有子级，商品可以挂上去。"""
+    h = await admin_login(client)
+    top = (await client.post("/api/admin/categories", headers=h, json={
+        "name": "待清空父级", "sort": 91})).json()["data"]
+    child = (await client.post("/api/admin/categories", headers=h, json={
+        "name": "已关闭子级", "parent_id": top["id"], "status": 0})).json()["data"]
+
+    # 还有子级（即使已关闭）不能删父级
+    resp = await client.delete(f"/api/admin/categories/{top['id']}", headers=h)
+    assert resp.status_code == 400
+    assert "子品类" in resp.json()["message"]
+
+    # 子级上有商品时不能删子级
+    product = {
+        "category_id": child["id"], "name": "挂在子级上", "status": 0,
+        "skus": [{"color_index": 0, "color_name": "黑", "color_hex": "#111",
+                  "size": "M", "price": 10000, "stock": 1}],
+    }
+    spu_id = (await client.post("/api/admin/products", headers=h, json=product)).json()["data"]["id"]
+    resp = await client.delete(f"/api/admin/categories/{child['id']}", headers=h)
+    assert resp.status_code == 400
+    assert "商品" in resp.json()["message"]
+    await client.delete(f"/api/admin/products/{spu_id}", headers=h)
+
+    # 一级品类的商城菜单配置随品类一起去掉
+    await client.put("/api/admin/shop/menus", headers=h, json={
+        "kind": "category", "ref_id": top["id"], "title": "待删菜单", "banners": []})
+    resp = await client.delete(f"/api/admin/categories/{child['id']}", headers=h)
+    assert resp.status_code == 200
+    resp = await client.delete(f"/api/admin/categories/{top['id']}", headers=h)
+    assert resp.status_code == 200
+
+    cats = (await client.get("/api/admin/categories", headers=h)).json()["data"]
+    assert not any(c["id"] in (top["id"], child["id"]) for c in cats)
+    menus = (await client.get("/api/admin/shop/menus", headers=h)).json()["data"]
+    assert not any(m["kind"] == "category" and m["ref_id"] == top["id"] for m in menus)
+
+    # 删干净之后，父级自己可以接收商品
+    again = (await client.post("/api/admin/categories", headers=h, json={
+        "name": "待清空父级", "sort": 91})).json()["data"]
+    hung = (await client.post("/api/admin/products", headers=h, json={
+        **product, "category_id": again["id"], "name": "挂回父级"})).json()["data"]
+    assert hung["id"]
+    await client.delete(f"/api/admin/products/{hung['id']}", headers=h)
+    resp = await client.delete(f"/api/admin/categories/{again['id']}", headers=h)
+    assert resp.status_code == 200
 
 
 async def test_series_crud_and_c_end(client):
