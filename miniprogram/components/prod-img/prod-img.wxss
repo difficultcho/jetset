@@ -3,6 +3,24 @@
   width: 100%;
   height: 100%;
 }
+.frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.mark {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  padding: 8rpx 12rpx;
+  background: rgba(17, 17, 17, 0.82);
+  color: #fff;
+  font-size: 20rpx;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
 .real-img {
   width: 100%;
   height: 100%;

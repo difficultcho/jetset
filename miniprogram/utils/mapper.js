@@ -33,6 +33,7 @@ function toCard(p) {
     sale: hasSale,
     saleText: hasSale ? fmt(p.original_price) : '',
     badge: p.badge || '',
+    sellable: p.sellable !== false,
     sw: p.color_hexes && p.color_hexes.length ? p.color_hexes : ['#c9b79b'],
     colorHex: (p.color_hexes && p.color_hexes[0]) || '#c9b79b',
     img: fullImg(p.image)
@@ -136,7 +137,10 @@ function toCartItem(it) {
     price: yuan(it.price),
     priceText: fmt(it.price),
     stock: it.stock,
-    prod: { en: it.en_model, sw: [it.color_hex || '#c9b79b'], img: fullImg(it.image) }
+    prod: {
+      en: it.en_model, sw: [it.color_hex || '#c9b79b'], img: fullImg(it.image),
+      sellable: it.sellable !== false
+    }
   };
 }
 

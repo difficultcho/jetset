@@ -23,6 +23,7 @@ def spu_to_list_item(spu: Spu, series_en: str = "") -> dict:
         "original_price": spu.original_price,
         "badge": spu.badge,
         "has_video": spu.has_video,
+        "sellable": spu.sellable,
         "image": _first_image(spu),
         "color_hexes": [colors[i] for i in sorted(colors)],
     }

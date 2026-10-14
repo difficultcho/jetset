@@ -29,6 +29,7 @@ async def _cart_out(session, user_id: int) -> list[CartItemOut]:
             name=sku.spu.name, en_model=sku.spu.code or sku.spu.en_model,
             color_name=sku.color_name, color_hex=sku.color_hex, size=sku.size,
             price=sku.price, stock=sku.stock, image=_color_image(sku) or None,
+            sellable=sku.spu.sellable,
         )
         for ci, sku in rows
     ]
@@ -49,7 +50,7 @@ async def add_item(req: CartAdd, user: CurrentUser, session: DB):
     if sku is None or sku.status != 1:
         raise HTTPException(status_code=404, detail="商品规格不存在")
     if not sku.spu.sellable:
-        raise BizError("暂不支持购买")
+        raise BizError("中国境内未引进，请联系客服")
     existing = (
         await session.execute(
             select(CartItem).where(CartItem.user_id == user.id, CartItem.sku_id == req.sku_id)

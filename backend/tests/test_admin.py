@@ -147,12 +147,15 @@ async def test_unsellable_cannot_be_bought(client):
     spu_id = (await client.post("/api/admin/products", headers=h, json=payload)).json()["data"]["id"]
     detail = (await client.get(f"/api/v1/products/{spu_id}")).json()["data"]
     assert detail["sellable"] is False
+    listing = (await client.get("/api/v1/products", params={"page_size": 100})).json()["data"]
+    row = next(p for p in listing["items"] if p["id"] == spu_id)
+    assert row["sellable"] is False
     sku_id = detail["skus"][0]["id"]
 
     resp = await client.post("/api/v1/cart/items", headers=user_h,
                              json={"sku_id": sku_id, "qty": 1})
     assert resp.status_code == 400
-    assert resp.json()["message"] == "暂不支持购买"
+    assert resp.json()["message"] == "中国境内未引进，请联系客服"
 
     addr = await client.post("/api/v1/addresses", headers=user_h, json={
         "name": "陈列", "phone": "13900000001", "region": "", "detail": "路 1 号"})
@@ -161,7 +164,7 @@ async def test_unsellable_cannot_be_bought(client):
         "address_id": addr.json()["data"]["id"],
     })
     assert resp.status_code == 400
-    assert resp.json()["message"] == "暂不支持购买"
+    assert resp.json()["message"] == "中国境内未引进，请联系客服"
 
     # 重新打开后恢复购买
     resp = await client.post(f"/api/admin/products/{spu_id}/sellable", headers=h,

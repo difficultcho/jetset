@@ -65,7 +65,12 @@ Page({
       app.globalData.pickedAddrId = null;
       wx.redirectTo({ url: '/pages/payment/payment?id=' + order.id });
     } catch (e) {
-      wx.showToast({ title: (e && e.message) || '提交失败', icon: 'none' });
+      const msg = (e && e.message) || '提交失败';
+      if (msg === '中国境内未引进，请联系客服') {
+        wx.showModal({ content: msg, showCancel: false });
+      } else {
+        wx.showToast({ title: msg, icon: 'none' });
+      }
       this.setData({ submitting: false });
     }
   }

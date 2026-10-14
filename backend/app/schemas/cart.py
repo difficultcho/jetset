@@ -23,3 +23,4 @@ class CartItemOut(BaseModel):
     price: int
     stock: int
     image: str | None
+    sellable: bool = True

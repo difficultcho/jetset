@@ -15,6 +15,7 @@
         <view wx:if="{{prod.imgsList[ci].length > 1}}" class="hero-dots">
           <view class="hdot {{heroIdx === index ? 'on' : ''}}" wx:for="{{prod.imgsList[ci]}}" wx:key="*this" />
         </view>
+        <view wx:if="{{!prod.sellable}}" class="unsell-mark">未引进</view>
       </block>
       <prod-img wx:else prod="{{prod}}" ci="{{ci}}" />
     </view>

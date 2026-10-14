@@ -84,7 +84,7 @@ Page({
 
   async addBag() {
     if (this.data.prod && !this.data.prod.sellable) {
-      return wx.showToast({ title: '暂不支持购买', icon: 'none' });
+      return wx.showModal({ content: '中国境内未引进，请联系客服', showCancel: false });
     }
     const sku = this._sku();
     if (!sku) return wx.showToast({ title: '该规格暂不可选', icon: 'none' });
@@ -96,13 +96,18 @@ Page({
       if (f) f.refresh();
       wx.showToast({ title: '已加入购物袋', icon: 'none' });
     } catch (err) {
-      wx.showToast({ title: (err && err.message) || '加入失败', icon: 'none' });
+      const msg = (err && err.message) || '加入失败';
+      if (msg === '中国境内未引进，请联系客服') {
+        wx.showModal({ content: msg, showCancel: false });
+      } else {
+        wx.showToast({ title: msg, icon: 'none' });
+      }
     }
   },
 
   buyNow() {
     if (this.data.prod && !this.data.prod.sellable) {
-      return wx.showToast({ title: '暂不支持购买', icon: 'none' });
+      return wx.showModal({ content: '中国境内未引进，请联系客服', showCancel: false });
     }
     const sku = this._sku();
     if (!sku) return wx.showToast({ title: '该规格暂不可选', icon: 'none' });

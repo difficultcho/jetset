@@ -10,8 +10,11 @@
     <!-- 视频块（纯播放器，不跳转；进屏自动播） -->
     <view wx:elif="{{item.kind === 'video'}}" class="gb {{item.inset ? 'gb-inset' : ''}}"
       style="aspect-ratio:{{item.ratio || '3/3.4'}};">
+      <!-- 裸写 controls 会被当成 true。关掉后 poster 不再生效，播出来之前是黑的。 -->
       <video id="vb{{index}}" class="gb-fill" src="{{item.src}}" poster="{{item.poster}}"
-        controls muted loop show-mute-btn object-fit="cover" />
+        controls="{{false}}" show-mute-btn="{{false}}" show-center-play-btn="{{false}}"
+        show-play-btn="{{false}}" show-fullscreen-btn="{{false}}" show-progress="{{false}}"
+        enable-progress-gesture="{{false}}" muted loop object-fit="cover" />
     </view>
     <!-- 文本块 -->
     <view wx:elif="{{item.kind === 'text'}}" class="gt gt-{{item.preset}} gt-{{item.align}}"

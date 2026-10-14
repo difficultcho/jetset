@@ -1,4 +1,7 @@
-<image wx:if="{{src}}" class="real-img" src="{{src}}" mode="aspectFill" />
-<view wx:else class="ph-solid" style="background:{{tint}};">
-  <text class="ph-label">{{ph}}</text>
+<view class="frame">
+  <image wx:if="{{src}}" class="real-img" src="{{src}}" mode="aspectFill" />
+  <view wx:else class="ph-solid" style="background:{{tint}};">
+    <text class="ph-label">{{ph}}</text>
+  </view>
+  <view wx:if="{{unsellable}}" class="mark">未引进</view>
 </view>

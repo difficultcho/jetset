@@ -16,6 +16,11 @@
 .hero-dots { position: absolute; bottom: 20rpx; left: 0; right: 0; display: flex; justify-content: center; gap: 10rpx; z-index: 2; }
 .hdot { width: 10rpx; height: 10rpx; border-radius: 50%; background: rgba(120, 120, 120, 0.4); }
 .hdot.on { background: #111; }
+.unsell-mark {
+  position: absolute; top: 0; right: 0; z-index: 2;
+  padding: 12rpx 18rpx; background: rgba(17, 17, 17, 0.82); color: #fff;
+  font-size: 22rpx; letter-spacing: 0.08em; line-height: 1.2; pointer-events: none;
+}
 
 .info { padding: 28rpx 32rpx 0; }
 .name-row { display: flex; align-items: flex-start; justify-content: space-between; }

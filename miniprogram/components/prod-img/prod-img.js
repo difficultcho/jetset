@@ -5,7 +5,7 @@ Component({
     ci: { type: Number, value: 0 },
     label: { type: String, value: '' }  // 占位标签文字，缺省用商品英文名
   },
-  data: { src: '', tint: '#ece5dd', tint2: '#e4dccf', ph: '' },
+  data: { src: '', tint: '#ece5dd', tint2: '#e4dccf', ph: '', unsellable: false },
   observers: {
     'prod, ci, label'(prod, ci, label) {
       if (!prod) return;
@@ -18,7 +18,11 @@ Component({
         tint = _tint(hex, 0.82);
         tint2 = _tint(hex, 0.72);
       }
-      this.setData({ src, tint, tint2, ph: label || prod.en || prod.name || '' });
+      this.setData({
+        src, tint, tint2,
+        ph: label || prod.en || prod.name || '',
+        unsellable: prod.sellable === false
+      });
     }
   }
 });

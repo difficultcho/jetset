@@ -19,6 +19,7 @@ class ProductListItem(BaseModel):
     original_price: int | None = None
     badge: str | None
     has_video: bool = False
+    sellable: bool = True
     image: str | None
     color_hexes: list[str]
 
