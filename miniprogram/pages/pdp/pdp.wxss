@@ -17,10 +17,13 @@
 .hdot { width: 10rpx; height: 10rpx; border-radius: 50%; background: rgba(120, 120, 120, 0.4); }
 .hdot.on { background: #111; }
 .unsell-mark {
-  position: absolute; top: 0; right: 0; z-index: 2;
-  padding: 12rpx 18rpx; background: rgba(17, 17, 17, 0.82); color: #fff;
-  font-size: 22rpx; letter-spacing: 0.08em; line-height: 1.2; pointer-events: none;
+  position: absolute; left: 0; bottom: 0; z-index: 3;
+  display: flex; align-items: center; gap: 10rpx;
+  padding: 10rpx 16rpx 10rpx 10rpx;
+  background: rgba(247, 245, 242, 0.94); color: #1a1a1a;
+  font-size: 22rpx; letter-spacing: 0.06em; line-height: 1.2; pointer-events: none;
 }
+.unsell-flag { width: 34rpx; height: 22rpx; flex-shrink: 0; display: block; }
 
 .info { padding: 28rpx 32rpx 0; }
 .name-row { display: flex; align-items: flex-start; justify-content: space-between; }

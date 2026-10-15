@@ -1,8 +1,9 @@
 /* 首页——严格照设计稿，1 设计 px = 2rpx */
-.page { height: 100vh; display: flex; flex-direction: column; background: #fff; }
+page { background: #f3f3f3; }
+.page { height: 100vh; display: flex; flex-direction: column; background: #f3f3f3; }
 
 /* 头部 44px 高，padding 0 14px；品牌 19px/300/.32em */
-.hdr { background: rgba(255, 255, 255, 0.97); flex-shrink: 0; z-index: 10; }
+.hdr { background: #f3f3f3; flex-shrink: 0; z-index: 10; }
 .hdr-bar { height: 88rpx; display: flex; align-items: center; position: relative; padding: 0 28rpx; }
 .hdr-left { display: flex; gap: 32rpx; align-items: center; }
 .ic-search { width: 42rpx; height: 42rpx; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='21' height='21' fill='none' stroke='%23111' stroke-width='1.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M16 16 L20.5 20.5'/%3E%3C/svg%3E") no-repeat center / contain; }
@@ -11,7 +12,7 @@
 .bag-badge { position: absolute; top: -10rpx; right: -14rpx; min-width: 28rpx; height: 28rpx; padding: 0 6rpx; box-sizing: border-box; border-radius: 14rpx; background: #111; color: #fff; font-size: 18rpx; line-height: 28rpx; text-align: center; }
 .hdr-brand { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 38rpx; }
 
-.body { flex: 1; height: 0; }
+.body { flex: 1; height: 0; background: #f3f3f3; }
 
 /* 通用 monospace 占位标签 10px/.2em */
 .mono-label { font-family: monospace; font-size: 20rpx; letter-spacing: 0.2em; color: rgba(80, 60, 45, 0.6); }

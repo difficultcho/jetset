@@ -3,5 +3,8 @@
   <view wx:else class="ph-solid" style="background:{{tint}};">
     <text class="ph-label">{{ph}}</text>
   </view>
-  <view wx:if="{{unsellable}}" class="mark">未引进</view>
+  <view wx:if="{{unsellable}}" class="mark">
+    <image class="mark-flag" src="/assets/it-flag.png" mode="aspectFill" />
+    <text>EU Exclusive</text>
+  </view>
 </view>

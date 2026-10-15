@@ -1,4 +1,5 @@
 {
+  "backgroundColor": "#f3f3f3",
   "usingComponents": {
     "page-blocks": "/components/page-blocks/page-blocks",
     "fab-stack": "/components/fab-stack/fab-stack"

@@ -10,16 +10,28 @@
 }
 .mark {
   position: absolute;
-  top: 0;
-  right: 0;
+  left: 0;
+  bottom: 0;
   z-index: 2;
-  padding: 8rpx 12rpx;
-  background: rgba(17, 17, 17, 0.82);
-  color: #fff;
-  font-size: 20rpx;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 6rpx 10rpx 6rpx 6rpx;
+  background: rgba(247, 245, 242, 0.94);
+  color: #1a1a1a;
+  font-size: 18rpx;
   line-height: 1.2;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
   pointer-events: none;
+}
+.mark-flag {
+  width: 26rpx;
+  height: 18rpx;
+  flex-shrink: 0;
+  display: block;
 }
 .real-img {
   width: 100%;
