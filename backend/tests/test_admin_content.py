@@ -126,6 +126,34 @@ async def test_series_crud_and_c_end(client):
     assert resp.status_code == 200
 
 
+async def test_legacy_series_columns_do_not_block_create(client):
+    """旧库的 subtitle/cover/cover_tint 是 NOT NULL 且没有数据库默认值。
+    模型已不再写入这三列，启动迁移必须把它们删掉，否则新增系列会 500。"""
+    from sqlalchemy import text
+
+    from app.db import create_all, engine
+
+    async with engine.begin() as conn:
+        for col, ddl in (
+            ("subtitle", "VARCHAR(128) NOT NULL DEFAULT ''"),
+            ("cover", "VARCHAR(512) NOT NULL DEFAULT ''"),
+            ("cover_tint", "VARCHAR(16) NOT NULL DEFAULT ''"),
+        ):
+            await conn.execute(text(f"ALTER TABLE series ADD COLUMN {col} {ddl}"))
+    await create_all()
+    async with engine.begin() as conn:
+        rows = (await conn.execute(text("PRAGMA table_info(series)"))).all()
+    names = {r[1] for r in rows}
+    assert not {"subtitle", "cover", "cover_tint"} & names
+
+    h = await admin_login(client)
+    resp = await client.post("/api/admin/series", headers=h, json={
+        "name": "迁移后可新建", "en": "AFTER DROP", "sort": 1})
+    assert resp.status_code == 200, resp.text
+    sid = resp.json()["data"]["id"]
+    await client.delete(f"/api/admin/series/{sid}", headers=h)
+
+
 async def test_product_new_fields_roundtrip(client):
     h = await admin_login(client)
     cats = (await client.get("/api/admin/categories", headers=h)).json()["data"]

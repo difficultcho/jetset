@@ -53,10 +53,42 @@ def _add_missing_columns(conn) -> None:
             logging.getLogger(__name__).warning("列迁移：%s 表新增列 %s", table.name, col.name)
 
 
+# 模型已经删掉、旧库仍留着的列。这些列当初只有 ORM 默认值，没有数据库默认值，
+# 所以是 NOT NULL。ORM 不再写入它们时，MySQL 严格模式会让 INSERT 直接 500。
+_RETIRED_COLUMNS = {
+    "series": ("subtitle", "cover", "cover_tint"),
+}
+
+
+def _drop_retired_columns(conn) -> None:
+    """删掉明确废弃的列。幂等：列已不在则跳过。仍在模型里的列不会删。"""
+    import logging
+
+    from sqlalchemy import inspect, text
+
+    insp = inspect(conn)
+    quote = conn.dialect.identifier_preparer.quote
+    log = logging.getLogger(__name__)
+    for table_name, cols in _RETIRED_COLUMNS.items():
+        table = Base.metadata.tables.get(table_name)
+        if table is None or not insp.has_table(table_name):
+            continue
+        live = {c.name for c in table.columns}
+        existing = {c["name"] for c in insp.get_columns(table_name)}
+        for col in cols:
+            if col in live:
+                raise RuntimeError(f"{table_name}.{col} 仍在模型里，不能当作废弃列删除")
+            if col not in existing:
+                continue
+            conn.execute(text(f"ALTER TABLE {quote(table_name)} DROP COLUMN {quote(col)}"))
+            log.warning("列迁移：%s 表删除废弃列 %s", table_name, col)
+
+
 async def create_all() -> None:
     # MVP 阶段启动建表 + 轻量列迁移；schema 复杂化后改为 alembic
     from app import models  # noqa: F401  确保模型已注册
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await conn.run_sync(_drop_retired_columns)
         await conn.run_sync(_add_missing_columns)
