@@ -35,7 +35,7 @@
 - **设计令牌**集中在 `app.wxss`（颜色/按钮/品牌字标/占位斜纹）
 - **公共组件**：`nav-bar`（子页导航）、`prod-img`（真图优先，无图暖沙斜纹占位）、
   `product-card`（网格商品卡）、`fab-stack`（客服/购物袋/回顶悬浮按钮）、`custom-tab-bar`
-- **数据映射**统一在 `utils/mapper.js`（分→元千分位）；`utils/aurelle-data.js` 存门店/帮助/尺码等静态内容
+- **数据映射**统一在 `utils/mapper.js`（分→元千分位）；`utils/jetset-data.js` 存门店/帮助/尺码等静态内容
 - **请求层** `utils/{config,request,api}.js` 未变：静默登录、401 重试、按平台切换后端地址
 
 ## 运行

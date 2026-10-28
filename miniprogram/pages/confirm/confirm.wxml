@@ -47,24 +47,42 @@
       <view class="card-t">包装选择</view>
       <view class="pkgs">
         <view class="pkg {{packaging === 'classic' ? 'on' : ''}}" data-p="classic" bindtap="pickPackaging">
-          <view class="pkg-img" style="background:repeating-linear-gradient(135deg,#e7ded0 0 12rpx,#ded3c0 12rpx 24rpx);" />
+          <view class="pkg-img"><image src="/assets/pack-classic.jpg" mode="aspectFill" /></view>
           <view class="pkg-t">经典包装</view>
           <view class="pkg-d">品牌礼盒 + 丝带</view>
         </view>
         <view class="pkg {{packaging === 'eco' ? 'on' : ''}}" data-p="eco" bindtap="pickPackaging">
-          <view class="pkg-img" style="background:repeating-linear-gradient(135deg,#dfe3da 0 12rpx,#d4dacd 12rpx 24rpx);" />
+          <view class="pkg-img"><image src="/assets/pack-eco.jpg" mode="aspectFill" /></view>
           <view class="pkg-t">环保包装</view>
           <view class="pkg-d">可回收材质</view>
         </view>
       </view>
     </view>
 
-    <view class="agree" bindtap="toggleAgree">
-      <view class="checkbox {{agree ? 'on' : ''}}" />
-      <text class="agree-t">提交订单即表明您接受我们的销售条款</text>
+    <view class="agree">
+      <view class="checkbox {{agree ? 'on' : ''}}" bindtap="toggleAgree" />
+      <view class="agree-t">
+        <text bindtap="toggleAgree">提交订单即表明您接受我们的</text><text class="agree-link" catchtap="openTerms">销售条款</text>
+      </view>
     </view>
     <view class="body-space" />
   </scroll-view>
+
+  <view wx:if="{{showTerms}}" class="terms-mask" bindtap="closeTerms" catchtouchmove="noop">
+    <view class="terms-dialog" catchtap="noop">
+      <view class="terms-hd">
+        <text class="terms-title">销售条款</text>
+        <view class="terms-x" catchtap="closeTerms">×</view>
+      </view>
+      <scroll-view class="terms-body" scroll-y>
+        <view class="terms-sec" wx:for="{{terms}}" wx:key="title">
+          <view class="terms-h">{{item.title}}</view>
+          <view class="terms-p" wx:for="{{item.paras}}" wx:for-item="para" wx:key="*this">{{para}}</view>
+        </view>
+      </scroll-view>
+      <view class="terms-ok" catchtap="closeTerms">关闭</view>
+    </view>
+  </view>
 
   <view class="bar">
     <view class="bar-info"><text class="bar-cnt">共{{lines.length}}件商品</text><text class="bar-label">总计：</text><text class="bar-num">¥ {{payText}}</text></view>

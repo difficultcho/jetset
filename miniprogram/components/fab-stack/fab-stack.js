@@ -4,7 +4,7 @@ Component({
     showService: { type: Boolean, value: false },
     showBag: { type: Boolean, value: false },
     showTop: { type: Boolean, value: false },
-    bagSize: { type: Number, value: 52 },  // pdp 用 44
+    bagSize: { type: Number, value: 104 },  // 设计稿 52px；pdp 用 88（44px）
     bottom: { type: Number, value: 104 },
     aboveTab: { type: Boolean, value: false } // Tab 页：自动抬到 tabBar 之上（含安全区）
   },

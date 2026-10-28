@@ -1,4 +1,4 @@
-const { sizeApparel, sizeBody, sizeShoe } = require('../../utils/aurelle-data.js');
+const { sizeApparel, sizeBody, sizeShoe } = require('../../utils/jetset-data.js');
 Page({
   data: {
     tables: [

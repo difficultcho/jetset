@@ -73,14 +73,6 @@
       </view>
     </view>
 
-    <!-- 尊享服务 -->
-    <view class="services">
-      <view class="svc"><view class="svc-ic ic-vip" /><text class="svc-t">专属客服</text></view>
-      <view class="svc"><view class="svc-ic ic-return" /><text class="svc-t">退换货服务</text></view>
-      <view class="svc"><view class="svc-ic ic-ship" /><text class="svc-t">顺丰速达</text></view>
-      <view class="svc"><view class="svc-ic ic-gift" /><text class="svc-t">礼品包装</text></view>
-    </view>
-
     <!-- 热门推荐 -->
     <view class="recs-title">热门推荐</view>
     <view class="recs">
@@ -97,5 +89,5 @@
     <view class="act-star {{wished ? 'on' : ''}}" bindtap="toggleWish" />
   </view>
 
-  <fab-stack id="fab" show-bag show-service bag-size="{{44}}" bottom="{{200}}" />
+  <fab-stack id="fab" show-bag show-service bag-size="{{88}}" bottom="{{200}}" />
 </view>

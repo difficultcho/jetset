@@ -1,4 +1,4 @@
-const { helps } = require('../../utils/aurelle-data.js');
+const { helps } = require('../../utils/jetset-data.js');
 Page({
   data: { title: '帮助中心', qas: [], isSize: false },
   onLoad(opts) {

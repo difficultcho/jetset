@@ -1,6 +1,7 @@
 const app = getApp();
 const api = require('../../utils/api.js');
 const { toOrderLine, toAddress, fmt } = require('../../utils/mapper.js');
+const { salesTerms } = require('../../utils/jetset-data.js');
 
 Page({
   data: {
@@ -10,7 +11,9 @@ Page({
     addr: null,
     packaging: 'classic',
     agree: false,
-    submitting: false
+    submitting: false,
+    showTerms: false,
+    terms: salesTerms
   },
 
   onLoad() {
@@ -47,6 +50,9 @@ Page({
   goAddress() { wx.navigateTo({ url: '/pages/addresses/addresses?select=1' }); },
   pickPackaging(e) { this.setData({ packaging: e.currentTarget.dataset.p }); },
   toggleAgree() { this.setData({ agree: !this.data.agree }); },
+  openTerms() { this.setData({ showTerms: true }); },
+  closeTerms() { this.setData({ showTerms: false }); },
+  noop() {},
 
   async submit() {
     if (this.data.submitting) return;
