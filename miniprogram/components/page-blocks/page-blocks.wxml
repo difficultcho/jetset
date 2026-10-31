@@ -1,4 +1,5 @@
 <!-- 配置化页面块渲染器：五种块自由编排，供首页/品牌页/任意内容页共用 -->
+<wxs src="./marquee.wxs" module="mq" />
 <block wx:for="{{blocks}}" wx:key="bkey">
   <view class="gseg {{item.kind === 'image' && item.ratio === 'hero' ? 'gseg-flush' : ''}}{{item.kind === 'text' && item.preset === 'eyebrow' ? ' gseg-caption' : ''}}">
     <!-- 图片块 -->
@@ -30,21 +31,23 @@
         <text wx:if="{{item.right}}" class="ul-link" data-i="{{index}}" data-side="right" bindtap="goLink">{{item.right.text}}</text>
       </view>
     </view>
-    <!-- 走马灯块（单向圆点） -->
+    <!-- 走马灯：匀速连续向左。槽宽 500rpx，轨道是两份，所以宽度是件数 × 1000。 -->
     <view wx:elif="{{item.kind === 'carousel' && item.items.length}}" class="gcarousel">
-      <swiper class="prod-swiper" autoplay circular interval="4000" duration="600"
-        data-i="{{index}}" bindchange="onCarousel">
-        <swiper-item wx:for="{{item.items}}" wx:for-item="p" wx:key="id" data-id="{{p.id}}" bindtap="goPdp">
-          <view class="prod-frame">
-            <view class="prod-img"><prod-img prod="{{p}}" /></view>
-            <view class="prod-line">{{p.en}}</view>
-            <view class="prod-sub">{{p.name}}</view>
+      <view class="marquee">
+        <view class="marquee-track mq-{{index}}" data-mq="{{index}}"
+          style="width: {{item.items.length * 1000}}rpx; animation-duration: {{item.items.length * 6}}s;"
+          bindtouchstart="{{mq.hold}}" bindtouchend="{{mq.release}}" bindtouchcancel="{{mq.release}}">
+          <view class="marquee-set" wx:for="{{[0, 1]}}" wx:for-item="copy" wx:for-index="copyIdx" wx:key="*this">
+            <view class="marquee-item" wx:for="{{item.items}}" wx:for-item="p" wx:for-index="pidx" wx:key="id"
+              data-id="{{p.id}}" data-mq="{{index}}" bindtap="goPdp">
+              <view class="prod-frame">
+                <view class="prod-img"><prod-img prod="{{p}}" /></view>
+                <view class="prod-line">{{p.en}}</view>
+                <view class="prod-sub">{{p.name}}</view>
+              </view>
+            </view>
           </view>
-        </swiper-item>
-      </swiper>
-      <view class="prod-dots">
-        <view class="pdot {{(dots[index] || 0) === di ? 'on' : ''}}" wx:for="{{item.items}}"
-          wx:for-item="d" wx:for-index="di" wx:key="id" />
+        </view>
       </view>
     </view>
   </view>

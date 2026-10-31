@@ -1,13 +1,12 @@
 const nav = require('../../utils/nav.js');
 
-// 配置化页面块渲染器：接收已解析的块序列，负责跳转 / 走马灯圆点 / 视频进屏自动播。
+// 配置化页面块渲染器：接收已解析的块序列，负责跳转 / 视频进屏自动播。
+// 走马灯的按住暂停在 marquee.wxs，不经过这里。
 Component({
   properties: {
     blocks: { type: Array, value: [], observer(v) { this._watchVideos(v); } },
     heroH: { type: Number, value: 0 }   // 撑满首屏图的高度（页面按自身头部算好传入）
   },
-
-  data: { dots: {} },   // 走马灯块索引 → 当前圆点
 
   lifetimes: {
     detached() { this._disconnect(); }
@@ -36,8 +35,6 @@ Component({
         if (b.kind === 'video') wx.createVideoContext('vb' + i, this).pause();
       });
     },
-
-    onCarousel(e) { this.setData({ ['dots.' + e.currentTarget.dataset.i]: e.detail.current }); },
 
     goPdp(e) { wx.navigateTo({ url: '/pages/pdp/pdp?id=' + e.currentTarget.dataset.id }); },
 

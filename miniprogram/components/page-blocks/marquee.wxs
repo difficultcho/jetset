@@ -1,0 +1,27 @@
+// 按住时停在手指下，松手继续。走视图层改播放状态，避免 setData 把动画打回起点。
+
+function track(event, ownerInstance) {
+  var cur = event.currentTarget && event.currentTarget.dataset
+  var i = cur && cur.mq
+  if (i === undefined || i === '') {
+    var ds = event.instance && event.instance.getDataset()
+    i = ds && ds.mq
+  }
+  if (i === undefined || i === '') return null
+  return ownerInstance.selectComponent('.mq-' + i)
+}
+
+function hold(event, ownerInstance) {
+  var node = track(event, ownerInstance)
+  if (node) node.setStyle({ 'animation-play-state': 'paused' })
+}
+
+function release(event, ownerInstance) {
+  var node = track(event, ownerInstance)
+  if (node) node.setStyle({ 'animation-play-state': 'running' })
+}
+
+module.exports = {
+  hold: hold,
+  release: release
+}

@@ -34,15 +34,25 @@
 .lr-slot { min-width: 0; }
 .lr-right { text-align: right; }
 
-/* 走马灯 */
+/* 走马灯。商品图仍是 405rpx（原来一屏宽的 54%），槽收成 500rpx，相邻图间距约 95rpx。
+   6 秒经过一件；件数只拉长整圈时间。轨道宽度在 wxml 里按件数 × 1000rpx 计算。 */
 .gcarousel { padding: 0 0 16rpx; }
-.prod-swiper { width: 100%; height: 640rpx; }
+.marquee { width: 100%; height: 640rpx; overflow: hidden; }
+.marquee-track {
+  display: flex; flex-wrap: nowrap; height: 100%;
+  animation-name: marquee-shift; animation-timing-function: linear; animation-iteration-count: infinite;
+}
+.marquee-set { display: flex; flex: none; height: 100%; }
+.marquee-item { width: 500rpx; flex: none; height: 100%; }
 .prod-frame { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; }
-.prod-img { width: 54%; aspect-ratio: 3 / 3.6; overflow: hidden; }
+.prod-img { width: 405rpx; aspect-ratio: 3 / 3.6; overflow: hidden; }
+.prod-line, .prod-sub { width: 100%; box-sizing: border-box; padding: 0 8rpx; text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .prod-line { margin-top: 36rpx; font-size: 24rpx; letter-spacing: 0.24em; color: #3a3a3a; }
 .prod-sub { margin-top: 12rpx; font-size: 24rpx; color: #9a9a9a; letter-spacing: 0.05em; }
-.prod-dots { display: flex; justify-content: center; gap: 10rpx; margin-top: 32rpx; }
-.pdot { width: 8rpx; height: 8rpx; border-radius: 50%; background: rgba(120, 120, 120, 0.4); }
-.pdot.on { background: #111; }
+
+@keyframes marquee-shift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
 
 .gb-bottom { height: 40rpx; }
