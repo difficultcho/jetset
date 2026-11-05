@@ -11,7 +11,7 @@ class OrderStatus:
     PENDING_PAYMENT = "pending_payment"
     PENDING_SHIPMENT = "pending_shipment"
     PENDING_RECEIPT = "pending_receipt"
-    PENDING_REVIEW = "pending_review"
+    PENDING_REVIEW = "pending_review"  # 已停用。旧单由定时任务收成已完成。
     COMPLETED = "completed"
     CANCELLED = "cancelled"
 

@@ -210,11 +210,26 @@ async def mark_order_paid(session: AsyncSession, order: Order,
     return True
 
 
+def _finish_order(order: Order, now) -> None:
+    order.status = OrderStatus.COMPLETED
+    if order.completed_at is None:
+        order.completed_at = now
+
+
 async def confirm_receipt(session: AsyncSession, order: Order) -> None:
     if order.status != OrderStatus.PENDING_RECEIPT:
         raise BizError("当前状态不可确认收货")
-    order.status = OrderStatus.PENDING_REVIEW
-    order.completed_at = utcnow()
+    _finish_order(order, utcnow())
+
+
+# 用户未点确认时，由运维收口。待评价是已停用的旧状态，同样允许收成已完成。
+_COMPLETABLE = {OrderStatus.PENDING_RECEIPT, OrderStatus.PENDING_REVIEW}
+
+
+async def mark_completed(session: AsyncSession, order: Order) -> None:
+    if order.status not in _COMPLETABLE:
+        raise BizError("当前状态不可标为已完成")
+    _finish_order(order, utcnow())
 
 
 async def cancel_expired_orders(session: AsyncSession) -> int:

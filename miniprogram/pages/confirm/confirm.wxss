@@ -29,8 +29,9 @@
 .ship-val { color: #666; }
 
 .pkgs { display: flex; gap: 20rpx; }
-.pkg { flex: 1; border: 1rpx solid #eee; padding: 16rpx; }
-.pkg.on { border-color: #111; }
+/* 图片默认宽度会把格子撑出边框，盖住右边那张选中框的左线。min-width: 0 让格子能收缩，溢出裁在框内。 */
+.pkg { flex: 1; min-width: 0; box-sizing: border-box; border: 2rpx solid #eee; padding: 16rpx; overflow: hidden; }
+.pkg.on { position: relative; z-index: 1; border-color: #111; }
 .pkg-img { width: 100%; aspect-ratio: 4 / 3.2; overflow: hidden; background: #f3f3f3; }
 .pkg-img image { width: 100%; height: 100%; display: block; }
 .pkg-t { font-size: 25rpx; margin-top: 14rpx; }

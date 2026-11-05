@@ -26,6 +26,13 @@
         <text class="oline-price">¥ {{it.priceText}}</text>
       </view>
       <view class="way-row"><text>配送方式</text><text class="way-val">顺丰包邮</text></view>
+      <view wx:if="{{order.shipment}}" class="way-row">
+        <text>运单号</text>
+        <view class="no-right">
+          <text class="way-val">{{order.shipment.company}} {{order.shipment.tracking_no}}</text>
+          <view class="ic-copy" bindtap="copyTrack" />
+        </view>
+      </view>
       <view class="invoice">如需开发票请联系在线客服</view>
     </view>
 
@@ -43,5 +50,8 @@
   <view wx:if="{{pending}}" class="bar">
     <view class="bar-btn ghost" bindtap="goCancel">取消订单</view>
     <view class="bar-btn solid" bindtap="goPay">立即支付</view>
+  </view>
+  <view wx:elif="{{awaiting}}" class="bar">
+    <view class="bar-btn solid" bindtap="confirmReceipt">{{confirming ? '提交中…' : '确认收货'}}</view>
   </view>
 </view>

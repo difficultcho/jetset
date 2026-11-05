@@ -23,5 +23,23 @@ Page({
   },
 
   pickSub(e) { this.setData({ si: e.currentTarget.dataset.i }, () => this.fetch()); },
-  goDetail(e) { wx.navigateTo({ url: '/pages/order-detail/order-detail?id=' + e.currentTarget.dataset.id }); }
+  goDetail(e) { wx.navigateTo({ url: '/pages/order-detail/order-detail?id=' + e.currentTarget.dataset.id }); },
+
+  confirmReceipt(e) {
+    const id = e.currentTarget.dataset.id;
+    wx.showModal({
+      title: '确认收货',
+      content: '确认已收到商品？',
+      success: async (r) => {
+        if (!r.confirm) return;
+        try {
+          await api.orderConfirm(id);
+          wx.showToast({ title: '已确认收货', icon: 'none' });
+          this.fetch();
+        } catch (err) {
+          wx.showToast({ title: (err && err.message) || '确认失败', icon: 'none' });
+        }
+      }
+    });
+  }
 });

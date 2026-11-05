@@ -31,9 +31,10 @@
       <el-table-column label="下单时间" width="170">
         <template #default="{ row }">{{ fmt(row.created_at) }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="130">
+      <el-table-column label="操作" width="150">
         <template #default="{ row }">
           <el-button v-if="row.status === 'pending_shipment'" link type="primary" @click="openShip(row)">发货</el-button>
+          <el-button v-if="row.status === 'pending_receipt' || row.status === 'pending_review'" link type="primary" @click="markDone(row)">完成</el-button>
           <el-button link @click="detail = row">详情</el-button>
         </template>
       </el-table-column>
@@ -76,15 +77,15 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import http from '../api.js'
 
 const STATUS = {
   pending_payment: '待付款', pending_shipment: '待发货', pending_receipt: '待收货',
-  pending_review: '待评价', completed: '已完成', cancelled: '已取消'
+  completed: '已完成', cancelled: '已取消'
 }
 const TAG = { pending_payment: 'warning', pending_shipment: 'danger', pending_receipt: 'primary',
-              pending_review: 'success', cancelled: 'info' }
+              completed: 'success', cancelled: 'info' }
 
 const list = ref([])
 const total = ref(0)
@@ -116,6 +117,18 @@ async function fetch() {
 function openShip(row) {
   ship.value = { id: row.id, company: '', tracking_no: '' }
   shipDialog.value = true
+}
+
+async function markDone(row) {
+  try {
+    await ElMessageBox.confirm(`将订单 ${row.order_no} 标为已完成？`, '确认', { type: 'warning' })
+  } catch {
+    return
+  }
+  await http.post(`/api/admin/orders/${row.id}/complete`)
+  ElMessage.success('已标为已完成')
+  if (detail.value && detail.value.id === row.id) detail.value = null
+  fetch()
 }
 
 async function doShip() {

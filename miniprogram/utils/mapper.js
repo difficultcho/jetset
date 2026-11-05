@@ -1,6 +1,23 @@
 // 后端数据 → JET SET 视图模型。后端金额单位为「分」，展示用「元」（千分位）。
 const { ASSET_BASE } = require('./config.js');
 
+// 后端时间是不带时区的 UTC。按手机本地时间去解析，在中国会少 8 小时，倒计时一进来就是 0。
+function parseUtcMs(value) {
+  if (!value) return NaN;
+  const s = String(value).trim();
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2})/);
+  if (!m) return NaN;
+  let ms = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
+  const zone = s.match(/([zZ]|[+-]\d{2}:?(\d{2})?)$/);
+  if (zone && zone[1].toLowerCase() !== 'z') {
+    const sign = zone[1][0] === '-' ? -1 : 1;
+    const hh = parseInt(zone[1].slice(1, 3), 10) || 0;
+    const mm = parseInt(zone[2] || '0', 10) || 0;
+    ms -= sign * (hh * 60 + mm) * 60000;
+  }
+  return ms;
+}
+
 function yuan(cents) {
   return (cents || 0) / 100;
 }
@@ -168,6 +185,12 @@ function toOrder(o) {
     createdAt: (o.created_at || '').replace('T', ' ').slice(0, 19),
     expireAt: o.expire_at,
     shipment: o.shipment || null,
+    address: {
+      name: (o.address && o.address.name) || '',
+      phone: (o.address && o.address.phone) || '',
+      region: (o.address && o.address.region) || '',
+      detail: (o.address && o.address.detail) || '',
+    },
     items: o.items.map(toOrderLine),
     itemCount: o.items.reduce((s, i) => s + i.qty, 0)
   };
@@ -202,6 +225,6 @@ function toCoupon(c) {
 }
 
 module.exports = {
-  yuan, fmt, fullImg, toCard, toPageBlocks, toShopMenus, toDetail, toCartItem, toOrderLine, toOrder,
+  yuan, fmt, fullImg, parseUtcMs, toCard, toPageBlocks, toShopMenus, toDetail, toCartItem, toOrderLine, toOrder,
   toAddress, toCoupon, toStore
 };

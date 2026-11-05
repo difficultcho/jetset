@@ -1,9 +1,9 @@
 const app = getApp();
 const api = require('../../utils/api.js');
-const { fmt } = require('../../utils/mapper.js');
+const { fmt, parseUtcMs } = require('../../utils/mapper.js');
 
 Page({
-  data: { order: null, payText: '0', method: 'wechat', countdown: '', paying: false },
+  data: { order: null, payText: '0', countdown: '', paying: false },
 
   onLoad(opts) {
     this.id = opts.id;
@@ -19,22 +19,22 @@ Page({
   },
 
   startCountdown(expireAt) {
-    if (!expireAt) return;
-    const deadline = new Date(expireAt.replace(' ', 'T')).getTime();
+    clearInterval(this.iv);
+    const deadline = parseUtcMs(expireAt);
+    if (!deadline) return;
+    const pad = (n) => ('0' + n).slice(-2);
     const tick = () => {
       const left = Math.max(0, deadline - Date.now());
-      const m = Math.floor(left / 60000);
+      const h = Math.floor(left / 3600000);
+      const m = Math.floor((left % 3600000) / 60000);
       const s = Math.floor((left % 60000) / 1000);
-      const pad = (n) => ('0' + n).slice(-2);
-      this.setData({ countdown: '00 : ' + pad(m) + ' : ' + pad(s) });
+      this.setData({ countdown: pad(h) + ' : ' + pad(m) + ' : ' + pad(s) });
       if (left <= 0) clearInterval(this.iv);
     };
     tick();
     this.iv = setInterval(tick, 1000);
   },
   onUnload() { clearInterval(this.iv); },
-
-  pickMethod(e) { this.setData({ method: e.currentTarget.dataset.m }); },
 
   async pay() {
     if (this.data.paying) return;

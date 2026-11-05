@@ -1,9 +1,5 @@
 <view class="page">
   <nav-bar title="我的订单" />
-  <view class="top-tabs">
-    <view class="tt on">小程序</view>
-    <view class="tt">门店</view>
-  </view>
   <view class="subs">
     <view class="sub {{si === index ? 'on' : ''}}" wx:for="{{subs}}" wx:key="label" data-i="{{index}}" bindtap="pickSub">{{item.label}}</view>
   </view>
@@ -28,8 +24,13 @@
         </view>
         <text class="oline-price">¥ {{it.priceText}}</text>
       </view>
+      <view wx:if="{{item.shipment}}" class="track-row">
+        <text>运单号</text>
+        <text class="track-no">{{item.shipment.company}} {{item.shipment.tracking_no}}</text>
+      </view>
       <view class="order-foot">
         <text class="order-total">总计： ¥ {{item.payText}}</text>
+        <view wx:if="{{item.status === 'pending_receipt'}}" class="detail-btn ghost" data-id="{{item.id}}" bindtap="confirmReceipt">确认收货</view>
         <view class="detail-btn" data-id="{{item.id}}" bindtap="goDetail">订单详情</view>
       </view>
     </view>

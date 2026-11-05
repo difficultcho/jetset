@@ -6,7 +6,6 @@ const MENU = [
   { k: 'addresses', label: '地址管理' },
   { k: 'nearby', label: '附近门店' },
   { k: 'coupons', label: '优惠券' },
-  { k: 'points', label: '积分' },
   { k: 'settings', label: '个人设置' },
   { k: 'help', label: '帮助中心' }
 ];
@@ -46,7 +45,7 @@ Page({
     const map = {
       guide: '/pages/guide/guide', addresses: '/pages/addresses/addresses',
       nearby: '/pages/nearby/nearby', coupons: '/pages/coupons/coupons',
-      points: '/pages/points/points', settings: '/pages/settings/settings',
+      settings: '/pages/settings/settings',
       help: '/pages/help/help'
     };
     wx.navigateTo({ url: map[e.currentTarget.dataset.k] });

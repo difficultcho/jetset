@@ -8,13 +8,9 @@
     </view>
 
     <view class="methods">
-      <view class="method" data-m="wechat" bindtap="pickMethod">
+      <view class="method">
         <view class="m-left"><view class="m-ic ic-wechat" /><text class="m-name">微信支付</text></view>
-        <view class="radio {{method === 'wechat' ? 'on' : ''}}" />
-      </view>
-      <view class="method" data-m="alipay" bindtap="pickMethod">
-        <view class="m-left"><view class="m-ic ic-alipay" /><text class="m-name">支付宝</text></view>
-        <view class="radio {{method === 'alipay' ? 'on' : ''}}" />
+        <view class="radio on" />
       </view>
     </view>
   </view>

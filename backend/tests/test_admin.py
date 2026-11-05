@@ -194,8 +194,10 @@ async def test_ship_flow(client):
         "address_id": addr.json()["data"]["id"]})).json()["data"]
     await client.post("/api/v1/payments/mock/confirm", json={"order_no": order["order_no"]})
 
-    # 未发货前不能确认收货；不能对待发货以外的单发货
+    # 未发货前不能确认收货，也不能由后台标完成
     resp = await client.post(f"/api/v1/orders/{order['id']}/confirm", headers=user_h)
+    assert resp.status_code == 400
+    resp = await client.post(f"/api/admin/orders/{order['id']}/complete", headers=admin_h)
     assert resp.status_code == 400
 
     # 管理员发货
@@ -212,9 +214,21 @@ async def test_ship_flow(client):
     detail = (await client.get(f"/api/v1/orders/{order['id']}", headers=user_h)).json()["data"]
     assert detail["shipment"]["tracking_no"] == "SF123456"
 
-    # 用户确认收货 → 待评价
+    # 用户确认收货 → 已完成（购买周期在这里结束，没有评价环节）
     resp = await client.post(f"/api/v1/orders/{order['id']}/confirm", headers=user_h)
-    assert resp.json()["data"]["status"] == "pending_review"
+    assert resp.json()["data"]["status"] == "completed"
+
+    # 另一单用户不确认，运维手动标完成
+    order2 = (await client.post("/api/v1/orders", headers=user_h, json={
+        "items": [{"sku_id": sku["id"], "qty": 1}],
+        "address_id": addr.json()["data"]["id"]})).json()["data"]
+    await client.post("/api/v1/payments/mock/confirm", json={"order_no": order2["order_no"]})
+    await client.post(f"/api/admin/orders/{order2['id']}/ship", headers=admin_h,
+                      json={"company": "顺丰", "tracking_no": "SF654321"})
+    resp = await client.post(f"/api/admin/orders/{order2['id']}/complete", headers=admin_h)
+    assert resp.json()["data"]["status"] == "completed"
+    resp = await client.post(f"/api/admin/orders/{order2['id']}/complete", headers=admin_h)
+    assert resp.status_code == 400
 
 
 async def test_wholesale_review(client):

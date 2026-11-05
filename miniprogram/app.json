@@ -29,8 +29,7 @@
     "pages/size-guide/size-guide",
     "pages/store-intro/store-intro",
     "pages/store-detail/store-detail",
-    "pages/coupons/coupons",
-    "pages/points/points"
+    "pages/coupons/coupons"
   ],
   "window": {
     "navigationStyle": "custom",

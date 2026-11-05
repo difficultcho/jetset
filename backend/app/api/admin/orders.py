@@ -7,7 +7,7 @@ from app.errors import BizError
 from app.models.order import Order, OrderStatus, Shipment
 from app.schemas.admin import ShipReq
 from app.schemas.common import Page, Resp
-from app.services.orders import order_to_dict
+from app.services.orders import mark_completed, order_to_dict
 from app.utils import utcnow
 
 router = APIRouter()
@@ -77,4 +77,19 @@ async def ship_order(order_id: int, req: ShipReq, session: DB):
     order.shipped_at = utcnow()
     await session.commit()
     # TODO: 微信「发货信息录入」API + 订阅消息通知（上线前必接）
+    return Resp(data={"id": order.id, "status": order.status})
+
+
+@router.post("/orders/{order_id}/complete", response_model=Resp[dict])
+async def complete_order(order_id: int, session: DB):
+    """运维把用户未确认的订单收成已完成。不自动跑。"""
+    order = (
+        await session.execute(
+            select(Order).options(selectinload(Order.items)).where(Order.id == order_id)
+        )
+    ).scalar_one_or_none()
+    if order is None:
+        raise HTTPException(status_code=404, detail="订单不存在")
+    await mark_completed(session, order)
+    await session.commit()
     return Resp(data={"id": order.id, "status": order.status})
