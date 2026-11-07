@@ -17,7 +17,9 @@
          不再补占位条纹：那是开发期脚手架，真实用户看到只会觉得页面没做完。 -->
     <view class="shot">
       <block wx:for="{{store.images}}" wx:key="*this" wx:for-index="i">
-        <image wx:if="{{i > 0}}" class="sub-real" src="{{item}}" mode="aspectFill" />
+        <view wx:if="{{i > 0}}" class="sub">
+          <image class="sub-real" src="{{item}}" mode="aspectFill" />
+        </view>
       </block>
     </view>
     <view class="body-space" />
