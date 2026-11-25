@@ -32,9 +32,9 @@ docker compose exec api python -m app.seed        # 灌种子数据
 
 | 变量 | 说明 |
 |---|---|
-| `WECHAT_MOCK` | true 时 `POST /auth/login` 的 code 直接映射 openid，不请求微信 |
-| `WECHAT_APPID` / `WECHAT_SECRET` | 关闭 mock 后必填（code2session） |
-| `PAYMENT_PROVIDER` | `mock`：`POST /payments/mock/confirm` 模拟支付成功；`wechat`：待商户号配置后实现 |
+| `MOCK_MODE` | true：假登录、假支付、跳过内容安全。false 才走真实登录和微信支付 |
+| `WECHAT_APPID` / `WECHAT_SECRET` | 关闭 mock 后必填（code2session）。必须是实际上线的小程序 AppID |
+| `WXPAY_*` | 关闭 mock 后必填。JSAPI 下单和回调验签已实现，见 `.env.example` |
 | `ORDER_TIMEOUT_MINUTES` | 待付款超时时长，超时由 arq 任务/定时扫描自动取消并回补库存 |
 | `AUTO_CREATE_TABLES` | MVP 启动建表；schema 稳定后改 alembic 并关闭 |
 
@@ -55,8 +55,7 @@ docker compose exec api python -m app.seed        # 灌种子数据
 
 ## 待办（二期起）
 
-- 微信支付 JSAPI 真实接入（`app/services/payment.py` 的 `WechatPayProvider`）
-- 微信发货信息录入 API、订阅消息
+- 微信发货信息录入 API（实物订单支付后需录入，否则结算会被冻结）、订阅消息
 - 管理端 API（`/api/admin/*`，RBAC）：商品/订单/售后/批发审核/运营位
 - 优惠券/积分：金额试算已在 `orders.preview` 收口，扩展 `discount_amount` 即可
 - 上传从本地磁盘切换 COS 直传签名

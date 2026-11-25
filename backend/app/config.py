@@ -1,4 +1,5 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -37,9 +38,11 @@ class Settings(BaseSettings):
 
     wxpay_mchid: str = ""
     wxpay_cert_serial: str = ""
-    wxpay_private_key_path: str = ""
-    wxpay_apiv3_key: str = ""
+    wxpay_private_key_path: str = ""  # 商户 API 私钥 PEM，只放服务器
+    wxpay_apiv3_key: str = ""  # 32 字节
     wxpay_notify_url: str = ""
+    wxpay_public_key_path: str = ""  # 微信支付公钥 PEM
+    wxpay_public_key_id: str = ""  # PUB_KEY_ID_...，回调头 Wechatpay-Serial 必须相等
 
     order_timeout_minutes: int = 30
     freight_cents: int = 0
@@ -81,6 +84,14 @@ REAL_MODE_REQUIRED = (
     ("WXPAY_PRIVATE_KEY_PATH", "wxpay_private_key_path"),
     ("WXPAY_APIV3_KEY", "wxpay_apiv3_key"),
     ("WXPAY_NOTIFY_URL", "wxpay_notify_url"),
+    ("WXPAY_PUBLIC_KEY_PATH", "wxpay_public_key_path"),
+    ("WXPAY_PUBLIC_KEY_ID", "wxpay_public_key_id"),
+)
+
+# 关掉 mock 后，这两份 PEM 必须已经在服务器上。启动时只检查文件在不在。
+_WXPAY_FILES = (
+    ("WXPAY_PRIVATE_KEY_PATH", "wxpay_private_key_path"),
+    ("WXPAY_PUBLIC_KEY_PATH", "wxpay_public_key_path"),
 )
 
 
@@ -98,6 +109,14 @@ def config_problems(s: Settings) -> tuple[list[str], list[str]]:
         if miss:
             fatal.append("MOCK_MODE=false 走真实登录与真实支付，以下凭据未配置："
                          + "、".join(miss))
+        else:
+            key = str(s.wxpay_apiv3_key).strip()
+            if len(key.encode("utf-8")) != 32:
+                fatal.append("WXPAY_APIV3_KEY 必须是 32 字节")
+            absent = [env for env, field in _WXPAY_FILES
+                      if not Path(str(getattr(s, field)).strip()).is_file()]
+            if absent:
+                fatal.append("以下证书文件不存在：" + "、".join(absent))
 
     if s.app_env == "prod":
         if s.mock_mode:

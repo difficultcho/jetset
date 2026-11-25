@@ -10,6 +10,8 @@ backend/.pytest_cache/
 backend/.env
 backend/jetset.db
 backend/uploads/
+# 微信支付商户私钥和微信支付公钥，只放服务器
+backend/certs/
 
 # miniprogram
 miniprogram/node_modules/

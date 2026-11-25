@@ -1,20 +1,19 @@
-"""支付渠道抽象。
+"""支付渠道。
 
-MVP 用 MockProvider 跑通全流程；微信支付商户号（mchid/证书/APIv3 key）
-配置齐全后实现 WechatPayProvider（建议基于 wechatpayv3 库）：
-  1. create_payment -> JSAPI 下单，返回小程序 wx.requestPayment 所需参数
-  2. /payments/wechat/notify 回调 -> 验签 + 解密 -> mark_order_paid（幂等）
+MOCK_MODE=true 时用 MockProvider，收银台确认后走 /payments/mock/confirm。
+关掉后 WechatPayProvider 调微信 JSAPI 下单，支付结果只认验签后的回调。
 """
 
 from app.config import settings
 from app.errors import BizError
 from app.models.order import Order
+from app.services.wxpay import WxPayClient, client_from_settings
 
 
 class MockProvider:
     name = "mock"
 
-    async def create_payment(self, order: Order) -> dict:
+    async def create_payment(self, order: Order, openid: str = "") -> dict:
         return {
             "provider": "mock",
             "order_no": order.order_no,
@@ -26,20 +25,21 @@ class MockProvider:
 class WechatPayProvider:
     name = "wechat"
 
-    def __init__(self) -> None:
-        required = [
-            settings.wxpay_mchid,
-            settings.wxpay_cert_serial,
-            settings.wxpay_private_key_path,
-            settings.wxpay_apiv3_key,
-            settings.wxpay_notify_url,
-        ]
-        if not all(required):
-            raise BizError("微信支付未配置完整（mchid/证书/APIv3 key）", http_status=503)
+    def __init__(self, client: WxPayClient | None = None) -> None:
+        self._wx = client
+        if client is not None:
+            return
+        required = (
+            settings.wechat_appid, settings.wxpay_mchid, settings.wxpay_cert_serial,
+            settings.wxpay_private_key_path, settings.wxpay_apiv3_key, settings.wxpay_notify_url,
+            settings.wxpay_public_key_path, settings.wxpay_public_key_id,
+        )
+        if not all(str(item).strip() for item in required):
+            raise BizError("微信支付未配置完整", http_status=503)
 
-    async def create_payment(self, order: Order) -> dict:
-        # TODO: 接入 wechatpayv3 JSAPI 下单，需商户号资质
-        raise BizError("微信支付渠道尚未实现，请先使用 mock 渠道", http_status=501)
+    async def create_payment(self, order: Order, openid: str = "") -> dict:
+        client = self._wx or client_from_settings()
+        return await client.jsapi_params(order, openid)
 
 
 def get_provider():

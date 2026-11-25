@@ -26,13 +26,47 @@ def test_real_mode_missing_credentials_is_fatal():
         assert env in fatal[0], f"{env} 未出现在报错里：{fatal[0]}"
 
 
-def test_real_mode_with_all_credentials_passes():
+def test_real_mode_with_all_credentials_passes(tmp_path):
     creds = {field: "x" for _env, field in REAL_MODE_REQUIRED}
+    key_file = tmp_path / "apiclient_key.pem"
+    pub_file = tmp_path / "wxp_pub.pem"
+    key_file.write_text("pem")
+    pub_file.write_text("pem")
+    creds["wxpay_private_key_path"] = str(key_file)
+    creds["wxpay_public_key_path"] = str(pub_file)
+    creds["wxpay_apiv3_key"] = "k" * 32
     fatal, warn = config_problems(_s(app_env="prod", mock_mode=False,
                                      database_url="mysql+aiomysql://x/y",
                                      jwt_secret="a" * 40, admin_password="s3cret",
                                      **creds))
     assert fatal == [] and warn == []
+
+
+def test_real_mode_rejects_short_apiv3_key(tmp_path):
+    creds = {field: "x" for _env, field in REAL_MODE_REQUIRED}
+    key_file = tmp_path / "apiclient_key.pem"
+    pub_file = tmp_path / "wxp_pub.pem"
+    key_file.write_text("pem")
+    pub_file.write_text("pem")
+    creds["wxpay_private_key_path"] = str(key_file)
+    creds["wxpay_public_key_path"] = str(pub_file)
+    creds["wxpay_apiv3_key"] = "short"
+    fatal, _ = config_problems(_s(app_env="prod", mock_mode=False,
+                                  database_url="mysql+aiomysql://x/y", **creds))
+    assert any("WXPAY_APIV3_KEY" in item for item in fatal)
+
+
+def test_real_mode_rejects_missing_cert_files():
+    creds = {field: "x" for _env, field in REAL_MODE_REQUIRED}
+    creds["wxpay_apiv3_key"] = "k" * 32
+    creds["wxpay_private_key_path"] = "jetset-wxpay-key-missing.pem"
+    creds["wxpay_public_key_path"] = "jetset-wxpay-pub-missing.pem"
+    fatal, _ = config_problems(_s(app_env="prod", mock_mode=False,
+                                  database_url="mysql+aiomysql://x/y", **creds))
+    assert len(fatal) == 1
+    assert "WXPAY_PRIVATE_KEY_PATH" in fatal[0]
+    assert "WXPAY_PUBLIC_KEY_PATH" in fatal[0]
+    assert "jetset-wxpay-key-missing.pem" not in fatal[0]
 
 
 def test_prod_with_sqlite_is_fatal():

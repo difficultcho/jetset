@@ -113,4 +113,4 @@ async def pay_order(order_id: int, user: CurrentUser, session: DB):
         raise BizError("订单状态不可支付")
     if order.expire_at and order.expire_at < utcnow():
         raise BizError("订单已超时，请重新下单")
-    return Resp(data=await get_provider().create_payment(order))
+    return Resp(data=await get_provider().create_payment(order, user.openid))
