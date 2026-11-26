@@ -66,7 +66,7 @@ async def test_points_deduct_and_refund(client):
     assert await _my_points(client, h) == 0
 
     # 取消：积分退回
-    await client.post(f"/api/v1/orders/{order['id']}/cancel", headers=h)
+    await client.post(f"/api/v1/orders/{order['order_no']}/cancel", headers=h)
     assert await _my_points(client, h) == 5000
     logs = (await client.get("/api/v1/me/points/logs", headers=h)).json()["data"]
     assert logs[0]["reason"] == "订单退回"

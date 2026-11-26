@@ -30,8 +30,8 @@
       </view>
       <view class="order-foot">
         <text class="order-total">总计： ¥ {{item.payText}}</text>
-        <view wx:if="{{item.status === 'pending_receipt'}}" class="detail-btn ghost" data-id="{{item.id}}" bindtap="confirmReceipt">确认收货</view>
-        <view class="detail-btn" data-id="{{item.id}}" bindtap="goDetail">订单详情</view>
+        <view wx:if="{{item.status === 'pending_receipt'}}" class="detail-btn ghost" data-no="{{item.orderNo}}" bindtap="confirmReceipt">确认收货</view>
+        <view class="detail-btn" data-no="{{item.orderNo}}" bindtap="goDetail">订单详情</view>
       </view>
     </view>
     <view class="body-space" />

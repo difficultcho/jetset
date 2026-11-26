@@ -89,17 +89,17 @@ async def test_admin_refund_restores_stock_sales_coupon_and_payment(client):
     resp = await client.post(f"/api/admin/orders/{unpaid['id']}/refund", headers=admin_h, json={})
     assert resp.status_code == 400
     assert resp.json()["message"] == "当前状态不可退款"
-    resp = await client.post(f"/api/v1/orders/{unpaid['id']}/refund", headers=headers, json={})
+    resp = await client.post(f"/api/v1/orders/{unpaid['order_no']}/refund", headers=headers, json={})
     assert resp.status_code == 404
-    await client.post(f"/api/v1/orders/{unpaid['id']}/cancel", headers=headers)
+    await client.post(f"/api/v1/orders/{unpaid['order_no']}/cancel", headers=headers)
     stock_after_pay, sales_after_pay = await _levels(sku["id"])
 
-    detail = (await client.get(f"/api/v1/orders/{order['id']}", headers=headers)).json()["data"]
+    detail = (await client.get(f"/api/v1/orders/{order['order_no']}", headers=headers)).json()["data"]
     assert detail["can_refund"] is False
     resp = await client.post(f"/api/admin/orders/{order['id']}/refund", headers=headers, json={})
     assert resp.status_code == 401
     other = await login(client, "refund-other")
-    resp = await client.get(f"/api/v1/orders/{order['id']}", headers=other)
+    resp = await client.get(f"/api/v1/orders/{order['order_no']}", headers=other)
     assert resp.status_code == 404
 
     resp = await client.post(f"/api/admin/orders/{order['id']}/refund", headers=admin_h, json={})
@@ -140,9 +140,9 @@ async def test_admin_can_refund_shipped_order_after_eight_days(client):
     assert resp.json()["data"]["status"] == "pending_receipt"
     await _set_shipped_at(order["id"], utcnow() - timedelta(days=8))
 
-    detail = (await client.get(f"/api/v1/orders/{order['id']}", headers=headers)).json()["data"]
+    detail = (await client.get(f"/api/v1/orders/{order['order_no']}", headers=headers)).json()["data"]
     assert detail["can_refund"] is False
-    resp = await client.post(f"/api/v1/orders/{order['id']}/refund", headers=headers, json={})
+    resp = await client.post(f"/api/v1/orders/{order['order_no']}/refund", headers=headers, json={})
     assert resp.status_code == 404
 
     resp = await client.post(
@@ -162,7 +162,7 @@ async def test_admin_refunds_completed_order(client):
         f"/api/admin/orders/{order['id']}/ship", headers=admin_h,
         json={"company": "顺丰", "tracking_no": "SF700111"},
     )
-    await client.post(f"/api/v1/orders/{order['id']}/confirm", headers=headers)
+    await client.post(f"/api/v1/orders/{order['order_no']}/confirm", headers=headers)
     resp = await client.post(f"/api/admin/orders/{order['id']}/refund", headers=admin_h, json={})
     assert resp.status_code == 200, resp.text
     assert resp.json()["data"]["status"] == "refunded"
@@ -193,7 +193,7 @@ async def test_failed_retry_uses_same_number_and_processing_is_blocked(client):
     assert resp.status_code == 400
     assert resp.json()["message"] == "退款处理中"
     assert (await _levels(sku2["id"])) == held
-    detail = (await client.get(f"/api/v1/orders/{processing['id']}", headers=headers2)).json()["data"]
+    detail = (await client.get(f"/api/v1/orders/{processing['order_no']}", headers=headers2)).json()["data"]
     assert detail["status"] == "refund_pending"
     assert detail["refund"]["status"] == "processing"
 

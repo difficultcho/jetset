@@ -29,24 +29,20 @@ async def _present_one(session, order: Order) -> dict:
     return (await _present(session, [order]))[0]
 
 
-# 商品订单号是 14 位时间 + 4 位随机数。短数字仍是内部主键。
+# 顾客地址只认商品订单号：14 位时间 + 4 位随机数。数字主键不从这里查。
 _ORDER_NO = re.compile(r"\d{18}")
 
 
-async def _get_owned(session, user_id: int, key: str | int) -> Order:
-    """小程序订单地址同时接受数字编号和商品订单号。别人的订单一律当不存在。"""
-    text = str(key).strip()
-    if _ORDER_NO.fullmatch(text):
-        cond = Order.order_no == text
-    elif text.isdigit():
-        cond = Order.id == int(text)
-    else:
+async def _get_owned(session, user_id: int, order_no: str) -> Order:
+    """按商品订单号取当前用户的订单。别人的订单一律当不存在。"""
+    text = str(order_no).strip()
+    if not _ORDER_NO.fullmatch(text):
         raise HTTPException(status_code=404, detail="订单不存在")
     order = (
         await session.execute(
             select(Order).options(
                 selectinload(Order.items), selectinload(Order.refunds),
-            ).where(cond)
+            ).where(Order.order_no == text)
         )
     ).scalar_one_or_none()
     if order is None or order.user_id != user_id:
@@ -79,7 +75,7 @@ async def create_order(req: OrderCreateReq, user: CurrentUser, session: DB, requ
             )
         except Exception:
             pass
-    return Resp(data=await _present_one(session, await _get_owned(session, user.id, order.id)))
+    return Resp(data=await _present_one(session, await _get_owned(session, user.id, order.order_no)))
 
 
 @router.get("/orders", response_model=Resp[Page[OrderOut]])
@@ -112,30 +108,30 @@ async def list_orders(
     ))
 
 
-@router.get("/orders/{order_key}", response_model=Resp[OrderOut])
-async def order_detail(order_key: str, user: CurrentUser, session: DB):
-    return Resp(data=await _present_one(session, await _get_owned(session, user.id, order_key)))
+@router.get("/orders/{order_no}", response_model=Resp[OrderOut])
+async def order_detail(order_no: str, user: CurrentUser, session: DB):
+    return Resp(data=await _present_one(session, await _get_owned(session, user.id, order_no)))
 
 
-@router.post("/orders/{order_key}/cancel", response_model=Resp[OrderOut])
-async def cancel_order(order_key: str, user: CurrentUser, session: DB):
-    order = await _get_owned(session, user.id, order_key)
+@router.post("/orders/{order_no}/cancel", response_model=Resp[OrderOut])
+async def cancel_order(order_no: str, user: CurrentUser, session: DB):
+    order = await _get_owned(session, user.id, order_no)
     await svc.cancel_order(session, order)
     await session.commit()
     return Resp(data=await _present_one(session, order))
 
 
-@router.post("/orders/{order_key}/confirm", response_model=Resp[OrderOut])
-async def confirm_receipt(order_key: str, user: CurrentUser, session: DB):
-    order = await _get_owned(session, user.id, order_key)
+@router.post("/orders/{order_no}/confirm", response_model=Resp[OrderOut])
+async def confirm_receipt(order_no: str, user: CurrentUser, session: DB):
+    order = await _get_owned(session, user.id, order_no)
     await svc.confirm_receipt(session, order)
     await session.commit()
     return Resp(data=await _present_one(session, order))
 
 
-@router.post("/orders/{order_key}/pay", response_model=Resp[dict])
-async def pay_order(order_key: str, user: CurrentUser, session: DB):
-    order = await _get_owned(session, user.id, order_key)
+@router.post("/orders/{order_no}/pay", response_model=Resp[dict])
+async def pay_order(order_no: str, user: CurrentUser, session: DB):
+    order = await _get_owned(session, user.id, order_no)
     if order.status != OrderStatus.PENDING_PAYMENT:
         raise BizError("订单状态不可支付")
     if order.expire_at and order.expire_at < utcnow():

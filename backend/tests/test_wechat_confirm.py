@@ -109,9 +109,9 @@ async def test_fetch_order_state_rejects_unparsed_state(monkeypatch):
 
 async def test_mock_confirm_stays_local_and_receipt_is_hidden(client):
     _admin_h, user_h, order = await _shipped(client, "confirm-mock")
-    detail = (await client.get(f"/api/v1/orders/{order['id']}", headers=user_h)).json()["data"]
+    detail = (await client.get(f"/api/v1/orders/{order['order_no']}", headers=user_h)).json()["data"]
     assert detail["wechat_receipt"] is None
-    resp = await client.post(f"/api/v1/orders/{order['id']}/confirm", headers=user_h)
+    resp = await client.post(f"/api/v1/orders/{order['order_no']}/confirm", headers=user_h)
     assert resp.status_code == 200, resp.text
     assert resp.json()["data"]["status"] == "completed"
     assert resp.json()["data"]["wechat_receipt"] is None
@@ -120,16 +120,16 @@ async def test_mock_confirm_stays_local_and_receipt_is_hidden(client):
 async def test_receipt_payload_appears_only_for_a_real_wechat_payment(client, monkeypatch):
     _admin_h, user_h, order = await _shipped(client, "confirm-receipt")
     await _mark_wechat(order["id"])
-    detail = (await client.get(f"/api/v1/orders/{order['id']}", headers=user_h)).json()["data"]
+    detail = (await client.get(f"/api/v1/orders/{order['order_no']}", headers=user_h)).json()["data"]
     assert detail["wechat_receipt"] is None
 
     monkeypatch.setattr(settings, "mock_mode", False)
     monkeypatch.setattr(settings, "wxpay_mchid", "")
-    detail = (await client.get(f"/api/v1/orders/{order['id']}", headers=user_h)).json()["data"]
+    detail = (await client.get(f"/api/v1/orders/{order['order_no']}", headers=user_h)).json()["data"]
     assert detail["wechat_receipt"] is None
 
     monkeypatch.setattr(settings, "wxpay_mchid", MCHID)
-    detail = (await client.get(f"/api/v1/orders/{order['id']}", headers=user_h)).json()["data"]
+    detail = (await client.get(f"/api/v1/orders/{order['order_no']}", headers=user_h)).json()["data"]
     assert detail["wechat_receipt"] == {
         "transaction_id": TXN,
         "merchant_id": MCHID,
@@ -153,7 +153,7 @@ async def test_real_confirm_rejects_until_wechat_says_received(client, monkeypat
 
     monkeypatch.setattr(settings, "mock_mode", False)
     monkeypatch.setattr(shipping, "fetch_order_state", queried)
-    resp = await client.post(f"/api/v1/orders/{order['id']}/confirm", headers=user_h)
+    resp = await client.post(f"/api/v1/orders/{order['order_no']}/confirm", headers=user_h)
     assert resp.status_code == 400
     assert resp.json()["message"] == "请先在微信确认收货"
     saved = await _saved(order["id"])
@@ -173,7 +173,7 @@ async def test_real_confirm_completes_once_wechat_state_is_received(client, monk
     monkeypatch.setattr(settings, "mock_mode", False)
     monkeypatch.setattr(settings, "wxpay_mchid", MCHID)
     monkeypatch.setattr(shipping, "fetch_order_state", queried)
-    resp = await client.post(f"/api/v1/orders/{order['id']}/confirm", headers=user_h)
+    resp = await client.post(f"/api/v1/orders/{order['order_no']}/confirm", headers=user_h)
     assert resp.status_code == 200, resp.text
     body = resp.json()["data"]
     assert body["status"] == "completed"
@@ -181,7 +181,7 @@ async def test_real_confirm_completes_once_wechat_state_is_received(client, monk
     done_at = (await _saved(order["id"])).completed_at
     assert done_at is not None
 
-    again = await client.post(f"/api/v1/orders/{order['id']}/confirm", headers=user_h)
+    again = await client.post(f"/api/v1/orders/{order['order_no']}/confirm", headers=user_h)
     assert again.status_code == 200, again.text
     assert again.json()["data"]["status"] == "completed"
     assert (await _saved(order["id"])).completed_at == done_at
@@ -192,7 +192,7 @@ async def test_real_confirm_without_wechat_payment_is_rejected(client, monkeypat
     _admin_h, user_h, order = await _shipped(client, "confirm-nopay")
     monkeypatch.setattr(settings, "mock_mode", False)
     monkeypatch.setattr(shipping, "fetch_order_state", _forbid)
-    resp = await client.post(f"/api/v1/orders/{order['id']}/confirm", headers=user_h)
+    resp = await client.post(f"/api/v1/orders/{order['order_no']}/confirm", headers=user_h)
     assert resp.status_code == 400
     assert resp.json()["message"] == "该订单无法在微信确认收货"
     assert (await _saved(order["id"])).status == "pending_receipt"
@@ -206,7 +206,7 @@ async def test_admin_complete_does_not_ask_wechat(client, monkeypatch):
     resp = await client.post(f"/api/admin/orders/{order['id']}/complete", headers=admin_h)
     assert resp.status_code == 200, resp.text
     assert resp.json()["data"]["status"] == "completed"
-    again = await client.post(f"/api/v1/orders/{order['id']}/confirm", headers=user_h)
+    again = await client.post(f"/api/v1/orders/{order['order_no']}/confirm", headers=user_h)
     assert again.status_code == 200, again.text
     assert again.json()["data"]["status"] == "completed"
 

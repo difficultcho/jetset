@@ -43,6 +43,8 @@ async def test_order_no_opens_detail_pay_and_cancel(client):
     assert by_no.status_code == 200, by_no.text
     assert by_no.json()["data"]["id"] == created["id"]
     assert by_no.json()["data"]["order_no"] == order_no
+    by_id = await client.get(f"/api/v1/orders/{created['id']}", headers=headers)
+    assert by_id.status_code == 404
 
     other = await login(client, "order-no-other")
     hidden = await client.get(f"/api/v1/orders/{order_no}", headers=other)
@@ -94,7 +96,7 @@ async def test_order_full_flow(client):
     assert await _sku_stock(client, sku["id"]) == stock_before - 2
 
     # 发起支付（mock）
-    resp = await client.post(f"/api/v1/orders/{order['id']}/pay", headers=headers)
+    resp = await client.post(f"/api/v1/orders/{order['order_no']}/pay", headers=headers)
     assert resp.json()["data"]["provider"] == "mock"
 
     # 支付回调 → 待发货
@@ -109,7 +111,7 @@ async def test_order_full_flow(client):
     assert resp.json()["data"]["changed"] is False
 
     # 已支付订单不可取消
-    resp = await client.post(f"/api/v1/orders/{order['id']}/cancel", headers=headers)
+    resp = await client.post(f"/api/v1/orders/{order['order_no']}/cancel", headers=headers)
     assert resp.status_code == 400
 
     # 订单列表按状态过滤
@@ -128,7 +130,7 @@ async def test_cancel_restores_stock(client):
     order = resp.json()["data"]
     assert await _sku_stock(client, sku["id"]) == stock_before - 3
 
-    resp = await client.post(f"/api/v1/orders/{order['id']}/cancel", headers=headers)
+    resp = await client.post(f"/api/v1/orders/{order['order_no']}/cancel", headers=headers)
     assert resp.json()["data"]["status"] == "cancelled"
     assert await _sku_stock(client, sku["id"]) == stock_before
 
@@ -158,11 +160,11 @@ async def test_expired_orders_cancelled(client):
     resp = await client.post("/api/v1/orders", headers=headers, json={
         "items": [{"sku_id": sku["id"], "qty": 1}], "address_id": addr_id,
     })
-    order_id = resp.json()["data"]["id"]
+    order = resp.json()["data"]
 
     # 把过期时间改到过去，模拟超时
     async with SessionFactory() as session:
-        row = (await session.execute(select(Order).where(Order.id == order_id))).scalar_one()
+        row = (await session.execute(select(Order).where(Order.id == order["id"]))).scalar_one()
         row.expire_at = utcnow() - timedelta(minutes=1)
         await session.commit()
 
@@ -172,7 +174,7 @@ async def test_expired_orders_cancelled(client):
         await session.commit()
     assert count >= 1
 
-    resp = await client.get(f"/api/v1/orders/{order_id}", headers=headers)
+    resp = await client.get(f"/api/v1/orders/{order['order_no']}", headers=headers)
     assert resp.json()["data"]["status"] == "cancelled"
     assert await _sku_stock(client, sku["id"]) == stock_before
 

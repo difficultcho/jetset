@@ -69,7 +69,7 @@ Page({
       await app.refreshCartCount();
       app.globalData.pendingOrder = null;
       app.globalData.pickedAddrId = null;
-      wx.redirectTo({ url: '/pages/payment/payment?id=' + order.id });
+      wx.redirectTo({ url: '/pages/payment/payment?id=' + order.order_no });
     } catch (e) {
       const msg = (e && e.message) || '提交失败';
       if (msg === '中国境内未引进，请联系客服') {

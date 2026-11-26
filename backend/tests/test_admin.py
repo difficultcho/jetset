@@ -195,7 +195,7 @@ async def test_ship_flow(client):
     await client.post("/api/v1/payments/mock/confirm", json={"order_no": order["order_no"]})
 
     # 未发货前不能确认收货，也不能由后台标完成
-    resp = await client.post(f"/api/v1/orders/{order['id']}/confirm", headers=user_h)
+    resp = await client.post(f"/api/v1/orders/{order['order_no']}/confirm", headers=user_h)
     assert resp.status_code == 400
     resp = await client.post(f"/api/admin/orders/{order['id']}/complete", headers=admin_h)
     assert resp.status_code == 400
@@ -211,11 +211,11 @@ async def test_ship_flow(client):
     assert resp.status_code == 400
 
     # C 端订单详情能看到物流
-    detail = (await client.get(f"/api/v1/orders/{order['id']}", headers=user_h)).json()["data"]
+    detail = (await client.get(f"/api/v1/orders/{order['order_no']}", headers=user_h)).json()["data"]
     assert detail["shipment"]["tracking_no"] == "SF123456"
 
     # 用户确认收货 → 已完成（购买周期在这里结束，没有评价环节）
-    resp = await client.post(f"/api/v1/orders/{order['id']}/confirm", headers=user_h)
+    resp = await client.post(f"/api/v1/orders/{order['order_no']}/confirm", headers=user_h)
     assert resp.json()["data"]["status"] == "completed"
 
     # 另一单用户不确认，运维手动标完成

@@ -120,7 +120,7 @@ async def test_cancel_order_releases_coupon(client):
         "items": [{"sku_id": sku["id"], "qty": 1}],
         "address_id": addr_id, "user_coupon_id": uc["id"]})).json()["data"]
 
-    await client.post(f"/api/v1/orders/{order['id']}/cancel", headers=h)
+    await client.post(f"/api/v1/orders/{order['order_no']}/cancel", headers=h)
 
     mine = (await client.get("/api/v1/me/coupons", headers=h)).json()["data"]
     assert next(x for x in mine if x["id"] == uc["id"])["status"] == "unused"

@@ -169,7 +169,7 @@ async def test_real_ship_rolls_back_when_upload_fails_and_commits_when_it_succee
     )
     assert resp.status_code == 200, resp.text
     assert resp.json()["data"]["status"] == "pending_receipt"
-    detail = (await client.get(f"/api/v1/orders/{order['id']}", headers=user_h)).json()["data"]
+    detail = (await client.get(f"/api/v1/orders/{order['order_no']}", headers=user_h)).json()["data"]
     assert detail["shipment"]["company"] == "顺丰速运"
     assert detail["shipment"]["tracking_no"] == "SF998877"
     assert calls["n"] == 2

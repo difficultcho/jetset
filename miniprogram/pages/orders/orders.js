@@ -27,12 +27,12 @@ Page({
   },
 
   pickSub(e) { this.setData({ si: e.currentTarget.dataset.i }, () => this.fetch()); },
-  goDetail(e) { wx.navigateTo({ url: '/pages/order-detail/order-detail?id=' + e.currentTarget.dataset.id }); },
+  goDetail(e) { wx.navigateTo({ url: '/pages/order-detail/order-detail?id=' + e.currentTarget.dataset.no }); },
 
   async confirmReceipt(e) {
     if (this._waitConfirm) return;
-    const id = e.currentTarget.dataset.id;
-    const order = (this.data.list || []).find((row) => String(row.id) === String(id));
+    const orderNo = e.currentTarget.dataset.no;
+    const order = (this.data.list || []).find((row) => row.orderNo === orderNo);
     if (!order) return;
     this._waitConfirm = true;
     try {

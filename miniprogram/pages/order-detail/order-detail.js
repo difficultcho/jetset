@@ -15,8 +15,7 @@ Page({
   async load() {
     try {
       const raw = await api.orderDetail(this.id);
-      // 微信订单入口带来的是商品订单号。加载后改回数字编号，支付和取消沿用原来的地址。
-      this.id = raw.id;
+      this.id = raw.order_no;
       const order = toOrder(raw);
       order.payText = fmt(raw.pay_amount);
       this.setData({

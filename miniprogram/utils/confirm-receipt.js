@@ -9,7 +9,7 @@ function cancelError() {
 
 function confirmOrder(order) {
   if (order && order.wechatReceipt) {
-    return openConfirm(order.wechatReceipt).then(() => api.orderConfirm(order.id));
+    return openConfirm(order.wechatReceipt).then(() => api.orderConfirm(order.orderNo));
   }
   return new Promise((resolve, reject) => {
     wx.showModal({
@@ -20,7 +20,7 @@ function confirmOrder(order) {
           reject(cancelError());
           return;
         }
-        api.orderConfirm(order.id).then(resolve, reject);
+        api.orderConfirm(order.orderNo).then(resolve, reject);
       },
       fail: () => reject(cancelError())
     });

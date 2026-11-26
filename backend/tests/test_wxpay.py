@@ -290,7 +290,7 @@ async def test_pay_route_passes_openid(client, monkeypatch):
 
     monkeypatch.setattr("app.api.orders.get_provider", lambda: Capture())
     headers, order = await _create_order(client, "wxpay-pass")
-    resp = await client.post(f"/api/v1/orders/{order['id']}/pay", headers=headers)
+    resp = await client.post(f"/api/v1/orders/{order['order_no']}/pay", headers=headers)
     assert resp.status_code == 200, resp.text
     assert captured["openid"] == "mock-wxpay-pass"
     assert resp.json()["data"]["provider"] == "mock"
@@ -381,7 +381,7 @@ async def test_notify_rejects_mismatch_and_closed_order(client, wx_settings, pri
     assert (await _saved(order["order_no"]))[0] == "pending_payment"
 
     headers, order = await _create_order(client, "wxpay-closed")
-    cancelled = await client.post(f"/api/v1/orders/{order['id']}/cancel", headers=headers)
+    cancelled = await client.post(f"/api/v1/orders/{order['order_no']}/cancel", headers=headers)
     assert cancelled.json()["data"]["status"] == "cancelled"
     resp = await _post_notify(
         client, private_key, _txn(order["order_no"], "mock-wxpay-closed", order["pay_amount"]),
@@ -553,7 +553,7 @@ async def test_refund_notify_finalizes_once_and_rejects_bad_money(client, wx_set
     )
     assert resp.status_code == 200
     assert (await _saved(closed["order_no"]))[0] == "refund_pending"
-    detail = (await client.get(f"/api/v1/orders/{closed['id']}", headers=headers)).json()["data"]
+    detail = (await client.get(f"/api/v1/orders/{closed['order_no']}", headers=headers)).json()["data"]
     assert detail["refund"]["status"] == "failed"
     assert detail["can_refund"] is False
     assert await _stock(client, closed) == held
