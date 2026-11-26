@@ -48,6 +48,21 @@ class PreviewOut(BaseModel):
     points_deduct: int = 0         # 积分抵扣金额（分）
 
 
+class RefundOut(BaseModel):
+    status: str
+    status_label: str
+    reason: str
+    reject_reason: str = ""
+    created_at: datetime
+    refunded_at: datetime | None = None
+
+
+class WechatReceiptOut(BaseModel):
+    transaction_id: str
+    merchant_id: str
+    merchant_trade_no: str
+
+
 class OrderOut(BaseModel):
     id: int
     order_no: str
@@ -66,3 +81,6 @@ class OrderOut(BaseModel):
     expire_at: datetime | None
     paid_at: datetime | None
     created_at: datetime
+    can_refund: bool = False
+    refund: RefundOut | None = None
+    wechat_receipt: WechatReceiptOut | None = None

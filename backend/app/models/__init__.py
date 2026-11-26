@@ -4,7 +4,7 @@ from app.models.cart import CartItem
 from app.models.catalog import Category, Sku, Spu, SpuImage
 from app.models.cms import Page
 from app.models.coupon import Coupon, UserCoupon
-from app.models.order import Order, OrderItem, OrderStatus, Payment, Shipment
+from app.models.order import Order, OrderItem, OrderStatus, Payment, Refund, Shipment
 from app.models.points import PointsLog
 from app.models.series import Series
 from app.models.shop import ShopMenu
@@ -23,6 +23,7 @@ __all__ = [
     "OrderItem",
     "OrderStatus",
     "Payment",
+    "Refund",
     "PointsLog",
     "Series",
     "Shipment",

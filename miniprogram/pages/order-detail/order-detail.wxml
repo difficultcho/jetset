@@ -33,6 +33,11 @@
           <view class="ic-copy" bindtap="copyTrack" />
         </view>
       </view>
+      <view wx:if="{{order.refund}}" class="way-row">
+        <text>退款</text>
+        <text class="way-val">{{order.refund.statusLabel}}</text>
+      </view>
+      <view wx:if="{{order.refund && order.refund.rejectReason}}" class="invoice">拒绝原因：{{order.refund.rejectReason}}</view>
       <view class="invoice">如需开发票请联系在线客服</view>
     </view>
 

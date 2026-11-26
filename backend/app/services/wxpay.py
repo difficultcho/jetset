@@ -28,11 +28,15 @@ logger = logging.getLogger(__name__)
 
 JSAPI_PATH = "/v3/pay/transactions/jsapi"
 JSAPI_URL = "https://api.mch.weixin.qq.com" + JSAPI_PATH
+REFUND_PATH = "/v3/refund/domestic/refunds"
+REFUND_URL = "https://api.mch.weixin.qq.com" + REFUND_PATH
 AUTH_SCHEME = "WECHATPAY2-SHA256-RSA2048"
 SKEW_SECONDS = 300
 _ORDER_NO = re.compile(r"[0-9A-Za-z_\-|*]{6,32}")
+_REFUND_NO = re.compile(r"[0-9A-Za-z_\-|*]{6,64}")
 _PREPAY_ID = re.compile(r"[A-Za-z0-9_\-]{10,64}")
 _WECHAT_CODE = re.compile(r"[A-Z0-9_]{1,32}")
+_REFUND_STATUS = {"SUCCESS", "PROCESSING", "CLOSED", "ABNORMAL"}
 
 # 只映射已知错误码。微信原文可能带请求细节，不回给前端。
 _WECHAT_ERRORS = {
@@ -43,6 +47,19 @@ _WECHAT_ERRORS = {
     "NO_AUTH": "微信支付权限未开通",
     "MCH_NOT_EXISTS": "微信支付商户号无效",
     "SIGN_ERROR": "微信支付签名失败",
+}
+_REFUND_ERRORS = {
+    "NOT_ENOUGH": "微信账户余额不足，无法退款",
+    "RESOURCE_NOT_EXISTS": "微信侧找不到该支付单",
+    "ORDER_NOT_EXIST": "微信侧找不到该支付单",
+    "FREQUENCY_LIMITED": "退款请求过于频繁，请稍后重试",
+    "USER_ACCOUNT_ABNORMAL": "用户账户异常，无法原路退款",
+    "INVALID_REQUEST": "退款请求无效",
+    "PARAM_ERROR": "退款请求无效",
+    "SYSTEM_ERROR": "微信退款暂不可用，请稍后重试",
+    "SIGN_ERROR": "微信支付签名失败",
+    "NO_AUTH": "微信支付退款权限未开通",
+    "MCH_NOT_EXISTS": "微信支付商户号无效",
 }
 
 
@@ -87,6 +104,14 @@ def _clip_utf8(text: str, limit: int) -> str:
     if len(raw) <= limit:
         return text
     return raw[:limit].decode("utf-8", errors="ignore")
+
+
+def refund_notify_url(notify_url: str) -> str:
+    """支付回调是 …/notify，退款回调换成同目录的 …/refund-notify。不新增环境变量。"""
+    base = (notify_url or "").strip().rstrip("/")
+    if not base.startswith("https://") or not base.endswith("/notify"):
+        raise BizError("微信支付未配置完整", http_status=503)
+    return base[:-len("notify")] + "refund-notify"
 
 
 def description_for(order) -> str:
@@ -259,7 +284,11 @@ class WxPayClient:
             raise BizError("微信支付暂不可用，请稍后重试", http_status=502) from None
 
         if resp.status_code < 200 or resp.status_code >= 300:
-            raise BizError(_wechat_error(resp), http_status=502)
+            raise BizError(
+                _wechat_error(resp, log_name="jsapi", mapping=_WECHAT_ERRORS,
+                              fallback="微信支付下单失败，请稍后重试"),
+                http_status=502,
+            )
         _verify_response(self.public_key, self.public_key_id, resp)
         try:
             data = json.loads(resp.content)
@@ -282,8 +311,70 @@ class WxPayClient:
             "paySign": pay_sign,
         }
 
+    async def create_refund(self, *, out_trade_no: str, out_refund_no: str,
+                            amount: int, reason: str) -> dict:
+        """申请原路退款。只返回状态和微信退款单号，不把微信报文交出去。"""
+        if not isinstance(amount, int) or amount < 1:
+            raise BizError("退款金额无效")
+        if not _ORDER_NO.fullmatch(out_trade_no or ""):
+            raise BizError("订单号无法用于微信支付")
+        if not _REFUND_NO.fullmatch(out_refund_no or ""):
+            raise BizError("退款单号无效")
+        payload = {
+            "out_trade_no": out_trade_no,
+            "out_refund_no": out_refund_no,
+            "notify_url": refund_notify_url(self.notify_url),
+            "amount": {"refund": amount, "total": amount, "currency": "CNY"},
+        }
+        text = (reason or "").strip()[:80]
+        if text:
+            payload["reason"] = text
+        body = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        authorization, _, _ = _authorization(
+            self.mchid, self.cert_serial, self.private_key, "POST", REFUND_PATH, body,
+        )
+        headers = {
+            "Authorization": authorization,
+            "Accept": "application/json",
+            "Accept-Encoding": "identity",
+            "Content-Type": "application/json",
+            "User-Agent": "jetset-shop/wxpay",
+        }
+        try:
+            if self._http is not None:
+                resp = await self._http.post(REFUND_URL, content=body, headers=headers)
+            else:
+                async with httpx.AsyncClient(timeout=10) as http:
+                    resp = await http.post(REFUND_URL, content=body, headers=headers)
+        except httpx.HTTPError:
+            raise BizError("微信退款暂不可用，请稍后重试", http_status=502) from None
+        if resp.status_code < 200 or resp.status_code >= 300:
+            raise BizError(
+                _wechat_error(resp, log_name="refund", mapping=_REFUND_ERRORS,
+                              fallback="微信退款失败，请稍后重试"),
+                http_status=502,
+            )
+        _verify_response(self.public_key, self.public_key_id, resp)
+        try:
+            data = json.loads(resp.content)
+        except json.JSONDecodeError:
+            raise BizError("微信退款失败，请稍后重试", http_status=502) from None
+        if not isinstance(data, dict):
+            raise BizError("微信退款失败，请稍后重试", http_status=502)
+        status = data.get("status")
+        amount_obj = data.get("amount")
+        if (status not in _REFUND_STATUS or data.get("out_refund_no") != out_refund_no
+                or not isinstance(amount_obj, dict)
+                or amount_obj.get("refund") != amount or amount_obj.get("total") != amount
+                or amount_obj.get("currency") not in (None, "CNY")):
+            raise BizError("微信退款失败，请稍后重试", http_status=502)
+        refund_id = data.get("refund_id")
+        if not isinstance(refund_id, str) or not refund_id or len(refund_id) > 64:
+            refund_id = ""
+        return {"status": status, "refund_id": refund_id}
 
-def _wechat_error(resp: httpx.Response) -> str:
+
+def _wechat_error(resp: httpx.Response, *, log_name: str, mapping: dict[str, str], fallback: str) -> str:
     code = ""
     try:
         data = json.loads(resp.content)
@@ -293,8 +384,8 @@ def _wechat_error(resp: httpx.Response) -> str:
         raw = data.get("code")
         if isinstance(raw, str) and _WECHAT_CODE.fullmatch(raw):
             code = raw
-    logger.warning("wxpay jsapi http %s code %s", resp.status_code, code or "-")
-    return _WECHAT_ERRORS.get(code, "微信支付下单失败，请稍后重试")
+    logger.warning("wxpay %s http %s code %s", log_name, resp.status_code, code or "-")
+    return mapping.get(code, fallback)
 
 
 def _verify_response(public_key, public_key_id: str, resp: httpx.Response) -> None:

@@ -1,11 +1,15 @@
 const api = require('../../utils/api.js');
+const { confirmOrder } = require('../../utils/confirm-receipt.js');
 const { toOrder, fmt, parseUtcMs } = require('../../utils/mapper.js');
 
 Page({
   data: { order: null, countdown: '', pending: false, awaiting: false, confirming: false },
 
   onLoad(opts) { this.id = opts.id; },
-  onShow() { this.load(); },
+  onShow() {
+    if (this._waitConfirm) return;
+    this.load();
+  },
   onUnload() { clearInterval(this.iv); },
 
   async load() {
@@ -51,23 +55,18 @@ Page({
   goCancel() { wx.navigateTo({ url: '/pages/cancel/cancel?id=' + this.id }); },
   goPay() { wx.navigateTo({ url: '/pages/payment/payment?id=' + this.id }); },
 
-  confirmReceipt() {
-    if (this.data.confirming) return;
-    wx.showModal({
-      title: '确认收货',
-      content: '确认已收到商品？',
-      success: async (r) => {
-        if (!r.confirm) return;
-        this.setData({ confirming: true });
-        try {
-          await api.orderConfirm(this.id);
-          wx.showToast({ title: '已确认收货', icon: 'none' });
-          this.load();
-        } catch (err) {
-          wx.showToast({ title: (err && err.message) || '确认失败', icon: 'none' });
-          this.setData({ confirming: false });
-        }
-      }
-    });
+  async confirmReceipt() {
+    if (this._waitConfirm || !this.data.order) return;
+    this._waitConfirm = true;
+    this.setData({ confirming: true });
+    try {
+      await confirmOrder(this.data.order);
+      wx.showToast({ title: '已确认收货', icon: 'none' });
+    } catch (err) {
+      if (!(err && err.cancel)) wx.showToast({ title: (err && err.message) || '确认失败', icon: 'none' });
+    } finally {
+      this._waitConfirm = false;
+      this.load();
+    }
   }
 });

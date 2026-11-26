@@ -94,6 +94,11 @@ class PageIn(BaseModel):
 class ShipReq(BaseModel):
     company: str = Field(min_length=1, max_length=32)
     tracking_no: str = Field(min_length=1, max_length=64)
+    express_code: str = Field(default="", max_length=16)
+
+
+class RefundReq(BaseModel):
+    reason: str = Field(default="", max_length=80)
 
 
 class ReviewReq(BaseModel):

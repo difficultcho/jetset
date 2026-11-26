@@ -1,4 +1,5 @@
 const api = require('../../utils/api.js');
+const { confirmOrder } = require('../../utils/confirm-receipt.js');
 const { toOrder } = require('../../utils/mapper.js');
 
 const SUBS = [
@@ -11,13 +12,16 @@ const SUBS = [
 Page({
   data: { subs: SUBS, si: 0, list: [], loaded: false },
 
-  onShow() { this.fetch(); },
+  onShow() {
+    if (this._waitConfirm) return;
+    this.fetch();
+  },
 
   async fetch() {
     const sub = SUBS[this.data.si];
     try {
-      if (sub.status === '__after') { this.setData({ list: [], loaded: true }); return; }
-      const page = await api.orders(sub.status);
+      const status = sub.status === '__after' ? 'after_sale' : sub.status;
+      const page = await api.orders(status);
       this.setData({ list: page.items.map(toOrder), loaded: true });
     } catch (e) { /* 静默 */ }
   },
@@ -25,21 +29,20 @@ Page({
   pickSub(e) { this.setData({ si: e.currentTarget.dataset.i }, () => this.fetch()); },
   goDetail(e) { wx.navigateTo({ url: '/pages/order-detail/order-detail?id=' + e.currentTarget.dataset.id }); },
 
-  confirmReceipt(e) {
+  async confirmReceipt(e) {
+    if (this._waitConfirm) return;
     const id = e.currentTarget.dataset.id;
-    wx.showModal({
-      title: '确认收货',
-      content: '确认已收到商品？',
-      success: async (r) => {
-        if (!r.confirm) return;
-        try {
-          await api.orderConfirm(id);
-          wx.showToast({ title: '已确认收货', icon: 'none' });
-          this.fetch();
-        } catch (err) {
-          wx.showToast({ title: (err && err.message) || '确认失败', icon: 'none' });
-        }
-      }
-    });
+    const order = (this.data.list || []).find((row) => String(row.id) === String(id));
+    if (!order) return;
+    this._waitConfirm = true;
+    try {
+      await confirmOrder(order);
+      wx.showToast({ title: '已确认收货', icon: 'none' });
+    } catch (err) {
+      if (!(err && err.cancel)) wx.showToast({ title: (err && err.message) || '确认失败', icon: 'none' });
+    } finally {
+      this._waitConfirm = false;
+      this.fetch();
+    }
   }
 });

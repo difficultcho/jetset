@@ -1,5 +1,6 @@
 const { ensureLogin } = require('./utils/request.js');
 const api = require('./utils/api.js');
+const { takeConfirmResult } = require('./utils/wechat-receipt.js');
 
 App({
   globalData: {
@@ -7,7 +8,12 @@ App({
     navBarHeight: 44,
     userInfo: null,     // 服务端 /me
     cartCount: 0,       // 购物袋数量缓存（FAB 角标）
-    pendingOrder: null  // 下单中转
+    pendingOrder: null, // 下单中转
+    wechatConfirmWait: null
+  },
+
+  onShow(options) {
+    takeConfirmResult(options);
   },
 
   onLaunch() {

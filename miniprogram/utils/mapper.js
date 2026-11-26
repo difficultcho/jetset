@@ -185,6 +185,14 @@ function toOrder(o) {
     createdAt: (o.created_at || '').replace('T', ' ').slice(0, 19),
     expireAt: o.expire_at,
     shipment: o.shipment || null,
+    canRefund: !!o.can_refund,
+    wechatReceipt: o.wechat_receipt || null,
+    refund: o.refund ? {
+      status: o.refund.status,
+      statusLabel: o.refund.status_label,
+      reason: o.refund.reason || '',
+      rejectReason: o.refund.reject_reason || ''
+    } : null,
     address: {
       name: (o.address && o.address.name) || '',
       phone: (o.address && o.address.phone) || '',

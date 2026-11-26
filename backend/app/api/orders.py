@@ -11,6 +11,7 @@ from app.models.order import Order, OrderStatus
 from app.schemas.common import Page, Resp
 from app.schemas.order import OrderCreateReq, OrderOut, PreviewOut, PreviewReq
 from app.services import orders as svc
+from app.services import shipping
 from app.services import wechat
 from app.services.payment import get_provider
 from app.utils import utcnow
@@ -18,10 +19,21 @@ from app.utils import utcnow
 router = APIRouter()
 
 
+async def _present(session, orders: list[Order]) -> list[dict]:
+    receipts = await shipping.wechat_receipts(session, orders)
+    return [svc.order_to_dict(order, receipts.get(order.id)) for order in orders]
+
+
+async def _present_one(session, order: Order) -> dict:
+    return (await _present(session, [order]))[0]
+
+
 async def _get_owned(session, user_id: int, order_id: int) -> Order:
     order = (
         await session.execute(
-            select(Order).options(selectinload(Order.items)).where(Order.id == order_id)
+            select(Order).options(
+                selectinload(Order.items), selectinload(Order.refunds),
+            ).where(Order.id == order_id)
         )
     ).scalar_one_or_none()
     if order is None or order.user_id != user_id:
@@ -54,7 +66,7 @@ async def create_order(req: OrderCreateReq, user: CurrentUser, session: DB, requ
             )
         except Exception:
             pass
-    return Resp(data=svc.order_to_dict(await _get_owned(session, user.id, order.id)))
+    return Resp(data=await _present_one(session, await _get_owned(session, user.id, order.id)))
 
 
 @router.get("/orders", response_model=Resp[Page[OrderOut]])
@@ -66,7 +78,9 @@ async def list_orders(
     page_size: int = Query(default=10, ge=1, le=50),
 ):
     stmt = select(Order).where(Order.user_id == user.id)
-    if status:
+    if status == "after_sale":
+        stmt = stmt.where(Order.status.in_((OrderStatus.REFUND_PENDING, OrderStatus.REFUNDED)))
+    elif status:
         if status not in OrderStatus.LABELS:
             raise BizError("无效的订单状态")
         stmt = stmt.where(Order.status == status)
@@ -80,14 +94,14 @@ async def list_orders(
         )
     ).scalars().all()
     return Resp(data=Page(
-        items=[svc.order_to_dict(o) for o in rows],
+        items=await _present(session, list(rows)),
         total=total, page=page, page_size=page_size,
     ))
 
 
 @router.get("/orders/{order_id}", response_model=Resp[OrderOut])
 async def order_detail(order_id: int, user: CurrentUser, session: DB):
-    return Resp(data=svc.order_to_dict(await _get_owned(session, user.id, order_id)))
+    return Resp(data=await _present_one(session, await _get_owned(session, user.id, order_id)))
 
 
 @router.post("/orders/{order_id}/cancel", response_model=Resp[OrderOut])
@@ -95,7 +109,7 @@ async def cancel_order(order_id: int, user: CurrentUser, session: DB):
     order = await _get_owned(session, user.id, order_id)
     await svc.cancel_order(session, order)
     await session.commit()
-    return Resp(data=svc.order_to_dict(order))
+    return Resp(data=await _present_one(session, order))
 
 
 @router.post("/orders/{order_id}/confirm", response_model=Resp[OrderOut])
@@ -103,7 +117,7 @@ async def confirm_receipt(order_id: int, user: CurrentUser, session: DB):
     order = await _get_owned(session, user.id, order_id)
     await svc.confirm_receipt(session, order)
     await session.commit()
-    return Resp(data=svc.order_to_dict(order))
+    return Resp(data=await _present_one(session, order))
 
 
 @router.post("/orders/{order_id}/pay", response_model=Resp[dict])

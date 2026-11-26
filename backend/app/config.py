@@ -30,6 +30,8 @@ class Settings(BaseSettings):
 
     wechat_appid: str = ""
     wechat_secret: str = ""
+    # 小程序消息推送 Token。明文模式下用来验签结算消息。不配则不接收。
+    wechat_msg_token: str = ""
 
     # 开发期脚手架总开关，管三件事：假登录（code 直接映射 openid）、假支付、
     # 跳过内容安全检测。这三者必须同时开关——拆成多个开关只会上线时漏掉某一个。

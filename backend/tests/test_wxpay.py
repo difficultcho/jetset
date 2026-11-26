@@ -17,7 +17,7 @@ from sqlalchemy import select
 from app.config import settings
 from app.db import SessionFactory
 from app.errors import BizError
-from app.models.order import Order, Payment
+from app.models.order import Order, Payment, Refund
 from app.services.payment import WechatPayProvider
 from app.services.wxpay import WxPayClient
 from app.utils import utcnow
@@ -392,3 +392,175 @@ async def test_notify_rejects_mismatch_and_closed_order(client, wx_settings, pri
     status, pays = await _saved(order["order_no"])
     assert status == "cancelled"
     assert pays == []
+
+
+def _signed_json(private_key, payload: dict) -> tuple[bytes, dict]:
+    body = json.dumps(payload, separators=(",", ":")).encode()
+    ts = str(int(time.time()))
+    nonce = "refund-nonce"
+    message = f"{ts}\n{nonce}\n".encode() + body + b"\n"
+    return body, {
+        "Content-Type": "application/json",
+        "Wechatpay-Timestamp": ts,
+        "Wechatpay-Nonce": nonce,
+        "Wechatpay-Signature": _rsa_sign(private_key, message),
+        "Wechatpay-Serial": PUBID,
+    }
+
+
+async def _stock(client, order: dict) -> int:
+    item = order["items"][0]
+    detail = (await client.get(f"/api/v1/products/{item['spu_id']}")).json()["data"]
+    return next(row["stock"] for row in detail["skus"] if row["id"] == item["sku_id"])
+
+
+async def test_create_refund_is_signed_and_hides_wechat_body(private_key):
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["path"] = request.url.path
+        seen["body"] = request.content
+        seen["auth"] = request.headers["Authorization"]
+        seen["accept_encoding"] = request.headers.get("Accept-Encoding")
+        payload = json.loads(request.content)
+        body, headers = _signed_json(private_key, {
+            "refund_id": "5030000000000000000000000001",
+            "out_refund_no": payload["out_refund_no"],
+            "out_trade_no": payload["out_trade_no"],
+            "status": "PROCESSING",
+            "amount": payload["amount"],
+            "user_received_account": "SECRET_LEAK",
+        })
+        return httpx.Response(200, content=body, headers=headers)
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http:
+        result = await _client(private_key, http).create_refund(
+            out_trade_no="202611241200000009",
+            out_refund_no="R202611241200000009",
+            amount=239900,
+            reason="想" * 90,
+        )
+
+    assert seen["path"] == "/v3/refund/domestic/refunds"
+    assert seen["accept_encoding"] == "identity"
+    payload = json.loads(seen["body"])
+    assert payload["notify_url"] == "https://example.com/jetset/api/v1/payments/wechat/refund-notify"
+    assert payload["amount"] == {"refund": 239900, "total": 239900, "currency": "CNY"}
+    assert payload["reason"] == "想" * 80
+    assert payload["out_trade_no"] == "202611241200000009"
+    token = seen["auth"].split(" ", 1)[1]
+    assert ", " not in token
+    fields = dict(re.findall(r'([a-z_]+)="([^"]*)"', token))
+    message = (
+        f"POST\n/v3/refund/domestic/refunds\n{fields['timestamp']}\n{fields['nonce_str']}\n".encode()
+        + seen["body"] + b"\n"
+    )
+    private_key.public_key().verify(
+        base64.b64decode(fields["signature"]), message, padding.PKCS1v15(), hashes.SHA256(),
+    )
+    assert result == {"status": "PROCESSING", "refund_id": "5030000000000000000000000001"}
+    assert "SECRET_LEAK" not in str(result)
+
+    def leak(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(400, content=b'{"code":"NOT_ENOUGH","message":"SECRET_LEAK"}')
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(leak)) as http:
+        with pytest.raises(BizError) as raised:
+            await _client(private_key, http).create_refund(
+                out_trade_no="202611241200000009",
+                out_refund_no="R202611241200000009",
+                amount=100,
+                reason="退款",
+            )
+    assert raised.value.message == "微信账户余额不足，无法退款"
+    assert "SECRET_LEAK" not in raised.value.message
+
+
+async def _seed_processing_refund(order: dict) -> None:
+    async with SessionFactory() as session:
+        row = (await session.execute(select(Order).where(Order.id == order["id"]))).scalar_one()
+        row.status = "refund_pending"
+        session.add(Refund(
+            order_id=row.id,
+            out_refund_no="R" + row.order_no,
+            reason="客服确认退款",
+            status="processing",
+            previous_status="pending_shipment",
+            amount=row.pay_amount,
+        ))
+        await session.commit()
+
+
+async def test_refund_notify_finalizes_once_and_rejects_bad_money(client, wx_settings, private_key):
+    headers, order = await _create_order(client, "wxpay-refund")
+    await client.post("/api/v1/payments/mock/confirm", json={"order_no": order["order_no"]})
+    stock_paid = await _stock(client, order)
+    await _seed_processing_refund(order)
+    assert (await _saved(order["order_no"]))[0] == "refund_pending"
+    assert await _stock(client, order) == stock_paid
+
+    txn = {
+        "mchid": MCHID,
+        "out_trade_no": order["order_no"],
+        "out_refund_no": "R" + order["order_no"],
+        "refund_id": "5030000000000000000000000002",
+        "refund_status": "SUCCESS",
+        "amount": {"total": order["pay_amount"], "refund": order["pay_amount"], "currency": "CNY"},
+        "user_received_account": "SECRET_LEAK",
+    }
+    bad_amount = dict(txn, amount={"total": order["pay_amount"], "refund": 1, "currency": "CNY"})
+    resp = await client.post(
+        "/api/v1/payments/wechat/refund-notify",
+        content=_notify_bytes(bad_amount, "refund-bad-amt"),
+        headers=_notify_headers(private_key, _notify_bytes(bad_amount, "refund-bad-amt")),
+    )
+    assert resp.status_code == 400
+    assert resp.json()["message"] == "金额不匹配"
+    assert await _stock(client, order) == stock_paid
+    assert (await _saved(order["order_no"]))[0] == "refund_pending"
+
+    body = _notify_bytes(txn, "refund-ok")
+    resp = await client.post(
+        "/api/v1/payments/wechat/refund-notify",
+        content=body, headers=_notify_headers(private_key, body),
+    )
+    assert resp.status_code == 200
+    assert resp.json() == {"code": "SUCCESS", "message": "成功"}
+    assert "SECRET_LEAK" not in resp.text
+    status, pays = await _saved(order["order_no"])
+    assert status == "refunded"
+    assert pays[0][3] == "refunded"
+    assert await _stock(client, order) == stock_paid + 1
+
+    replay = _notify_bytes(txn, "refund-replay")
+    resp = await client.post(
+        "/api/v1/payments/wechat/refund-notify",
+        content=replay, headers=_notify_headers(private_key, replay),
+    )
+    assert resp.status_code == 200
+    assert await _stock(client, order) == stock_paid + 1
+
+    headers, closed = await _create_order(client, "wxpay-refund-closed")
+    await client.post("/api/v1/payments/mock/confirm", json={"order_no": closed["order_no"]})
+    await _seed_processing_refund(closed)
+    held = await _stock(client, closed)
+    closed_txn = dict(txn, out_trade_no=closed["order_no"], out_refund_no="R" + closed["order_no"],
+                      refund_status="CLOSED")
+    body = _notify_bytes(closed_txn, "refund-closed")
+    resp = await client.post(
+        "/api/v1/payments/wechat/refund-notify",
+        content=body, headers=_notify_headers(private_key, body),
+    )
+    assert resp.status_code == 200
+    assert (await _saved(closed["order_no"]))[0] == "refund_pending"
+    detail = (await client.get(f"/api/v1/orders/{closed['id']}", headers=headers)).json()["data"]
+    assert detail["refund"]["status"] == "failed"
+    assert detail["can_refund"] is False
+    assert await _stock(client, closed) == held
+
+    bogus = _notify_bytes(txn, "refund-bogus")
+    bad_headers = _notify_headers(private_key, bogus, serial="OTHER")
+    resp = await client.post(
+        "/api/v1/payments/wechat/refund-notify", content=bogus, headers=bad_headers,
+    )
+    assert resp.status_code == 401

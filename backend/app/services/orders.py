@@ -13,6 +13,8 @@ from app.models.user import User
 from app.schemas.order import OrderLineReq
 from app.services import coupons as coupon_svc
 from app.services import points as points_svc
+from app.services import shipping
+from app.services.refunds import refund_fields
 from app.utils import gen_order_no, utcnow
 
 
@@ -217,8 +219,15 @@ def _finish_order(order: Order, now) -> None:
 
 
 async def confirm_receipt(session: AsyncSession, order: Order) -> None:
+    """用户确认收货。正式环境先核对微信已确认，mock 直接完成。已完成的再点一次也成功。"""
+    if order.status == OrderStatus.COMPLETED:
+        return
     if order.status != OrderStatus.PENDING_RECEIPT:
         raise BizError("当前状态不可确认收货")
+    if not settings.mock_mode:
+        state = await shipping.fetch_order_state(await shipping.wechat_transaction_id(session, order))
+        if state not in shipping.CONFIRMED_STATES:
+            raise BizError("请先在微信确认收货")
     _finish_order(order, utcnow())
 
 
@@ -246,7 +255,7 @@ async def cancel_expired_orders(session: AsyncSession) -> int:
     return len(rows)
 
 
-def order_to_dict(order: Order) -> dict:
+def order_to_dict(order: Order, wechat_receipt: dict | None = None) -> dict:
     return {
         "id": order.id,
         "order_no": order.order_no,
@@ -277,4 +286,6 @@ def order_to_dict(order: Order) -> dict:
         "expire_at": order.expire_at,
         "paid_at": order.paid_at,
         "created_at": order.created_at,
+        "wechat_receipt": wechat_receipt,
+        **refund_fields(order),
     }

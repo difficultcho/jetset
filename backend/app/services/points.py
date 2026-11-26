@@ -1,3 +1,5 @@
+import logging
+
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -6,10 +8,13 @@ from app.errors import BizError
 from app.models.points import PointsLog
 from app.models.user import User
 
+logger = logging.getLogger(__name__)
+
 REASON_LABELS = {
     "order_reward": "购物奖励",
     "order_deduct": "下单抵扣",
     "order_refund": "订单退回",
+    "order_reward_revoke": "退款扣回奖励",
     "admin_adjust": "平台调整",
 }
 
@@ -57,6 +62,32 @@ async def deduct(session: AsyncSession, user_id: int, amount: int, reason: str,
         user_id=user_id, change=-amount, balance_after=await _balance(session, user_id),
         reason=reason, ref_id=ref_id, remark=remark,
     ))
+
+
+async def revoke_up_to(session: AsyncSession, user_id: int, amount: int, reason: str,
+                       ref_id: int | None = None, remark: str = "") -> int:
+    """扣回不超过当前余额的积分。余额不够也不报错，避免挡住已经答应的退款。"""
+    if amount <= 0:
+        return 0
+    for _ in range(3):
+        balance = await _balance(session, user_id)
+        take = min(balance, amount)
+        if take <= 0:
+            return 0
+        res = await session.execute(
+            update(User)
+            .where(User.id == user_id, User.points >= take)
+            .values(points=User.points - take)
+        )
+        if res.rowcount == 0:
+            continue
+        session.add(PointsLog(
+            user_id=user_id, change=-take, balance_after=await _balance(session, user_id),
+            reason=reason, ref_id=ref_id, remark=remark,
+        ))
+        return take
+    logger.warning("points revoke skipped user %s amount %s", user_id, amount)
+    return 0
 
 
 async def list_logs(session: AsyncSession, user_id: int, limit: int = 100) -> list[PointsLog]:

@@ -14,6 +14,8 @@ class OrderStatus:
     PENDING_REVIEW = "pending_review"  # 已停用。旧单由定时任务收成已完成。
     COMPLETED = "completed"
     CANCELLED = "cancelled"
+    REFUND_PENDING = "refund_pending"  # 已提交退款，钱还没到账
+    REFUNDED = "refunded"
 
     LABELS = {
         PENDING_PAYMENT: "待付款",
@@ -22,6 +24,8 @@ class OrderStatus:
         PENDING_REVIEW: "待评价",
         COMPLETED: "已完成",
         CANCELLED: "已取消",
+        REFUND_PENDING: "退款中",
+        REFUNDED: "已退款",
     }
 
 
@@ -48,6 +52,7 @@ class Order(Base):
 
     items: Mapped[list["OrderItem"]] = relationship(back_populates="order", lazy="selectin")
     shipment: Mapped["Shipment | None"] = relationship(lazy="selectin")
+    refunds: Mapped[list["Refund"]] = relationship(back_populates="order", lazy="selectin")
 
 
 class OrderItem(Base):
@@ -91,3 +96,25 @@ class Payment(Base):
     status: Mapped[str] = mapped_column(String(16), default="paid")  # created | paid | refunded
     paid_at: Mapped[datetime | None] = mapped_column(DateTime, default=None)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+class Refund(Base):
+    """整单退款。客服核验后由管理后台发起。失败时用同一退款单号重试。"""
+
+    __tablename__ = "refund"
+
+    id: Mapped[int] = mapped_column(BigIntPK, primary_key=True, autoincrement=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), index=True)
+    out_refund_no: Mapped[str] = mapped_column(String(64), unique=True)
+    reason: Mapped[str] = mapped_column(String(80), default="")
+    reject_reason: Mapped[str] = mapped_column(String(80), default="")
+    # pending 待提交 | processing 微信处理中 | success | rejected 旧数据 | failed
+    status: Mapped[str] = mapped_column(String(16), default="pending", index=True)
+    previous_status: Mapped[str] = mapped_column(String(32))  # 拒绝时退回这个订单状态
+    amount: Mapped[int] = mapped_column(Integer)  # 分，整单实付
+    wechat_refund_id: Mapped[str | None] = mapped_column(String(64), default=None)
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime, default=None)
+    refunded_at: Mapped[datetime | None] = mapped_column(DateTime, default=None)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+    order: Mapped[Order] = relationship(back_populates="refunds")

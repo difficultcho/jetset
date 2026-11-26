@@ -13,6 +13,7 @@ from app.models.order import Order, OrderStatus
 from app.models.user import User
 from app.schemas.common import Resp
 from app.services.orders import mark_order_paid
+from app.services.refunds import handle_notify as handle_refund_notify
 from app.services.wxpay import NotifyError, client_from_settings, parse_notify
 
 logger = logging.getLogger(__name__)
@@ -105,6 +106,35 @@ async def wechat_notify(request: Request, session: DB):
         return _fail(exc.http_status, exc.message)
     except Exception:
         logger.exception("wxpay notify failed")
+        await session.rollback()
+        return _fail(500, "处理失败")
+    return JSONResponse(status_code=200, content={"code": "SUCCESS", "message": "成功"})
+
+
+async def _apply_refund_notify(session, raw: bytes, headers) -> None:
+    try:
+        wx = client_from_settings()
+    except BizError:
+        raise NotifyError(503, "微信支付未配置") from None
+    data = parse_notify(
+        raw, headers,
+        public_key=wx.public_key, public_key_id=wx.public_key_id, apiv3_key=wx.apiv3_key,
+    )
+    await handle_refund_notify(session, data)
+
+
+@router.post("/payments/wechat/refund-notify")
+async def wechat_refund_notify(request: Request, session: DB):
+    """微信退款结果通知。没有用户登录态，成功必须是 HTTP 200 的 SUCCESS。"""
+    raw = await request.body()
+    try:
+        await _apply_refund_notify(session, raw, request.headers)
+        await session.commit()
+    except NotifyError as exc:
+        await session.rollback()
+        return _fail(exc.http_status, exc.message)
+    except Exception:
+        logger.exception("wxpay refund notify failed")
         await session.rollback()
         return _fail(500, "处理失败")
     return JSONResponse(status_code=200, content={"code": "SUCCESS", "message": "成功"})

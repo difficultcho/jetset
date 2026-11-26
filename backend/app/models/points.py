@@ -17,7 +17,7 @@ class PointsLog(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), index=True)
     change: Mapped[int] = mapped_column(Integer)          # 正为获得，负为消耗
     balance_after: Mapped[int] = mapped_column(Integer)   # 变动后余额
-    reason: Mapped[str] = mapped_column(String(32))       # order_reward/order_deduct/order_refund/admin_adjust
+    reason: Mapped[str] = mapped_column(String(32))       # order_reward/order_deduct/order_refund/order_reward_revoke/admin_adjust
     ref_id: Mapped[int | None] = mapped_column(BigInteger, default=None)  # 关联订单等
     remark: Mapped[str] = mapped_column(String(128), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
