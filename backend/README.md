@@ -44,6 +44,7 @@ docker compose exec api python -m app.seed        # 灌种子数据
 - **金额一律为整数「分」**（如 ¥2399 → 239900），前端展示时 `/100`
 - 统一响应包裹 `{ code, message, data }`，`code=0` 成功
 - 订单状态: `pending_payment / pending_shipment / pending_receipt / pending_review / completed / cancelled / refund_pending / refunded`，响应含中文 `status_label`
+- 小程序订单详情、支付、取消、确认收货同时接受数字编号和商品订单号（`order_no`，即微信支付的 `out_trade_no`）。管理端仍用数字编号
 - 退款由管理端在客服核验后整单原路发起。小程序没有自主退货。未发货的已支付订单、待收货、已完成都可以退，代码不锁 7 天；帮助文案写快递送达后 7 天、买家自费退回、查验后再退。经营税由会计处理
 - 正式环境的确认收货打开微信组件。服务器用 get_order 核对状态为确认收货或交易完成后，才把订单改为已完成。用户在微信里确认，或快递第 10 天自动确认，靠消息推送 `trade_manage_order_settlement` 收口。mock 仍直接确认。管理端「完成」只改本系统状态
 - 商品按 SPU/SKU 建模，加购/下单传 `sku_id`；下单用条件更新扣库存防超卖，取消、超时、退款成功都会回补

@@ -32,6 +32,38 @@ async def _sku_stock(client, sku_id: int) -> int:
     return next(s["stock"] for s in detail.json()["data"]["skus"] if s["id"] == sku_id)
 
 
+async def test_order_no_opens_detail_pay_and_cancel(client):
+    headers, sku, addr_id = await _prepare(client, "order-no-link")
+    created = (await client.post("/api/v1/orders", headers=headers, json={
+        "items": [{"sku_id": sku["id"], "qty": 1}], "address_id": addr_id,
+    })).json()["data"]
+    order_no = created["order_no"]
+
+    by_no = await client.get(f"/api/v1/orders/{order_no}", headers=headers)
+    assert by_no.status_code == 200, by_no.text
+    assert by_no.json()["data"]["id"] == created["id"]
+    assert by_no.json()["data"]["order_no"] == order_no
+
+    other = await login(client, "order-no-other")
+    hidden = await client.get(f"/api/v1/orders/{order_no}", headers=other)
+    assert hidden.status_code == 404
+
+    missing = await client.get("/api/v1/orders/202001010101019999", headers=headers)
+    assert missing.status_code == 404
+    bad = await client.get("/api/v1/orders/not-an-order", headers=headers)
+    assert bad.status_code == 404
+
+    paid = await client.post(f"/api/v1/orders/{order_no}/pay", headers=headers)
+    assert paid.status_code == 200, paid.text
+
+    second = (await client.post("/api/v1/orders", headers=headers, json={
+        "items": [{"sku_id": sku["id"], "qty": 1}], "address_id": addr_id,
+    })).json()["data"]
+    cancelled = await client.post(f"/api/v1/orders/{second['order_no']}/cancel", headers=headers)
+    assert cancelled.status_code == 200, cancelled.text
+    assert cancelled.json()["data"]["status"] == "cancelled"
+
+
 async def test_preview(client):
     headers, sku, _ = await _prepare(client, "order-preview")
     resp = await client.post("/api/v1/orders/preview", headers=headers,
